@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign Up — ScriptBridge</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23FF4D2E'/%3E%3Ctext x='16' y='23' font-family='Georgia,serif' font-size='20' font-weight='700' fill='white' text-anchor='middle'%3ES%3C/text%3E%3C/svg%3E">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300;1,9..40,400&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;0,9..144,700;1,9..144,300;1,9..144,500;1,9..144,700&family=Noto+Sans+SC:wght@300;400;500&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/common.css">
+
+  <style>
+    .signup-header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .signup-header h1 {
+      font-family: 'Fraunces', serif;
+      font-size: 32px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: var(--ink);
+    }
+
+    .signup-header p {
+      font-size: 16px;
+      color: var(--muted);
+    }
+
+    .form-divider {
+      text-align: center;
+      margin: 24px 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .role-selector {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .role-option {
+      flex: 1;
+      position: relative;
+    }
+
+    .role-option input {
+      display: none;
+    }
+
+    .role-option label {
+      display: block;
+      padding: 16px;
+      text-align: center;
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      cursor: pointer;
+      transition: all 0.2s;
+      background: var(--warm-white);
+      font-weight: 500;
+      margin-bottom: 0;
+    }
+
+    .role-option input:checked + label {
+      border-color: var(--coral);
+      background: rgba(255, 77, 46, 0.1);
+      color: var(--coral);
+      font-weight: 600;
+    }
+
+    .role-option label:hover {
+      border-color: var(--coral);
+    }
+
+    .signup-link {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 14px;
+    }
+
+    .signup-link a {
+      color: var(--coral);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .signup-link a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <!-- 导航栏 -->
+  <nav>
+    <a href="index.html" class="nav-logo">
+      <div class="nav-logo-mark">S</div>
+      <div>
+        <div class="nav-logo-text">ScriptBridge</div>
+      </div>
+    </a>
+    <div class="nav-right">
+      <a href="login.html" class="btn btn-outline">Already have an account?</a>
+    </div>
+  </nav>
+
+  <!-- 主页面 -->
+  <div class="page-wrapper">
+    <div class="auth-container">
+      <div class="signup-header">
+        <h1>Create Account</h1>
+        <p>Join ScriptBridge to share and discover scripts</p>
+      </div>
+
+      <div id="alert-container"></div>
+
+      <form id="signup-form">
+        <!-- 角色选择 -->
+        <div class="form-group">
+          <label>I am a...</label>
+          <div class="role-selector">
+            <div class="role-option">
+              <input type="radio" id="role-creator" name="role" value="creator" required>
+              <label for="role-creator">Script Creator</label>
+            </div>
+            <div class="role-option">
+              <input type="radio" id="role-buyer" name="role" value="buyer" required>
+              <label for="role-buyer">Buyer</label>
+            </div>
+          </div>
+        </div>
+
+        <!-- 邮箱 -->
+        <div class="form-group">
+          <label for="email">Email Address</label>
+          <input type="email" id="email" name="email" required placeholder="your@email.com">
+          <div class="form-error" id="email-error"></div>
+        </div>
+
+        <!-- 密码 -->
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" required placeholder="At least 8 characters">
+          <div class="form-error" id="password-error"></div>
+        </div>
+
+        <!-- 确认密码 -->
+        <div class="form-group">
+          <label for="confirm-password">Confirm Password</label>
+          <input type="password" id="confirm-password" name="confirm_password" required placeholder="Confirm your password">
+          <div class="form-error" id="confirm-error"></div>
+        </div>
+
+        <!-- 提交按钮 -->
+        <button type="submit" class="btn btn-primary" style="width: 100%;">
+          <span id="btn-text">Create Account</span>
+          <span id="btn-spinner" class="spinner" style="display: none;"></span>
+        </button>
+      </form>
+
+      <div class="signup-link">
+        Already have an account? <a href="login.html">Sign in</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Supabase SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <!-- 初始化 Supabase -->
+  <script src="js/supabase-client.js"></script>
+
+  <script>
+    const form = document.getElementById('signup-form');
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+    const confirmInput = document.getElementById('confirm-password');
+    const roleInputs = document.querySelectorAll('input[name="role"]');
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const btnText = document.getElementById('btn-text');
+    const btnSpinner = document.getElementById('btn-spinner');
+    const alertContainer = document.getElementById('alert-container');
+
+    // 表单验证
+    function validateForm() {
+      let isValid = true;
+
+      // 清空错误提示
+      document.getElementById('email-error').textContent = '';
+      document.getElementById('password-error').textContent = '';
+      document.getElementById('confirm-error').textContent = '';
+
+      // 检查邮箱
+      if (!emailInput.value) {
+        document.getElementById('email-error').textContent = 'Email is required';
+        isValid = false;
+      } else if (!emailInput.value.includes('@')) {
+        document.getElementById('email-error').textContent = 'Please enter a valid email';
+        isValid = false;
+      }
+
+      // 检查密码长度
+      if (!passwordInput.value) {
+        document.getElementById('password-error').textContent = 'Password is required';
+        isValid = false;
+      } else if (passwordInput.value.length < 8) {
+        document.getElementById('password-error').textContent = 'Password must be at least 8 characters';
+        isValid = false;
+      }
+
+      // 检查密码一致性
+      if (passwordInput.value !== confirmInput.value) {
+        document.getElementById('confirm-error').textContent = 'Passwords do not match';
+        isValid = false;
+      }
+
+      return isValid;
+    }
+
+    // 显示提示消息
+    function showAlert(message, type) {
+      alertContainer.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
+      window.scrollTo(0, 0);
+    }
+
+    // 处理表单提交
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      // 验证表单
+      if (!validateForm()) {
+        return;
+      }
+
+      // 禁用按钮并显示加载状态
+      submitBtn.disabled = true;
+      btnText.style.display = 'none';
+      btnSpinner.style.display = 'inline-block';
+
+      const email = emailInput.value.trim();
+      const password = passwordInput.value;
+      const role = document.querySelector('input[name="role"]:checked').value;
+
+      try {
+        // 第一步：使用 Supabase Auth 注册
+        const { data, error } = await window.supabase_client.auth.signUp({
+          email: email,
+          password: password,
+        });
+
+        if (error) {
+          throw new Error(error.message);
+        }
+
+        // 第二步：在 users 表中创建用户记录
+        const { user } = data;
+        if (user) {
+          const { error: insertError } = await window.supabase_client
+            .from('users')
+            .insert({
+              user_id: user.id,
+              email: email,
+              role: role,
+            });
+
+          if (insertError) {
+            throw new Error('Failed to create user profile: ' + insertError.message);
+          }
+        }
+
+        // 注册成功
+        showAlert('Account created successfully! Redirecting to login...', 'success');
+
+        // 2 秒后重定向到登录页
+        setTimeout(() => {
+          window.location.href = 'login.html';
+        }, 2000);
+
+      } catch (error) {
+        showAlert('Sign up failed: ' + error.message, 'error');
+        submitBtn.disabled = false;
+        btnText.style.display = 'inline';
+        btnSpinner.style.display = 'none';
+      }
+    });
+  </script>
+</body>
+</html>
