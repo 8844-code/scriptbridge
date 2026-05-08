@@ -12,6 +12,7 @@
 
   <link rel="stylesheet" href="css/common.css">
   <script src="js/theme.js" defer></script>
+  <script src="js/nav-mobile.js" defer></script>
 
   <style>
     .dashboard-wrapper {
@@ -180,7 +181,7 @@
 
     @media (max-width: 768px) {
       .dashboard-wrapper {
-        padding: 80px 20px 60px;
+        padding: 74px 14px 48px;
       }
 
       .dashboard-header h1 {
@@ -195,10 +196,50 @@
 
       .dashboard-grid {
         grid-template-columns: 1fr;
+        gap: 12px;
+      }
+
+      .action-card {
+        padding: 18px 14px;
+      }
+
+      .profile-section {
+        padding: 16px 14px;
+      }
+
+      .user-info {
+        align-items: flex-start;
+        margin-bottom: 16px;
       }
 
       .lang-pill button {
         padding: 4px 10px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .dashboard-wrapper {
+        padding-top: 68px;
+      }
+
+      .dashboard-header {
+        margin-bottom: 20px;
+      }
+
+      .dashboard-header h1 {
+        font-size: 22px;
+      }
+
+      .user-details h2 {
+        font-size: 17px;
+      }
+
+      .action-card-title {
+        font-size: 16px;
+      }
+
+      .action-card-desc {
+        font-size: 13px;
       }
     }
   </style>

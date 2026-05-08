@@ -1,15 +1,15 @@
 /* ScriptBridge 共享样式 */
 
 :root {
-  --cream: #F5F0E8;
-  --ink:   #1A1A1A;
-  --coral: #FF4D2E;
-  --sage:  #3D6B4F;
-  --sage-light: #5A9470;
-  --coral-light: #FF7A62;
-  --warm-white: #FDFAF4;
-  --muted: #7A7268;
-  --border: rgba(26,26,26,0.1);
+  --cream: #f3efe8;
+  --ink:   #1c2430;
+  --coral: #f26a4f;
+  --sage:  #4d7661;
+  --sage-light: #618f76;
+  --coral-light: #f48b73;
+  --warm-white: #faf7f1;
+  --muted: #6f7784;
+  --border: rgba(28, 36, 48, 0.12);
   --error: #E53E3E;
   --success: #38A169;
   --r: 14px;
@@ -19,15 +19,15 @@
 }
 
 :root.theme-dark {
-  --cream: #0f141b;
-  --ink: #f8fafc;
-  --coral: #ff6b4a;
-  --sage: #5f8f70;
-  --sage-light: #77ad8c;
-  --coral-light: #ff8b73;
-  --warm-white: #1e2733;
-  --muted: #cbd5e1;
-  --border: rgba(255, 255, 255, 0.24);
+  --cream: #0c1420;
+  --ink: #f4f7fb;
+  --coral: #ff7a5f;
+  --sage: #6f9f86;
+  --sage-light: #88b89f;
+  --coral-light: #ff9b86;
+  --warm-white: #1a2634;
+  --muted: #c2cedd;
+  --border: rgba(244, 247, 251, 0.2);
   --error: #f87171;
   --success: #4ade80;
 }
@@ -49,6 +49,18 @@ body {
   font-size: 16px;
   line-height: 1.6;
   overflow-x: hidden;
+  position: relative;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 12% 8%, rgba(242, 106, 79, 0.08), transparent 32%),
+    radial-gradient(circle at 88% 92%, rgba(77, 118, 97, 0.1), transparent 34%);
 }
 
 /* ===== 导航栏 ===== */
@@ -62,9 +74,46 @@ nav {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: rgba(245, 240, 232, 0.88);
+  background: rgba(250, 247, 241, 0.82);
   backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--border);
+  transition: transform 0.28s ease, background 0.2s ease, border-color 0.2s ease;
+  will-change: transform;
+}
+
+html.nav-hidden nav {
+  transform: translateY(calc(-100% - 8px));
+  opacity: 0.12;
+}
+
+html.nav-compact nav {
+  padding-top: 7px;
+  padding-bottom: 7px;
+}
+
+html.nav-compact .nav-logo-mark {
+  width: 26px;
+  height: 26px;
+  font-size: 13px;
+}
+
+html.nav-compact .nav-logo-text {
+  font-size: 15px;
+}
+
+html.nav-compact .lang-pill button {
+  padding: 3px 9px;
+  font-size: 11px;
+}
+
+html.nav-compact .theme-pill button {
+  padding: 3px 7px;
+  font-size: 11px;
+}
+
+html.nav-compact .btn-logout {
+  padding: 6px 12px;
+  font-size: 12px;
 }
 
 :root.theme-dark nav {
@@ -128,6 +177,7 @@ nav {
   border-radius: var(--r-pill);
   cursor: pointer;
   transition: all 0.2s;
+  white-space: nowrap;
 }
 
 .lang-pill button.active {
@@ -225,7 +275,7 @@ nav {
 }
 
 .btn-primary {
-  background: var(--sage);
+  background: linear-gradient(140deg, #416852 0%, #4d7661 100%);
   color: #fff;
 }
 
@@ -236,7 +286,7 @@ nav {
 }
 
 .btn-secondary {
-  background: var(--coral);
+  background: linear-gradient(140deg, #e86045 0%, #f26a4f 100%);
   color: #fff;
 }
 
@@ -247,13 +297,13 @@ nav {
 }
 
 .btn-outline {
-  background: transparent;
+  background: rgba(255, 255, 255, 0.46);
   color: var(--ink);
   border: 1px solid var(--border);
 }
 
 .btn-outline:hover {
-  background: rgba(26, 26, 26, 0.05);
+  background: rgba(255, 255, 255, 0.72);
 }
 
 :root.theme-dark .btn-outline {
@@ -418,11 +468,12 @@ nav {
 
 /* ===== 卡片 ===== */
 .card {
-  background: var(--warm-white);
+  background: rgba(250, 247, 241, 0.8);
   border: 1px solid var(--border);
   border-radius: var(--r-lg);
   padding: 24px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
+  backdrop-filter: blur(10px);
 }
 
 .card-header {
@@ -500,24 +551,51 @@ nav {
 /* ===== 响应式 ===== */
 @media (max-width: 768px) {
   nav {
-    padding: 12px 20px;
+    padding: 10px 14px;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .nav-logo {
+    gap: 8px;
+    min-width: 0;
+  }
+
+  .nav-logo-mark {
+    width: 28px;
+    height: 28px;
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+
+  .nav-logo-text {
+    font-size: 16px;
+    line-height: 1.2;
+  }
+
+  .nav-right {
+    gap: 8px;
+    width: 100%;
+    flex-wrap: nowrap;
+    justify-content: flex-end;
   }
 
   .page-wrapper {
-    padding: 80px 20px 60px;
+    padding: 74px 14px 48px;
   }
 
   .container {
-    padding: 0 20px;
+    padding: 0 14px;
   }
 
   .btn {
-    padding: 10px 20px;
+    padding: 10px 16px;
     font-size: 14px;
   }
 
   .card {
-    padding: 20px;
+    padding: 16px;
   }
 
   .auth-container {
@@ -530,6 +608,43 @@ nav {
 
   .theme-pill button {
     padding: 4px 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  body {
+    font-size: 15px;
+  }
+
+  .btn {
+    min-height: 42px;
+    font-size: 13.5px;
+  }
+
+  .form-group {
+    margin-bottom: 14px;
+  }
+
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    padding: 10px 12px;
+    font-size: 15px;
+  }
+
+  .lang-pill button {
+    padding: 2px 7px;
+    font-size: 11px;
+  }
+
+  .theme-pill button {
+    padding: 2px 6px;
+    font-size: 11px;
+  }
+
+  .btn-logout {
+    padding: 6px 12px;
+    font-size: 12px;
   }
 }
 

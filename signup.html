@@ -12,6 +12,7 @@
 
   <link rel="stylesheet" href="css/common.css">
   <script src="js/theme.js" defer></script>
+  <script src="js/nav-mobile.js" defer></script>
 
   <style>
     .page-wrapper {
@@ -185,11 +186,41 @@
 
     @media (max-width: 768px) {
       .auth-card {
-        padding: 30px 22px 24px;
+        padding: 24px 16px 18px;
       }
 
       .signup-header h1 {
-        font-size: 30px;
+        font-size: 28px;
+      }
+
+      .role-selector {
+        gap: 8px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .auth-container {
+        max-width: 100%;
+      }
+
+      .signup-header {
+        margin-bottom: 20px;
+      }
+
+      .signup-header h1 {
+        font-size: 24px;
+      }
+
+      .form-group {
+        margin-bottom: 14px;
+      }
+
+      .role-selector {
+        flex-direction: column;
+      }
+
+      .role-option label {
+        padding: 12px;
       }
     }
   </style>

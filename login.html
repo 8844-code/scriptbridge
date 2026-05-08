@@ -12,6 +12,7 @@
 
   <link rel="stylesheet" href="css/common.css">
   <script src="js/theme.js" defer></script>
+  <script src="js/nav-mobile.js" defer></script>
 
   <style>
     .page-wrapper {
@@ -161,11 +162,33 @@
 
     @media (max-width: 768px) {
       .auth-card {
-        padding: 30px 22px 24px;
+        padding: 24px 16px 18px;
       }
 
       .login-header h1 {
-        font-size: 30px;
+        font-size: 28px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .auth-container {
+        max-width: 100%;
+      }
+
+      .login-header {
+        margin-bottom: 20px;
+      }
+
+      .login-header h1 {
+        font-size: 24px;
+      }
+
+      .form-group {
+        margin-bottom: 14px;
+      }
+
+      .remember-row {
+        margin-bottom: 16px;
       }
     }
   </style>

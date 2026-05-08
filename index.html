@@ -9,17 +9,18 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300;1,9..40,400&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;0,9..144,700;1,9..144,300;1,9..144,500;1,9..144,700&family=Noto+Sans+SC:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="js/theme.js" defer></script>
+<script src="js/nav-mobile.js" defer></script>
 <style>
 :root {
-  --cream: #F5F0E8;
-  --ink:   #1A1A1A;
-  --coral: #FF4D2E;
-  --sage:  #3D6B4F;
-  --sage-light: #5A9470;
-  --coral-light: #FF7A62;
-  --warm-white: #FDFAF4;
-  --muted: #7A7268;
-  --border: rgba(26,26,26,0.1);
+  --cream: #f3efe8;
+  --ink:   #1c2430;
+  --coral: #f26a4f;
+  --sage:  #4d7661;
+  --sage-light: #618f76;
+  --coral-light: #f48b73;
+  --warm-white: #faf7f1;
+  --muted: #6f7784;
+  --border: rgba(28,36,48,0.12);
   --r: 14px;
   --r-sm: 8px;
   --r-lg: 24px;
@@ -27,15 +28,15 @@
 }
 
 :root.theme-dark {
-  --cream: #0f172a;
-  --ink: #e5e7eb;
-  --coral: #ff6b4a;
-  --sage: #5f8f70;
-  --sage-light: #77ad8c;
-  --coral-light: #ff8b73;
-  --warm-white: #1e293b;
-  --muted: #cbd5e1;
-  --border: rgba(255,255,255,0.24);
+  --cream: #0c1420;
+  --ink: #f4f7fb;
+  --coral: #ff7a5f;
+  --sage: #6f9f86;
+  --sage-light: #88b89f;
+  --coral-light: #ff9b86;
+  --warm-white: #1a2634;
+  --muted: #c2cedd;
+  --border: rgba(244,247,251,0.2);
 }
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; }
@@ -60,6 +61,33 @@ nav {
   background: rgba(245,240,232,0.88);
   backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--border);
+  transition: transform 0.28s ease, background 0.2s ease, border-color 0.2s ease;
+  will-change: transform;
+}
+html.nav-hidden nav {
+  transform: translateY(calc(-100% - 8px));
+  opacity: 0.12;
+}
+html.nav-compact nav {
+  padding-top: 7px;
+  padding-bottom: 7px;
+}
+html.nav-compact .nav-logo-mark {
+  width: 26px;
+  height: 26px;
+  font-size: 13px;
+}
+html.nav-compact .nav-logo-text {
+  font-size: 15px;
+}
+html.nav-compact .btn-nav {
+  padding: 7px 12px;
+  font-size: 12px;
+}
+html.nav-compact .lang-pill button,
+html.nav-compact .theme-pill button {
+  padding: 3px 8px;
+  font-size: 11px;
 }
 :root.theme-dark nav {
   background: rgba(8, 13, 23, 0.95);
@@ -579,13 +607,34 @@ body:not(.zh) .zh-only { display: none !important; }
   .market-top { grid-template-columns: 1fr; }
 }
 @media (max-width: 768px) {
-  nav { padding: 14px 20px; }
+  nav {
+    padding: 10px 14px;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .nav-logo-sub { display: none; }
+  .nav-logo-text { font-size: 16px; }
+  .nav-right {
+    width: 100%;
+    gap: 8px;
+    flex-wrap: nowrap;
+    justify-content: flex-end;
+  }
+  .lang-pill button,
+  .theme-pill button {
+    white-space: nowrap;
+  }
   .auth-nav-links { display: none; }
-  .hero { padding: 100px 20px 60px; }
+  .hero { padding: 88px 14px 48px; }
+  .hero-eyebrow { margin-bottom: 20px; }
+  .hero-h1 { font-size: clamp(34px, 10vw, 52px); margin-bottom: 8px; }
+  .hero-h1-sub { margin-bottom: 18px; }
+  .hero-desc { font-size: 15px; margin-bottom: 28px; }
   .hero-stats { flex-direction: column; gap: 2px; max-width: 100%; }
-  .hero-stat { padding: 18px 20px; }
+  .hero-stat { padding: 14px 14px; }
   .hero-stat-num { font-size: 24px; }
-  section { padding: 60px 20px; }
+  section { padding: 46px 14px; }
   .users-section, .rights-section, .cat-section, .value-section, .signup-section { margin: 0 12px; border-radius: 20px; }
   .rights-grid { grid-template-columns: repeat(2,1fr); }
   .protect-grid { grid-template-columns: 1fr; }
@@ -593,11 +642,69 @@ body:not(.zh) .zh-only { display: none !important; }
   footer { flex-direction: column; gap: 12px; text-align: center; }
   .footer-meta { text-align: center; }
   .hero-cta { flex-direction: column; align-items: center; }
+  .hero-cta .btn-primary,
+  .hero-cta .btn-outline {
+    width: 100%;
+    max-width: 320px;
+    justify-content: center;
+  }
   .signup-form-wrap { flex-direction: column; }
-  .signup-section { padding: 60px 24px; }
+  .signup-section { padding: 44px 14px; }
+  .signup-role-tabs { width: 100%; max-width: 360px; }
+  .role-tab { flex: 1; padding: 8px 10px; font-size: 12px; }
+  .signup-submit { width: 100%; }
   .market-insight-card { flex-direction: column; }
   .auth-entry-wrap { flex-direction: column; }
   .theme-pill button { padding: 4px 8px; }
+}
+
+@media (max-width: 480px) {
+  nav {
+    padding: 8px 10px;
+  }
+  .nav-logo-text {
+    font-size: 15px;
+  }
+  .nav-logo-mark {
+    width: 26px;
+    height: 26px;
+    font-size: 13px;
+  }
+  .nav-right {
+    justify-content: space-between;
+  }
+  .theme-pill {
+    transform: scale(0.92);
+    transform-origin: left center;
+  }
+  .lang-pill {
+    transform: scale(0.92);
+    transform-origin: right center;
+  }
+  .btn-nav {
+    padding: 7px 14px;
+    font-size: 12px;
+  }
+  .users-section, .rights-section, .cat-section, .value-section, .signup-section {
+    margin: 0 8px;
+    border-radius: 16px;
+  }
+  .section-header { margin-bottom: 28px; }
+  .section-title { line-height: 1.18; }
+  .rights-grid { grid-template-columns: 1fr; }
+  .rights-col,
+  .user-card,
+  .protect-card,
+  .value-card,
+  .market-big-card,
+  .market-green-card,
+  .market-small-card {
+    padding: 18px 14px;
+  }
+  .market-insight-card {
+    padding: 18px 14px;
+    gap: 12px;
+  }
 }
 </style>
 </head>
