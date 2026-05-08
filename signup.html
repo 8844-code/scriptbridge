@@ -43,6 +43,12 @@
       backdrop-filter: blur(4px);
     }
 
+    :root.theme-dark .auth-card {
+      background: #1e293b !important;
+      border-color: rgba(248, 250, 252, 0.28) !important;
+      box-shadow: 0 14px 36px rgba(0, 0, 0, 0.42) !important;
+    }
+
     .signup-header {
       text-align: center;
       margin-bottom: 28px;
@@ -63,6 +69,13 @@
       color: var(--muted);
     }
 
+    :root.theme-dark .signup-header h1,
+    :root.theme-dark .signup-header p,
+    :root.theme-dark .form-group label,
+    :root.theme-dark .switch-link {
+      color: #f8fafc !important;
+    }
+
     .form-group {
       margin-bottom: 18px;
     }
@@ -71,6 +84,16 @@
       border-radius: 12px;
       border: 1px solid rgba(26, 26, 26, 0.14);
       background: rgba(255, 255, 255, 0.84);
+    }
+
+    :root.theme-dark .form-group input {
+      background: rgba(255, 255, 255, 0.12) !important;
+      border-color: rgba(248, 250, 252, 0.32) !important;
+      color: #f8fafc !important;
+    }
+
+    :root.theme-dark .form-group input::placeholder {
+      color: rgba(248, 250, 252, 0.72) !important;
     }
 
     .form-group input:focus {
@@ -117,6 +140,12 @@
       border-color: rgba(61, 107, 79, 0.6);
     }
 
+    :root.theme-dark .role-option label {
+      background: rgba(255, 255, 255, 0.09) !important;
+      border-color: rgba(248, 250, 252, 0.26) !important;
+      color: #e2e8f0 !important;
+    }
+
     .btn-primary {
       border-radius: 12px;
       font-weight: 600;
@@ -147,6 +176,11 @@
 
     .switch-link a:hover {
       color: var(--coral);
+    }
+
+    :root.theme-dark .switch-link a {
+      color: #f8fafc !important;
+      border-bottom-color: rgba(248, 250, 252, 0.62) !important;
     }
 
     @media (max-width: 768px) {
