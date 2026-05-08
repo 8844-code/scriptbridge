@@ -222,39 +222,43 @@
       </div>
     </a>
     <div class="nav-right">
-      <a href="dashboard.html" class="btn btn-outline back-link">← Back</a>
+      <div class="lang-pill">
+        <button id="lang-en" type="button">EN</button>
+        <button id="lang-zh" type="button">中文</button>
+      </div>
+      <a href="dashboard.html" class="btn btn-outline back-link" id="back-link">← Back</a>
       <div id="nav-user-menu" class="nav-user-menu">Loading user...</div>
-      <button type="button" class="btn btn-logout" onclick="logout()">Log Out</button>
+      <button type="button" class="btn btn-logout" id="logout-btn" onclick="logout()">Log Out</button>
     </div>
   </nav>
 
   <main class="browse-wrapper">
     <div class="browse-container">
       <header class="browse-header">
-        <h1>Browse Scripts</h1>
-        <p>Find stories and IP from creators.</p>
+        <h1 id="page-title">Browse Scripts</h1>
+        <p id="page-subtitle">Find stories and IP from creators.</p>
       </header>
 
       <section class="filters-card">
         <input type="text" id="search-input" placeholder="Search by script title...">
 
         <select id="type-filter">
-          <option value="all">All Types</option>
+          <option value="all" id="type-all-option">All Types</option>
           <option value="短剧剧本">短剧剧本</option>
           <option value="电影剧本">电影剧本</option>
           <option value="小说IP">小说IP</option>
         </select>
 
         <select id="sort-select">
-          <option value="latest">Latest</option>
-          <option value="price_asc">Price: Low to High</option>
-          <option value="price_desc">Price: High to Low</option>
+          <option value="latest" id="sort-latest-option">Latest</option>
+          <option value="price_asc" id="sort-asc-option">Price: Low to High</option>
+          <option value="price_desc" id="sort-desc-option">Price: High to Low</option>
         </select>
       </section>
 
       <div id="loading-state" class="loading-state">
         <span class="spinner"></span>
-        <span>Loading scripts...</span>
+        <span id="loading-text">Loading scripts...</span>
       </div>
 
       <section id="scripts-grid" class="scripts-grid" style="display: none;"></section>
@@ -274,10 +278,75 @@
     const loadingState = document.getElementById('loading-state');
     const scriptsGrid = document.getElementById('scripts-grid');
     const emptyState = document.getElementById('empty-state');
+    const langEnBtn = document.getElementById('lang-en');
+    const langZhBtn = document.getElementById('lang-zh');
 
     let currentUser = null;
     let allScripts = [];
     let authorMap = {};
+    let currentLang = localStorage.getItem('scriptbridge_lang') || 'en';
+    const i18n = {
+      en: {
+        back: '← Back',
+        logout: 'Log Out',
+        pageTitle: 'Browse Scripts',
+        pageSubtitle: 'Find stories and IP from creators.',
+        searchPh: 'Search by script title...',
+        typeAll: 'All Types',
+        sortLatest: 'Latest',
+        sortAsc: 'Price: Low to High',
+        sortDesc: 'Price: High to Low',
+        loading: 'Loading scripts...',
+        empty: 'No scripts found',
+        unknownAuthor: 'Unknown author',
+        untitled: 'Untitled Script',
+        by: 'By ',
+        uploaded: 'Uploaded: ',
+        failed: 'Failed to load scripts: '
+      },
+      zh: {
+        back: '← 返回',
+        logout: '退出登录',
+        pageTitle: '浏览脚本',
+        pageSubtitle: '发现创作者发布的故事与 IP。',
+        searchPh: '按标题搜索脚本...',
+        typeAll: '全部类型',
+        sortLatest: '最新发布',
+        sortAsc: '价格：从低到高',
+        sortDesc: '价格：从高到低',
+        loading: '正在加载脚本...',
+        empty: '暂无脚本',
+        unknownAuthor: '未知作者',
+        untitled: '未命名脚本',
+        by: '作者：',
+        uploaded: '上传时间：',
+        failed: '加载脚本失败：'
+      }
+    };
+
+    function t(key) {
+      return i18n[currentLang][key];
+    }
+
+    function setLang(lang) {
+      currentLang = lang === 'zh' ? 'zh' : 'en';
+      document.body.classList.toggle('zh', currentLang === 'zh');
+      document.documentElement.lang = currentLang === 'zh' ? 'zh-CN' : 'en';
+      langEnBtn.classList.toggle('active', currentLang === 'en');
+      langZhBtn.classList.toggle('active', currentLang === 'zh');
+      localStorage.setItem('scriptbridge_lang', currentLang);
+      document.getElementById('back-link').textContent = t('back');
+      document.getElementById('logout-btn').textContent = t('logout');
+      document.getElementById('page-title').textContent = t('pageTitle');
+      document.getElementById('page-subtitle').textContent = t('pageSubtitle');
+      searchInput.placeholder = t('searchPh');
+      document.getElementById('type-all-option').textContent = t('typeAll');
+      document.getElementById('sort-latest-option').textContent = t('sortLatest');
+      document.getElementById('sort-asc-option').textContent = t('sortAsc');
+      document.getElementById('sort-desc-option').textContent = t('sortDesc');
+      document.getElementById('loading-text').textContent = t('loading');
+      emptyState.textContent = t('empty');
+    }
 
     function formatDate(isoString) {
       if (!isoString) return '—';
@@ -311,7 +380,7 @@
 
       authorMap = {};
       (data || []).forEach((user) => {
-        authorMap[user.user_id] = user.full_name || user.email || 'Unknown author';
+        authorMap[user.user_id] = user.full_name || user.email || t('unknownAuthor');
       });
     }
 
@@ -357,16 +426,16 @@
       }
 
       const html = list.map((item) => {
-        const author = authorMap[item.user_id] || 'Unknown author';
+        const author = authorMap[item.user_id] || t('unknownAuthor');
         return (
           '<a class="script-card" href="script-detail.html?id=' + encodeURIComponent(item.id) + '">' +
-            '<div class="script-card-title">' + escapeHtml(item.title || 'Untitled Script') + '</div>' +
-            '<div class="script-card-author">By ' + escapeHtml(author) + '</div>' +
+            '<div class="script-card-title">' + escapeHtml(item.title || t('untitled')) + '</div>' +
+            '<div class="script-card-author">' + t('by') + escapeHtml(author) + '</div>' +
             '<div class="script-card-row">' +
               '<span class="script-type-pill">' + escapeHtml(item.script_type || '—') + '</span>' +
               '<span class="script-price">' + formatPrice(item.price) + '</span>' +
             '</div>' +
-            '<div class="script-date">Uploaded: ' + formatDate(item.created_at) + '</div>' +
+            '<div class="script-date">' + t('uploaded') + formatDate(item.created_at) + '</div>' +
           '</a>'
         );
       }).join('');
@@ -378,6 +447,8 @@
 
     async function initPage() {
       try {
+        setLang(currentLang);
+
         const session = await requireAuth();
         if (!session) return;
 
@@ -393,13 +464,15 @@
         loadingState.style.display = 'none';
         applyFilters();
       } catch (error) {
-        loadingState.innerHTML = 'Failed to load scripts: ' + escapeHtml(error.message);
+        loadingState.innerHTML = t('failed') + escapeHtml(error.message);
       }
     }
 
     searchInput.addEventListener('input', applyFilters);
     typeFilter.addEventListener('change', applyFilters);
     sortSelect.addEventListener('change', applyFilters);
+    langEnBtn.addEventListener('click', () => setLang('en'));
+    langZhBtn.addEventListener('click', () => setLang('zh'));
 
     window.addEventListener('DOMContentLoaded', initPage);
   </script>

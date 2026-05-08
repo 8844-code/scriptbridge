@@ -287,9 +287,13 @@
       </div>
     </a>
     <div class="nav-right">
-      <a href="dashboard.html" class="btn btn-outline back-link">← Back</a>
+      <div class="lang-pill">
+        <button id="lang-en" type="button">EN</button>
+        <button id="lang-zh" type="button">中文</button>
+      </div>
+      <a href="dashboard.html" class="btn btn-outline back-link" id="back-link">← Back</a>
       <div id="nav-user-menu" class="nav-user-menu">Loading user...</div>
-      <button type="button" class="btn btn-logout" onclick="logout()">Log Out</button>
+      <button type="button" class="btn btn-logout" id="logout-btn" onclick="logout()">Log Out</button>
     </div>
   </nav>
 
@@ -297,10 +301,10 @@
     <div class="list-container">
       <header class="list-header">
         <div>
-          <h1>My Scripts</h1>
-          <p>Manage all scripts you have uploaded.</p>
+          <h1 id="page-title">My Scripts</h1>
+          <p id="page-subtitle">Manage all scripts you have uploaded.</p>
         </div>
-        <a href="scripts-upload.html" class="btn btn-primary">Upload Script</a>
+        <a href="scripts-upload.html" class="btn btn-primary" id="upload-btn">Upload Script</a>
       </header>
 
       <section class="list-card">
@@ -310,18 +314,18 @@
           <table class="scripts-table">
             <thead>
               <tr>
-                <th>Title</th>
-                <th>Type</th>
-                <th>Price</th>
-                <th>Uploaded At</th>
-                <th>Actions</th>
+                <th id="th-title">Title</th>
+                <th id="th-type">Type</th>
+                <th id="th-price">Price</th>
+                <th id="th-uploaded">Uploaded At</th>
+                <th id="th-actions">Actions</th>
               </tr>
             </thead>
             <tbody id="scripts-table-body">
               <tr>
                 <td colspan="5" class="loading-row">
                   <span class="spinner" style="vertical-align: middle;"></span>
-                  <span style="margin-left: 8px;">Loading scripts...</span>
+                  <span style="margin-left: 8px;" id="loading-text">Loading scripts...</span>
                 </td>
               </tr>
             </tbody>
@@ -330,9 +334,9 @@
 
         <div id="empty-state" class="empty-state" style="display: none;">
           <div class="empty-state-icon">📝</div>
-          <h2>No Scripts Yet</h2>
-          <p>You have not uploaded any script. Start by uploading your first one.</p>
-          <a href="scripts-upload.html" class="btn btn-primary">Upload Script</a>
+          <h2 id="empty-title">No Scripts Yet</h2>
+          <p id="empty-desc">You have not uploaded any script. Start by uploading your first one.</p>
+          <a href="scripts-upload.html" class="btn btn-primary" id="empty-upload-btn">Upload Script</a>
         </div>
       </section>
     </div>
@@ -366,9 +370,99 @@
     const previewBody = document.getElementById('preview-body');
     const previewFileLink = document.getElementById('preview-file-link');
     const closePreviewBtn = document.getElementById('close-preview-btn');
+    const langEnBtn = document.getElementById('lang-en');
+    const langZhBtn = document.getElementById('lang-zh');
 
     let currentUser = null;
     let scriptsData = [];
+    let currentLang = localStorage.getItem('scriptbridge_lang') || 'en';
+    const i18n = {
+      en: {
+        back: '← Back',
+        logout: 'Log Out',
+        pageTitle: 'My Scripts',
+        pageSubtitle: 'Manage all scripts you have uploaded.',
+        uploadBtn: 'Upload Script',
+        thTitle: 'Title',
+        thType: 'Type',
+        thPrice: 'Price',
+        thUploaded: 'Uploaded At',
+        thActions: 'Actions',
+        loading: 'Loading scripts...',
+        emptyTitle: 'No Scripts Yet',
+        emptyDesc: 'You have not uploaded any script. Start by uploading your first one.',
+        preview: 'Preview',
+        edit: 'Edit',
+        del: 'Delete',
+        openFile: 'Open File',
+        close: 'Close',
+        untitled: 'Untitled',
+        noDesc: 'No description.',
+        disabled: 'Edit feature is temporarily disabled.',
+        loadFailed: 'Failed to load scripts: ',
+        unableLoad: 'Unable to load data.',
+        confirmDelete: 'Delete "{title}"? This action cannot be undone.',
+        deleteSuccess: 'Script deleted successfully.',
+        deleteFailed: 'Delete failed: '
+      },
+      zh: {
+        back: '← 返回',
+        logout: '退出登录',
+        pageTitle: '我的脚本',
+        pageSubtitle: '管理你上传的所有脚本。',
+        uploadBtn: '上传脚本',
+        thTitle: '标题',
+        thType: '类型',
+        thPrice: '价格',
+        thUploaded: '上传日期',
+        thActions: '操作',
+        loading: '正在加载脚本...',
+        emptyTitle: '暂无脚本',
+        emptyDesc: '你还没有上传任何脚本，先上传第一部作品吧。',
+        preview: '预览',
+        edit: '编辑',
+        del: '删除',
+        openFile: '打开文件',
+        close: '关闭',
+        untitled: '未命名',
+        noDesc: '暂无描述。',
+        disabled: '编辑功能暂未开放。',
+        loadFailed: '加载脚本失败：',
+        unableLoad: '无法加载数据。',
+        confirmDelete: '确认删除“{title}”？此操作不可撤销。',
+        deleteSuccess: '删除成功。',
+        deleteFailed: '删除失败：'
+      }
+    };
+
+    function t(key) {
+      return i18n[currentLang][key];
+    }
+
+    function setLang(lang) {
+      currentLang = lang === 'zh' ? 'zh' : 'en';
+      document.body.classList.toggle('zh', currentLang === 'zh');
+      document.documentElement.lang = currentLang === 'zh' ? 'zh-CN' : 'en';
+      langEnBtn.classList.toggle('active', currentLang === 'en');
+      langZhBtn.classList.toggle('active', currentLang === 'zh');
+      localStorage.setItem('scriptbridge_lang', currentLang);
+      document.getElementById('back-link').textContent = t('back');
+      document.getElementById('logout-btn').textContent = t('logout');
+      document.getElementById('page-title').textContent = t('pageTitle');
+      document.getElementById('page-subtitle').textContent = t('pageSubtitle');
+      document.getElementById('upload-btn').textContent = t('uploadBtn');
+      document.getElementById('th-title').textContent = t('thTitle');
+      document.getElementById('th-type').textContent = t('thType');
+      document.getElementById('th-price').textContent = t('thPrice');
+      document.getElementById('th-uploaded').textContent = t('thUploaded');
+      document.getElementById('th-actions').textContent = t('thActions');
+      document.getElementById('loading-text').textContent = t('loading');
+      document.getElementById('empty-title').textContent = t('emptyTitle');
+      document.getElementById('empty-desc').textContent = t('emptyDesc');
+      document.getElementById('empty-upload-btn').textContent = t('uploadBtn');
+      previewFileLink.textContent = t('openFile');
+      closePreviewBtn.textContent = t('close');
+    }
 
     function showAlert(message, type) {
       alertContainer.innerHTML = '<div class="alert alert-' + type + '">' + message + '</div>';
@@ -393,15 +487,15 @@
       const rowsHtml = items.map((item) => {
         const safeTitle = (item.title || '').replace(/"/g, '&quot;');
         return '<tr>' +
-          '<td><div class="script-title" title="' + safeTitle + '">' + (item.title || 'Untitled') + '</div></td>' +
+          '<td><div class="script-title" title="' + safeTitle + '">' + (item.title || t('untitled')) + '</div></td>' +
           '<td>' + (item.script_type || '—') + '</td>' +
           '<td><span class="price-pill">' + formatPrice(item.price) + '</span></td>' +
           '<td>' + formatDate(item.created_at) + '</td>' +
           '<td>' +
             '<div class="action-buttons">' +
-              '<button class="btn btn-outline btn-sm" onclick="openPreview(\'' + item.id + '\')">Preview</button>' +
-              '<button class="btn btn-outline btn-sm btn-disabled" onclick="showEditDisabled(event)">Edit</button>' +
-              '<button class="btn btn-danger btn-sm" onclick="deleteScript(\'' + item.id + '\')">Delete</button>' +
+              '<button class="btn btn-outline btn-sm" onclick="openPreview(\'' + item.id + '\')">' + t('preview') + '</button>' +
+              '<button class="btn btn-outline btn-sm btn-disabled" onclick="showEditDisabled(event)">' + t('edit') + '</button>' +
+              '<button class="btn btn-danger btn-sm" onclick="deleteScript(\'' + item.id + '\')">' + t('del') + '</button>' +
             '</div>' +
           '</td>' +
         '</tr>';
@@ -441,6 +535,8 @@
 
     async function initPage() {
       try {
+        setLang(currentLang);
+
         const session = await requireAuth();
         if (!session) return;
 
@@ -453,23 +549,23 @@
         navUserMenu.textContent = currentUser.email || currentUser.id;
         await loadScripts();
       } catch (error) {
-        showAlert('Failed to load scripts: ' + error.message, 'error');
-        tableBody.innerHTML = '<tr><td colspan="5" class="loading-row">Unable to load data.</td></tr>';
+        showAlert(t('loadFailed') + error.message, 'error');
+        tableBody.innerHTML = '<tr><td colspan="5" class="loading-row">' + t('unableLoad') + '</td></tr>';
       }
     }
 
     function showEditDisabled(event) {
       event.preventDefault();
-      showAlert('Edit feature is temporarily disabled.', 'error');
+      showAlert(t('disabled'), 'error');
     }
 
     function openPreview(scriptId) {
       const item = scriptsData.find((script) => String(script.id) === String(scriptId));
       if (!item) return;
 
-      previewTitle.textContent = item.title || 'Untitled';
+      previewTitle.textContent = item.title || t('untitled');
       previewMeta.textContent = (item.script_type || '—') + '  |  ' + formatPrice(item.price) + '  |  ' + formatDate(item.created_at);
-      previewBody.textContent = item.description || 'No description.';
+      previewBody.textContent = item.description || t('noDesc');
       previewFileLink.href = item.file_url || '#';
       previewFileLink.style.pointerEvents = item.file_url ? 'auto' : 'none';
       previewFileLink.style.opacity = item.file_url ? '1' : '0.5';
@@ -484,7 +580,7 @@
       const target = scriptsData.find((script) => String(script.id) === String(scriptId));
       if (!target) return;
 
-      const confirmed = window.confirm('Delete "' + (target.title || 'this script') + '"? This action cannot be undone.');
+      const confirmed = window.confirm(t('confirmDelete').replace('{title}', target.title || t('untitled')));
       if (!confirmed) return;
 
       try {
@@ -506,10 +602,10 @@
 
         if (deleteError) throw deleteError;
 
-        showAlert('Script deleted successfully.', 'success');
+        showAlert(t('deleteSuccess'), 'success');
         await loadScripts();
       } catch (error) {
-        showAlert('Delete failed: ' + error.message, 'error');
+        showAlert(t('deleteFailed') + error.message, 'error');
       }
     }
 
@@ -523,6 +619,8 @@
     window.deleteScript = deleteScript;
 
     window.addEventListener('DOMContentLoaded', initPage);
+    langEnBtn.addEventListener('click', () => setLang('en'));
+    langZhBtn.addEventListener('click', () => setLang('zh'));
   </script>
 </body>
 </html>

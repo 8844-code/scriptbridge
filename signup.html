@@ -148,38 +148,6 @@
       color: var(--coral);
     }
 
-    /* LANGUAGE */
-    .en-only { display: block; }
-    .zh-only { display: none; }
-    body.zh .en-only { display: none; }
-    body.zh .zh-only { display: block; }
-
-    .lang-pill {
-      display: flex;
-      background: var(--ink);
-      border-radius: 100px;
-      overflow: hidden;
-      padding: 3px;
-      gap: 2px;
-    }
-    .lang-pill button {
-      border: none;
-      background: transparent;
-      color: rgba(255, 255, 255, 0.5);
-      font-family: 'DM Sans', sans-serif;
-      font-size: 12px;
-      font-weight: 500;
-      padding: 4px 12px;
-      border-radius: 100px;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-    .lang-pill button.active {
-      background: var(--coral);
-      color: #fff;
-      border-bottom-color: var(--coral);
-    }
-
     @media (max-width: 768px) {
       .auth-card {
         padding: 30px 22px 24px;
@@ -308,6 +276,7 @@
     // 表单验证
     function validateForm() {
       let isValid = true;
+      const isZh = document.body.classList.contains('zh');
 
       // 清空错误提示
       document.getElementById('email-error').textContent = '';
@@ -316,25 +285,25 @@
 
       // 检查邮箱
       if (!emailInput.value) {
-        document.getElementById('email-error').textContent = 'Email is required';
+        document.getElementById('email-error').textContent = isZh ? '请输入邮箱' : 'Email is required';
         isValid = false;
       } else if (!emailInput.value.includes('@')) {
-        document.getElementById('email-error').textContent = 'Please enter a valid email';
+        document.getElementById('email-error').textContent = isZh ? '请输入有效邮箱' : 'Please enter a valid email';
         isValid = false;
       }
 
       // 检查密码长度
       if (!passwordInput.value) {
-        document.getElementById('password-error').textContent = 'Password is required';
+        document.getElementById('password-error').textContent = isZh ? '请输入密码' : 'Password is required';
         isValid = false;
       } else if (passwordInput.value.length < 8) {
-        document.getElementById('password-error').textContent = 'Password must be at least 8 characters';
+        document.getElementById('password-error').textContent = isZh ? '密码至少 8 位' : 'Password must be at least 8 characters';
         isValid = false;
       }
 
       // 检查密码一致性
       if (passwordInput.value !== confirmInput.value) {
-        document.getElementById('confirm-error').textContent = 'Passwords do not match';
+        document.getElementById('confirm-error').textContent = isZh ? '两次密码不一致' : 'Passwords do not match';
         isValid = false;
       }
 
@@ -393,7 +362,7 @@
         }
 
         // 注册成功
-        showAlert('Account created successfully! Redirecting to login...', 'success');
+        showAlert(document.body.classList.contains('zh') ? '创建成功！正在跳转到登录页...' : 'Account created successfully! Redirecting to login...', 'success');
 
         // 2 秒后重定向到登录页
         setTimeout(() => {
@@ -401,7 +370,7 @@
         }, 2000);
 
       } catch (error) {
-        showAlert('Sign up failed: ' + error.message, 'error');
+        showAlert((document.body.classList.contains('zh') ? '注册失败：' : 'Sign up failed: ') + error.message, 'error');
         submitBtn.disabled = false;
         btnText.style.display = 'inline';
         btnSpinner.style.display = 'none';

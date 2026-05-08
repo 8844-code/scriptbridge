@@ -98,37 +98,6 @@
 
     .btn-primary {
       border-radius: 12px;
-
-    /* LANGUAGE */
-    .en-only { display: block; }
-    .zh-only { display: none; }
-    body.zh .en-only { display: none; }
-    body.zh .zh-only { display: block; }
-
-    .lang-pill {
-      display: flex;
-      background: var(--ink);
-      border-radius: 100px;
-      overflow: hidden;
-      padding: 3px;
-      gap: 2px;
-    }
-    .lang-pill button {
-      border: none;
-      background: transparent;
-      color: rgba(255, 255, 255, 0.5);
-      font-family: 'DM Sans', sans-serif;
-      font-size: 12px;
-      font-weight: 500;
-      padding: 4px 12px;
-      border-radius: 100px;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-    .lang-pill button.active {
-      background: var(--coral);
-      color: #fff;
-    }
       font-weight: 600;
       letter-spacing: 0.01em;
       background: linear-gradient(140deg, #2f5a40 0%, #3d6b4f 100%);
@@ -284,20 +253,21 @@
     // 表单验证
     function validateForm() {
       let isValid = true;
+      const isZh = document.body.classList.contains('zh');
 
       document.getElementById('email-error').textContent = '';
       document.getElementById('password-error').textContent = '';
 
       if (!emailInput.value) {
-        document.getElementById('email-error').textContent = 'Email is required';
+        document.getElementById('email-error').textContent = isZh ? '请输入邮箱' : 'Email is required';
         isValid = false;
       } else if (!emailInput.value.includes('@')) {
-        document.getElementById('email-error').textContent = 'Please enter a valid email';
+        document.getElementById('email-error').textContent = isZh ? '请输入有效邮箱' : 'Please enter a valid email';
         isValid = false;
       }
 
       if (!passwordInput.value) {
-        document.getElementById('password-error').textContent = 'Password is required';
+        document.getElementById('password-error').textContent = isZh ? '请输入密码' : 'Password is required';
         isValid = false;
       }
 
@@ -344,7 +314,7 @@
         }
 
         // 登录成功
-        showAlert('Sign in successful! Redirecting to dashboard...', 'success');
+        showAlert(document.body.classList.contains('zh') ? '登录成功！正在跳转到控制台...' : 'Sign in successful! Redirecting to dashboard...', 'success');
 
         // 2 秒后重定向到个人主页
         setTimeout(() => {
@@ -352,7 +322,7 @@
         }, 2000);
 
       } catch (error) {
-        showAlert('Sign in failed: ' + error.message, 'error');
+        showAlert((document.body.classList.contains('zh') ? '登录失败：' : 'Sign in failed: ') + error.message, 'error');
         submitBtn.disabled = false;
         btnText.style.display = 'inline';
         btnSpinner.style.display = 'none';

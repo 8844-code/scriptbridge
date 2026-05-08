@@ -149,6 +149,33 @@
       min-height: 200px;
     }
 
+    .lang-pill {
+      display: flex;
+      background: var(--ink);
+      border-radius: var(--r-pill);
+      overflow: hidden;
+      padding: 3px;
+      gap: 2px;
+    }
+
+    .lang-pill button {
+      border: none;
+      background: transparent;
+      color: rgba(255, 255, 255, 0.5);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 12px;
+      font-weight: 500;
+      padding: 4px 12px;
+      border-radius: var(--r-pill);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .lang-pill button.active {
+      background: var(--coral);
+      color: #fff;
+    }
+
     @media (max-width: 768px) {
       .dashboard-wrapper {
         padding: 80px 20px 60px;
@@ -167,6 +194,10 @@
       .dashboard-grid {
         grid-template-columns: 1fr;
       }
+
+      .lang-pill button {
+        padding: 4px 10px;
+      }
     }
   </style>
 </head>
@@ -179,20 +210,26 @@
         <div class="nav-logo-text">ScriptBridge</div>
       </div>
     </a>
-    <div class="nav-right"></div>
+    <div class="nav-right">
+      <div class="lang-pill">
+        <button id="lang-en" type="button">EN</button>
+        <button id="lang-zh" type="button">中文</button>
+      </div>
+      <button id="nav-logout-btn" class="btn btn-logout" type="button" onclick="logout()">Log Out</button>
+    </div>
   </nav>
 
   <!-- 仪表板 -->
   <div class="dashboard-wrapper">
     <div class="container">
       <div class="dashboard-header">
-        <h1>Dashboard</h1>
+        <h1 id="dashboard-title">Dashboard</h1>
       </div>
 
       <!-- 加载状态 -->
       <div id="loading" class="loading-spinner">
         <div class="spinner"></div>
-        <span style="margin-left: 12px; color: var(--muted);">Loading...</span>
+        <span id="loading-text" style="margin-left: 12px; color: var(--muted);">Loading...</span>
       </div>
 
       <!-- 用户信息卡片 -->
@@ -211,27 +248,27 @@
 
         <!-- 用户资料部分 -->
         <div class="profile-section">
-          <h3>Account Information</h3>
+          <h3 id="account-info-title">Account Information</h3>
           <div class="profile-field">
-            <label>Email</label>
+            <label id="profile-label-email">Email</label>
             <p id="profile-email">—</p>
           </div>
           <div class="profile-field">
-            <label>Role</label>
+            <label id="profile-label-role">Role</label>
             <p id="profile-role">—</p>
           </div>
           <div class="profile-field">
-            <label>Bio</label>
+            <label id="profile-label-bio">Bio</label>
             <p id="profile-bio">—</p>
           </div>
           <div class="profile-field">
-            <label>Member Since</label>
+            <label id="profile-label-joined">Member Since</label>
             <p id="profile-joined">—</p>
           </div>
         </div>
 
         <!-- 登出按钮 -->
-        <button class="btn btn-secondary" onclick="logout()" style="width: 100%;">
+        <button id="bottom-logout-btn" class="btn btn-secondary" onclick="logout()" style="width: 100%;">
           Log Out
         </button>
       </div>
@@ -249,9 +286,160 @@
     const loadingEl = document.getElementById('loading');
     const userCardEl = document.getElementById('user-card');
     const actionCardsEl = document.getElementById('action-cards');
+    const langEnBtn = document.getElementById('lang-en');
+    const langZhBtn = document.getElementById('lang-zh');
+
+    const I18N = {
+      en: {
+        dashboardTitle: 'Dashboard',
+        loading: 'Loading...',
+        accountInfo: 'Account Information',
+        labelEmail: 'Email',
+        labelRole: 'Role',
+        labelBio: 'Bio',
+        labelJoined: 'Member Since',
+        logout: 'Log Out',
+        roleCreator: 'Script Creator',
+        roleBuyer: 'Buyer',
+        noBio: 'No bio yet',
+        creatorCards: `
+          <a href="scripts-upload.html" class="action-card">
+            <div class="action-card-icon">📝</div>
+            <div class="action-card-title">Upload Script</div>
+            <div class="action-card-desc">Share your new script</div>
+          </a>
+          <a href="scripts-list-author.html" class="action-card">
+            <div class="action-card-icon">📚</div>
+            <div class="action-card-title">My Scripts</div>
+            <div class="action-card-desc">Manage your scripts</div>
+          </a>
+          <a href="scripts-browse.html" class="action-card">
+            <div class="action-card-icon">🔍</div>
+            <div class="action-card-title">Browse Market</div>
+            <div class="action-card-desc">Discover other scripts</div>
+          </a>
+        `,
+        buyerCards: `
+          <a href="scripts-browse.html" class="action-card">
+            <div class="action-card-icon">🔍</div>
+            <div class="action-card-title">Browse Scripts</div>
+            <div class="action-card-desc">Find scripts to buy</div>
+          </a>
+          <a href="scripts-browse.html" class="action-card">
+            <div class="action-card-icon">❤️</div>
+            <div class="action-card-title">Favorites</div>
+            <div class="action-card-desc">Your saved scripts</div>
+          </a>
+          <a href="scripts-browse.html" class="action-card">
+            <div class="action-card-icon">📦</div>
+            <div class="action-card-title">My Purchases</div>
+            <div class="action-card-desc">Scripts you own</div>
+          </a>
+        `,
+        failedLoad: 'Failed to load dashboard: '
+      },
+      zh: {
+        dashboardTitle: '控制台',
+        loading: '加载中...',
+        accountInfo: '账号信息',
+        labelEmail: '邮箱',
+        labelRole: '角色',
+        labelBio: '简介',
+        labelJoined: '注册时间',
+        logout: '退出登录',
+        roleCreator: '创作者',
+        roleBuyer: '买家',
+        noBio: '暂无简介',
+        creatorCards: `
+          <a href="scripts-upload.html" class="action-card">
+            <div class="action-card-icon">📝</div>
+            <div class="action-card-title">上传脚本</div>
+            <div class="action-card-desc">发布你的新作品</div>
+          </a>
+          <a href="scripts-list-author.html" class="action-card">
+            <div class="action-card-icon">📚</div>
+            <div class="action-card-title">我的脚本</div>
+            <div class="action-card-desc">管理已上传作品</div>
+          </a>
+          <a href="scripts-browse.html" class="action-card">
+            <div class="action-card-icon">🔍</div>
+            <div class="action-card-title">浏览市场</div>
+            <div class="action-card-desc">发现其他优质脚本</div>
+          </a>
+        `,
+        buyerCards: `
+          <a href="scripts-browse.html" class="action-card">
+            <div class="action-card-icon">🔍</div>
+            <div class="action-card-title">浏览脚本</div>
+            <div class="action-card-desc">寻找可购买作品</div>
+          </a>
+          <a href="scripts-browse.html" class="action-card">
+            <div class="action-card-icon">❤️</div>
+            <div class="action-card-title">收藏夹</div>
+            <div class="action-card-desc">查看已收藏脚本</div>
+          </a>
+          <a href="scripts-browse.html" class="action-card">
+            <div class="action-card-icon">📦</div>
+            <div class="action-card-title">我的购买</div>
+            <div class="action-card-desc">查看已购买版权</div>
+          </a>
+        `,
+        failedLoad: '加载控制台失败：'
+      }
+    };
+
+    let currentLang = localStorage.getItem('scriptbridge_lang') || 'en';
+    let currentUserData = null;
+    let currentProfile = null;
+
+    function t(key) {
+      return I18N[currentLang][key];
+    }
+
+    function applyLanguageUI() {
+      document.documentElement.lang = currentLang === 'zh' ? 'zh-CN' : 'en';
+      langEnBtn.classList.toggle('active', currentLang === 'en');
+      langZhBtn.classList.toggle('active', currentLang === 'zh');
+      document.getElementById('dashboard-title').textContent = t('dashboardTitle');
+      document.getElementById('loading-text').textContent = t('loading');
+      document.getElementById('account-info-title').textContent = t('accountInfo');
+      document.getElementById('profile-label-email').textContent = t('labelEmail');
+      document.getElementById('profile-label-role').textContent = t('labelRole');
+      document.getElementById('profile-label-bio').textContent = t('labelBio');
+      document.getElementById('profile-label-joined').textContent = t('labelJoined');
+      document.getElementById('nav-logout-btn').textContent = t('logout');
+      document.getElementById('bottom-logout-btn').textContent = t('logout');
+    }
+
+    function renderDashboardContent() {
+      if (!currentUserData || !currentProfile) return;
+
+      const roleText = currentProfile.role === 'creator' ? t('roleCreator') : t('roleBuyer');
+      const initial = (currentProfile.full_name || currentUserData.email).charAt(0).toUpperCase();
+
+      document.getElementById('user-avatar').textContent = initial;
+      document.getElementById('user-name').textContent = currentProfile.full_name || 'User';
+      document.getElementById('user-email').textContent = currentUserData.email;
+      document.getElementById('user-role').textContent = roleText;
+
+      document.getElementById('profile-email').textContent = currentUserData.email;
+      document.getElementById('profile-role').textContent = roleText;
+      document.getElementById('profile-bio').textContent = currentProfile.bio || t('noBio');
+      document.getElementById('profile-joined').textContent = new Date(currentProfile.created_at).toLocaleDateString();
+      actionCardsEl.innerHTML = currentProfile.role === 'creator' ? t('creatorCards') : t('buyerCards');
+    }
+
+    function setLang(lang) {
+      currentLang = lang === 'zh' ? 'zh' : 'en';
+      localStorage.setItem('scriptbridge_lang', currentLang);
+      applyLanguageUI();
+      renderDashboardContent();
+    }
 
     async function initDashboard() {
       try {
+        applyLanguageUI();
+
         // 1. 检查用户是否已登录
         const session = await checkAuthStatus();
         if (!session) {
@@ -272,75 +460,22 @@
           throw new Error('Failed to load user profile');
         }
 
-        // 4. 填充用户信息
-        const roleText = profile.role === 'creator' ? 'Script Creator' : 'Buyer';
-        const initial = (profile.full_name || user.email).charAt(0).toUpperCase();
-
-        document.getElementById('user-avatar').textContent = initial;
-        document.getElementById('user-name').textContent = profile.full_name || 'User';
-        document.getElementById('user-email').textContent = user.email;
-        document.getElementById('user-role').textContent = roleText;
-
-        document.getElementById('profile-email').textContent = user.email;
-        document.getElementById('profile-role').textContent = roleText;
-        document.getElementById('profile-bio').textContent = profile.bio || 'No bio yet';
-        document.getElementById('profile-joined').textContent = new Date(profile.created_at).toLocaleDateString();
-
-        // 5. 根据角色显示不同的卡片
-        let cardsHTML = '';
-
-        if (profile.role === 'creator') {
-          cardsHTML = `
-            <a href="scripts-upload.html" class="action-card">
-              <div class="action-card-icon">📝</div>
-              <div class="action-card-title">Upload Script</div>
-              <div class="action-card-desc">Share your new script</div>
-            </a>
-            <a href="scripts-list-author.html" class="action-card">
-              <div class="action-card-icon">📚</div>
-              <div class="action-card-title">My Scripts</div>
-              <div class="action-card-desc">Manage your scripts</div>
-            </a>
-            <a href="scripts-browse.html" class="action-card">
-              <div class="action-card-icon">🔍</div>
-              <div class="action-card-title">Browse Market</div>
-              <div class="action-card-desc">Discover other scripts</div>
-            </a>
-          `;
-        } else {
-          cardsHTML = `
-            <a href="scripts-browse.html" class="action-card">
-              <div class="action-card-icon">🔍</div>
-              <div class="action-card-title">Browse Scripts</div>
-              <div class="action-card-desc">Find scripts to buy</div>
-            </a>
-            <a href="scripts-browse.html" class="action-card">
-              <div class="action-card-icon">❤️</div>
-              <div class="action-card-title">Favorites</div>
-              <div class="action-card-desc">Your saved scripts</div>
-            </a>
-            <a href="scripts-browse.html" class="action-card">
-              <div class="action-card-icon">📦</div>
-              <div class="action-card-title">My Purchases</div>
-              <div class="action-card-desc">Scripts you own</div>
-            </a>
-          `;
-        }
-
-        actionCardsEl.innerHTML = cardsHTML;
+        currentUserData = user;
+        currentProfile = profile;
+        renderDashboardContent();
 
         // 6. 隐藏加载状态，显示内容
         loadingEl.style.display = 'none';
         userCardEl.style.display = 'block';
 
-        // 7. 设置导航栏的登出按钮
-        setupAuthNav();
-
       } catch (error) {
         console.error('Error initializing dashboard:', error);
-        loadingEl.innerHTML = `<div class="alert alert-error">Failed to load dashboard: ${error.message}</div>`;
+        loadingEl.innerHTML = `<div class="alert alert-error">${t('failedLoad')}${error.message}</div>`;
       }
     }
+
+    langEnBtn.addEventListener('click', () => setLang('en'));
+    langZhBtn.addEventListener('click', () => setLang('zh'));
 
     // 页面加载时初始化
     window.addEventListener('DOMContentLoaded', initDashboard);
