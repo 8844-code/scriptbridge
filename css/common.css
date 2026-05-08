@@ -361,3 +361,20 @@ nav {
 .gap-1 { gap: 8px; }
 .gap-2 { gap: 16px; }
 .gap-3 { gap: 24px; }
+
+/* ===== 语言切换 ===== */
+.en-only {
+  display: inline-block;
+}
+
+.zh-only {
+  display: none;
+}
+
+body.zh .en-only {
+  display: none !important;
+}
+
+body.zh .zh-only {
+  display: inline-block;
+}
