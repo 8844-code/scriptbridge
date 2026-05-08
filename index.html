@@ -831,11 +831,13 @@ body:not(.zh) .zh-only { display: none !important; }
       <span class="en-only">Join Waitlist →</span><span class="zh-only">提交申请 →</span>
     </button>
   </div>
-  <div class="auth-entry-wrap">
-    <a class="auth-entry-link en-only" href="signup.html">Create ScriptBridge Account</a>
-    <a class="auth-entry-link en-only" href="login.html">Already registered? Sign In</a>
-    <a class="auth-entry-link zh-only" href="signup.html">创建 ScriptBridge 账号</a>
-    <a class="auth-entry-link zh-only" href="login.html">已有账号？立即登录</a>
+
+  <div style="margin-top: 20px; display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+    <a href="signup.html" style="display: inline-block; background: rgba(255,255,255,0.12); border: 1.5px solid rgba(255,255,255,0.25); color: var(--cream); padding: 12px 20px; border-radius: 100px; font-size: 14px; text-decoration: none; transition: all 0.2s;" class="en-only" onmouseover="this.style.background='rgba(255,255,255,0.2)'" onmouseout="this.style.background='rgba(255,255,255,0.12)'">Create Account</a>
+    <a href="login.html" style="display: inline-block; background: rgba(255,255,255,0.12); border: 1.5px solid rgba(255,255,255,0.25); color: var(--cream); padding: 12px 20px; border-radius: 100px; font-size: 14px; text-decoration: none; transition: all 0.2s;" class="en-only" onmouseover="this.style.background='rgba(255,255,255,0.2)'" onmouseout="this.style.background='rgba(255,255,255,0.12)'">Sign In</a>
+
+    <a href="signup.html" style="display: inline-block; background: rgba(255,255,255,0.12); border: 1.5px solid rgba(255,255,255,0.25); color: var(--cream); padding: 12px 20px; border-radius: 100px; font-size: 14px; text-decoration: none; transition: all 0.2s;" class="zh-only" onmouseover="this.style.background='rgba(255,255,255,0.2)'" onmouseout="this.style.background='rgba(255,255,255,0.12)'">创建账户</a>
+    <a href="login.html" style="display: inline-block; background: rgba(255,255,255,0.12); border: 1.5px solid rgba(255,255,255,0.25); color: var(--cream); padding: 12px 20px; border-radius: 100px; font-size: 14px; text-decoration: none; transition: all 0.2s;" class="zh-only" onmouseover="this.style.background='rgba(255,255,255,0.2)'" onmouseout="this.style.background='rgba(255,255,255,0.12)'">登录</a>
   </div>
   <p class="signup-note"><span class="en-only">No spam. Only important updates when we launch.</span><span class="zh-only">我们不会发送垃圾邮件，只通知重要节点。</span></p>
   <div class="signup-success" id="signup-success">
