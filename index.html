@@ -364,6 +364,31 @@ section { padding: 80px 40px; }
 .signup-submit:hover { background: var(--coral-light); transform: translateY(-1px); }
 .signup-note { font-size: 12px; color: rgba(255,255,255,0.25); position: relative; z-index: 1; }
 .signup-success { display: none; font-family: 'Fraunces', serif; font-size: 20px; color: var(--coral-light); margin-top: 8px; font-style: italic; position: relative; z-index: 1; }
+.auth-entry-wrap {
+  margin-top: 18px;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  position: relative;
+  z-index: 1;
+}
+.auth-entry-link {
+  background: rgba(255,255,255,0.08);
+  border: 1.5px solid rgba(255,255,255,0.18);
+  color: var(--cream);
+  padding: 10px 18px;
+  border-radius: var(--r-pill);
+  font-size: 13px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+.auth-entry-link:hover {
+  background: rgba(255,255,255,0.16);
+  border-color: rgba(255,255,255,0.35);
+  transform: translateY(-1px);
+}
 .waitlist-count { display: flex; align-items: center; gap: 10px; justify-content: center; margin-bottom: 20px; font-size: 14px; color: rgba(245,240,232,0.7); position: relative; z-index: 1; }
 .waitlist-count strong { color: var(--coral-light); font-size: 16px; }
 .waitlist-avatars { font-size: 18px; letter-spacing: -4px; }
@@ -412,6 +437,7 @@ body:not(.zh) .zh-only { display: none !important; }
   .signup-form-wrap { flex-direction: column; }
   .signup-section { padding: 60px 24px; }
   .market-insight-card { flex-direction: column; }
+  .auth-entry-wrap { flex-direction: column; }
 }
 </style>
 </head>
@@ -460,11 +486,11 @@ body:not(.zh) .zh-only { display: none !important; }
     <span class="zh-only">第一个正规的中文剧本版权交易平台——透明定价、法律合同、资金托管，连接创作者与全球买家。</span>
   </p>
   <div class="hero-cta">
-    <a href="#signup" class="btn-primary" onclick="selectRole('creator')">
+    <a href="signup.html" class="btn-primary" onclick="selectRole('creator')">
       <span class="en-only">✍️ Join as Creator</span>
       <span class="zh-only">✍️ 创作者入驻</span>
     </a>
-    <a href="#signup" class="btn-outline" onclick="selectRole('buyer')">
+    <a href="signup.html" class="btn-outline" onclick="selectRole('buyer')">
       <span class="en-only">🎬 Browse as Buyer</span>
       <span class="zh-only">🎬 买家入驻</span>
     </a>
@@ -803,6 +829,12 @@ body:not(.zh) .zh-only { display: none !important; }
     <button class="signup-submit" onclick="handleSignup()">
       <span class="en-only">Join Waitlist →</span><span class="zh-only">提交申请 →</span>
     </button>
+  </div>
+  <div class="auth-entry-wrap">
+    <a class="auth-entry-link en-only" href="signup.html">Create ScriptBridge Account</a>
+    <a class="auth-entry-link en-only" href="login.html">Already registered? Sign In</a>
+    <a class="auth-entry-link zh-only" href="signup.html">创建 ScriptBridge 账号</a>
+    <a class="auth-entry-link zh-only" href="login.html">已有账号？立即登录</a>
   </div>
   <p class="signup-note"><span class="en-only">No spam. Only important updates when we launch.</span><span class="zh-only">我们不会发送垃圾邮件，只通知重要节点。</span></p>
   <div class="signup-success" id="signup-success">
