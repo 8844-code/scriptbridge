@@ -18,6 +18,20 @@
   --r-pill: 100px;
 }
 
+:root.theme-dark {
+  --cream: #11161c;
+  --ink: #f3f4f6;
+  --coral: #ff6b4a;
+  --sage: #5f8f70;
+  --sage-light: #77ad8c;
+  --coral-light: #ff8b73;
+  --warm-white: #1a222c;
+  --muted: #a7afb9;
+  --border: rgba(255, 255, 255, 0.16);
+  --error: #f87171;
+  --success: #4ade80;
+}
+
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
@@ -149,6 +163,34 @@ nav {
 .btn-logout:hover {
   background: #c53030;
   transform: translateY(-1px);
+}
+
+.theme-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px;
+  border-radius: var(--r-pill);
+  background: rgba(26, 26, 26, 0.08);
+  border: 1px solid var(--border);
+}
+
+.theme-pill button {
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: var(--r-pill);
+  padding: 5px 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.theme-pill button.active {
+  background: var(--ink);
+  color: var(--cream);
 }
 
 /* ===== 按钮 ===== */
@@ -367,6 +409,10 @@ nav {
 
   .lang-pill button {
     padding: 4px 10px;
+  }
+
+  .theme-pill button {
+    padding: 4px 8px;
   }
 }
 
