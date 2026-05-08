@@ -314,6 +314,95 @@ nav {
   opacity: 1;
 }
 
+/* ===== 暗色模式全局增强（业务页面） ===== */
+:root.theme-dark .auth-card,
+:root.theme-dark .upload-card,
+:root.theme-dark .list-card,
+:root.theme-dark .filters-card,
+:root.theme-dark .detail-content,
+:root.theme-dark .error-state,
+:root.theme-dark .metric-card {
+  background: #1e293b !important;
+  border-color: rgba(248, 250, 252, 0.24) !important;
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.35) !important;
+}
+
+:root.theme-dark .form-group label,
+:root.theme-dark .switch-link,
+:root.theme-dark .description-label,
+:root.theme-dark .profile-field label,
+:root.theme-dark .script-card-author,
+:root.theme-dark .script-date,
+:root.theme-dark .preview-meta,
+:root.theme-dark .loading-row,
+:root.theme-dark .loading-state,
+:root.theme-dark .empty-state,
+:root.theme-dark .muted,
+:root.theme-dark .nav-user-menu {
+  color: #cbd5e1 !important;
+}
+
+:root.theme-dark .auth-card h1,
+:root.theme-dark .auth-card p,
+:root.theme-dark .detail-title,
+:root.theme-dark .description-text,
+:root.theme-dark .preview-body,
+:root.theme-dark .scripts-table td,
+:root.theme-dark .scripts-table th,
+:root.theme-dark .script-card-title,
+:root.theme-dark .list-header h1,
+:root.theme-dark .browse-header h1,
+:root.theme-dark .upload-header h1 {
+  color: #f8fafc !important;
+}
+
+:root.theme-dark .form-group input,
+:root.theme-dark .form-group textarea,
+:root.theme-dark .form-group select,
+:root.theme-dark .filters-card input,
+:root.theme-dark .filters-card select,
+:root.theme-dark .signup-input {
+  background: rgba(255, 255, 255, 0.1) !important;
+  border-color: rgba(248, 250, 252, 0.28) !important;
+  color: #f8fafc !important;
+}
+
+:root.theme-dark .role-option label,
+:root.theme-dark .rights-option label {
+  background: rgba(255, 255, 255, 0.08) !important;
+  border-color: rgba(248, 250, 252, 0.24) !important;
+  color: #e2e8f0 !important;
+}
+
+:root.theme-dark .switch-link a,
+:root.theme-dark .back-link,
+:root.theme-dark .auth-nav-links a {
+  color: #f8fafc !important;
+  border-bottom-color: rgba(248, 250, 252, 0.55) !important;
+}
+
+:root.theme-dark .scripts-table th,
+:root.theme-dark .scripts-table td {
+  border-bottom-color: rgba(248, 250, 252, 0.2) !important;
+}
+
+:root.theme-dark .preview-content,
+:root.theme-dark .list-card,
+:root.theme-dark .profile-section,
+:root.theme-dark .action-card,
+:root.theme-dark .script-card,
+:root.theme-dark .market-small-card,
+:root.theme-dark .hero-stat {
+  background: #1e293b !important;
+  border-color: rgba(248, 250, 252, 0.24) !important;
+}
+
+:root.theme-dark .action-card-desc,
+:root.theme-dark .action-card-title,
+:root.theme-dark .profile-field p {
+  color: #f8fafc !important;
+}
+
 .form-error {
   color: var(--error);
   font-size: 13px;
