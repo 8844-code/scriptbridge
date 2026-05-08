@@ -1,0 +1,12 @@
+# Obsidian vault config - not part of the website
+.obsidian/
+
+# Claude AI session files
+.claude/
+
+# macOS
+.DS_Store
+**/.DS_Store
+
+# Node modules (if used in future)
+node_modules/
