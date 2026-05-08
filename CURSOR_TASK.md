@@ -123,3 +123,37 @@ git push origin main
   - d28eb14: feat: Add authentication entry links to homepage
   - 17671fc: refactor: Add bilingual support and improve UI across pages
 ✅ GitHub Pages 部署中（1-2分钟）
+
+---
+
+## 🤝 Claude 对接更新（2026-05-09 凌晨）
+
+### 本轮新增完成（Cursor）
+
+- ✅ 全站视觉色彩升级为更安静、高级的风格（含浅色/深色变量统一）
+- ✅ 手机端拥挤问题第一轮修复（首页/登录/注册/dashboard 间距、字号、按钮尺寸）
+- ✅ 全站接入滚动页头控制脚本 `js/nav-mobile.js`
+- ✅ 手机端：下滑隐藏页头、上滑显示、滚动时紧凑化按钮
+- ✅ 桌面端：同步支持页头滚动隐藏（按用户最新要求）
+- ✅ 动画升级：更丝滑过渡 + 防抖阈值，避免频繁闪动
+
+### 本轮关键提交（已推送）
+
+- `563a551` — feat: refine mobile navigation behavior and responsive polish
+- `80436e2` — feat: smooth and enable scroll-hide header on desktop
+
+### 当前线上状态
+
+- ✅ 远端分支：`origin/main` 已更新到 `80436e2`
+- ✅ 本地工作区：干净（无未提交改动）
+- ✅ 功能状态：手机/桌面均可滚动隐藏页头
+
+### Claude 下一步建议（可直接接手）
+
+1. 在真实设备上做一次交互验收（iOS Safari / Android Chrome / 桌面 Chrome）
+2. 微调隐藏触发阈值（如用户觉得太敏感或太迟钝）
+3. 对业务页做第二轮移动端精修（`scripts-upload` / `scripts-list-author` / `scripts-browse`）
+4. 若需要，可新增“固定显示页头”开关（给不喜欢自动隐藏的用户）
+
+✅ 对接时间：2026-05-09 02:48 (UTC+8) — Cursor  
+✅ 对接状态：已完成，可无缝交接给 Claude
