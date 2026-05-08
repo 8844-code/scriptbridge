@@ -109,17 +109,18 @@ nav {
 
 .lang-pill {
   display: flex;
-  background: var(--ink);
+  background: #0f172a;
   border-radius: var(--r-pill);
   overflow: hidden;
   padding: 3px;
   gap: 2px;
+  border: 1px solid rgba(248, 250, 252, 0.2);
 }
 
 .lang-pill button {
   border: none;
   background: transparent;
-  color: rgba(255, 255, 255, 0.5);
+  color: rgba(248, 250, 252, 0.78);
   font-family: 'DM Sans', sans-serif;
   font-size: 12px;
   font-weight: 500;
