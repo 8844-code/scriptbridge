@@ -19,15 +19,15 @@
 }
 
 :root.theme-dark {
-  --cream: #11161c;
-  --ink: #f3f4f6;
+  --cream: #0f141b;
+  --ink: #f8fafc;
   --coral: #ff6b4a;
   --sage: #5f8f70;
   --sage-light: #77ad8c;
   --coral-light: #ff8b73;
-  --warm-white: #1a222c;
-  --muted: #a7afb9;
-  --border: rgba(255, 255, 255, 0.16);
+  --warm-white: #1e2733;
+  --muted: #cbd5e1;
+  --border: rgba(255, 255, 255, 0.24);
   --error: #f87171;
   --success: #4ade80;
 }
@@ -65,6 +65,10 @@ nav {
   background: rgba(245, 240, 232, 0.88);
   backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--border);
+}
+
+:root.theme-dark nav {
+  background: rgba(15, 20, 27, 0.92);
 }
 
 .nav-logo {
@@ -193,6 +197,15 @@ nav {
   color: var(--cream);
 }
 
+:root.theme-dark .theme-pill {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+:root.theme-dark .theme-pill button.active {
+  background: var(--coral);
+  color: #fff;
+}
+
 /* ===== 按钮 ===== */
 .btn {
   border: none;
@@ -242,6 +255,14 @@ nav {
   background: rgba(26, 26, 26, 0.05);
 }
 
+:root.theme-dark .btn-outline {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+:root.theme-dark .btn-outline:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
 .btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
@@ -285,6 +306,12 @@ nav {
 .form-group textarea {
   resize: vertical;
   min-height: 100px;
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+  color: var(--muted);
+  opacity: 1;
 }
 
 .form-error {

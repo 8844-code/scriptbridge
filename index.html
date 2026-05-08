@@ -27,15 +27,15 @@
 }
 
 :root.theme-dark {
-  --cream: #11161c;
-  --ink: #f3f4f6;
+  --cream: #0f172a;
+  --ink: #e5e7eb;
   --coral: #ff6b4a;
   --sage: #5f8f70;
   --sage-light: #77ad8c;
   --coral-light: #ff8b73;
-  --warm-white: #1a222c;
-  --muted: #a7afb9;
-  --border: rgba(255,255,255,0.16);
+  --warm-white: #1e293b;
+  --muted: #cbd5e1;
+  --border: rgba(255,255,255,0.24);
 }
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; }
@@ -89,6 +89,105 @@ nav {
 .auth-nav-links a:hover {
   color: var(--coral);
   border-bottom-color: var(--coral);
+}
+:root.theme-dark .auth-nav-links {
+  color: var(--muted);
+}
+:root.theme-dark .auth-nav-links a {
+  color: var(--ink);
+  border-bottom-color: rgba(248,250,252,0.45);
+}
+.auth-cta-note {
+  margin-top: 24px;
+  font-size: 13px;
+  color: rgba(245,240,232,0.72);
+  position: relative;
+  z-index: 1;
+}
+.auth-cta-note a {
+  color: rgba(245,240,232,0.95);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+:root.theme-dark .auth-cta-note {
+  color: rgba(248,250,252,0.78);
+}
+:root.theme-dark .auth-cta-note a {
+  color: #fff;
+}
+:root.theme-dark .hero-desc,
+:root.theme-dark .section-sub,
+:root.theme-dark .signup-sub,
+:root.theme-dark .waitlist-count,
+:root.theme-dark .share-label,
+:root.theme-dark .market-insight-text,
+:root.theme-dark .rights-section .section-sub,
+:root.theme-dark .value-card-text {
+  color: rgba(248,250,252,0.9);
+}
+:root.theme-dark .signup-note {
+  color: rgba(248,250,252,0.78);
+}
+:root.theme-dark .role-tab {
+  color: rgba(248,250,252,0.82);
+}
+:root.theme-dark .role-tab.active {
+  color: #fff;
+}
+:root.theme-dark .signup-input::placeholder {
+  color: rgba(248,250,252,0.62);
+}
+:root.theme-dark .rights-col-title-zh,
+:root.theme-dark .rights-tag,
+:root.theme-dark .footer-meta {
+  color: rgba(248,250,252,0.82);
+}
+:root.theme-dark .share-btn {
+  border-color: rgba(248,250,252,0.36);
+  background: rgba(248,250,252,0.12);
+}
+:root.theme-dark .share-btn:hover {
+  background: rgba(248,250,252,0.2);
+  border-color: rgba(248,250,252,0.55);
+}
+:root.theme-dark .insight-dot {
+  background: rgba(248,250,252,0.45);
+}
+:root.theme-dark .rights-section,
+:root.theme-dark .signup-section,
+:root.theme-dark .market-insight-card {
+  background: #0b1220;
+  color: #f8fafc;
+}
+:root.theme-dark .rights-col {
+  background: rgba(255,255,255,0.06);
+  border-color: rgba(255,255,255,0.18);
+}
+:root.theme-dark .rights-col-title,
+:root.theme-dark .rights-col-num {
+  color: #fff;
+}
+:root.theme-dark .rights-tag {
+  background: rgba(255,255,255,0.08);
+  border-color: rgba(255,255,255,0.14);
+}
+:root.theme-dark .signup-input {
+  background: rgba(255,255,255,0.14);
+  border-color: rgba(255,255,255,0.3);
+  color: #fff;
+}
+:root.theme-dark .auth-nav-links a {
+  color: #f8fafc;
+  border-bottom-color: rgba(248,250,252,0.55);
+}
+:root.theme-dark .market-big-label,
+:root.theme-dark .value-card-for,
+:root.theme-dark .value-card-text {
+  opacity: 1;
+}
+:root.theme-dark .footer-meta div[style*="opacity:0.5"],
+:root.theme-dark .footer-meta a[style*="opacity:0.5"] {
+  opacity: 0.9 !important;
 }
 .lang-pill {
   display: flex; background: var(--ink); border-radius: var(--r-pill);
@@ -883,11 +982,11 @@ body:not(.zh) .zh-only { display: none !important; }
     </button>
   </div>
 
-  <p style="margin-top: 24px; font-size: 13px; color: rgba(245,240,232,0.4); position: relative; z-index: 1;" class="en-only">
-    Platform is live. Already have an account? <a href="login.html" style="color: rgba(245,240,232,0.7); text-decoration: underline; text-underline-offset: 3px; transition: color 0.2s;" onmouseover="this.style.color='rgba(245,240,232,1)'" onmouseout="this.style.color='rgba(245,240,232,0.7)'">Sign In</a> &nbsp;·&nbsp; <a href="signup.html" style="color: rgba(245,240,232,0.7); text-decoration: underline; text-underline-offset: 3px; transition: color 0.2s;" onmouseover="this.style.color='rgba(245,240,232,1)'" onmouseout="this.style.color='rgba(245,240,232,0.7)'">Create Account</a>
+  <p class="auth-cta-note en-only">
+    Platform is live. Already have an account? <a href="login.html">Sign In</a> &nbsp;·&nbsp; <a href="signup.html">Create Account</a>
   </p>
-  <p style="margin-top: 24px; font-size: 13px; color: rgba(245,240,232,0.4); position: relative; z-index: 1;" class="zh-only">
-    平台已上线。已有账户？<a href="login.html" style="color: rgba(245,240,232,0.7); text-decoration: underline; text-underline-offset: 3px; transition: color 0.2s;" onmouseover="this.style.color='rgba(245,240,232,1)'" onmouseout="this.style.color='rgba(245,240,232,0.7)'">登录</a> &nbsp;·&nbsp; <a href="signup.html" style="color: rgba(245,240,232,0.7); text-decoration: underline; text-underline-offset: 3px; transition: color 0.2s;" onmouseover="this.style.color='rgba(245,240,232,1)'" onmouseout="this.style.color='rgba(245,240,232,0.7)'">创建账户</a>
+  <p class="auth-cta-note zh-only">
+    平台已上线。已有账户？<a href="login.html">登录</a> &nbsp;·&nbsp; <a href="signup.html">创建账户</a>
   </p>
   <p class="signup-note"><span class="en-only">No spam. Only important updates when we launch.</span><span class="zh-only">我们不会发送垃圾邮件，只通知重要节点。</span></p>
   <div class="signup-success" id="signup-success">
@@ -930,10 +1029,11 @@ function selectRole(role) {
   document.getElementById('tab-buyer').classList.toggle('active', role === 'buyer');
 }
 const WEB3FORMS_KEY = 'cbfde96d-d025-42af-a16b-81461d91783c';
-let currentWaitlistCount = 47;
+const MIN_WAITLIST_COUNT = 4;
+let currentWaitlistCount = MIN_WAITLIST_COUNT;
 
 function setWaitlistCount(value) {
-  const safeCount = Number.isFinite(value) && value >= 0 ? value : 0;
+  const safeCount = Number.isFinite(value) && value >= 0 ? Math.max(value, MIN_WAITLIST_COUNT) : MIN_WAITLIST_COUNT;
   document.getElementById('count-num-en').textContent = safeCount;
   document.getElementById('count-num-zh').textContent = safeCount;
   currentWaitlistCount = safeCount;
@@ -949,7 +1049,7 @@ async function fetchWaitlistCount() {
     return;
   }
   if (typeof count === 'number') {
-    animateCount(count, 650);
+    animateCount(Math.max(count, MIN_WAITLIST_COUNT), 650);
   }
 }
 

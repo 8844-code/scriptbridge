@@ -201,3 +201,29 @@ git push origin main
 ---
 
 **最后：这个流程就是 Claude 和 Cursor 的协作方式。清晰、可重复、高效。**
+
+---
+
+## Cursor 最新交接（2026-05-09 凌晨）
+
+### 已完成（可直接给 Claude Code 查看）
+- [x] 首页、登录、注册、Dashboard、Upload、Browse、Author List、Detail 页接入统一主题系统
+- [x] 新增 `js/theme.js`：支持 `light / dark / system`，并持久化到 `scriptbridge_theme`
+- [x] 暗色模式可读性修复（字体对比、边框、按钮、导航背景）
+- [x] 首页候补提交写入 Supabase（保留 Web3Forms 邮件）
+- [x] 首页候补人数改为数据库读取，并每 30 秒刷新
+- [x] 新增 SQL 脚本：`sql/waitlist_setup.sql`（表+RLS 策略）
+- [x] Supabase SQL 已由用户在控制台执行成功
+
+### 当前线上状态
+- 最新代码已推送到 `main`
+- 关键功能：语言切换、主题切换、候补实时人数均已在代码中接通
+
+### 待继续（建议 Claude Code 下一步）
+1. 增加重复邮箱提示（例如“你已在候补名单中”）
+2. 增加运营后台页 `admin-waitlist.html`：
+   - 总人数
+   - 今日新增
+   - 角色占比（creator/buyer）
+   - 最近报名列表
+3. 移动端进一步减负导航（保持收集入口强曝光）

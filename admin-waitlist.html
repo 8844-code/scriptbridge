@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Waitlist Stats — ScriptBridge</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23FF4D2E'/%3E%3Ctext x='16' y='23' font-family='Georgia,serif' font-size='20' font-weight='700' fill='white' text-anchor='middle'%3ES%3C/text%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Fraunces:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/common.css">
+  <script src="js/theme.js" defer></script>
+  <style>
+    .stats-wrapper { min-height: 100vh; padding: 100px 40px 70px; }
+    .stats-container { max-width: 980px; margin: 0 auto; }
+    .stats-header { margin-bottom: 22px; }
+    .stats-header h1 { font-family: 'Fraunces', serif; font-size: 34px; }
+    .stats-header p { color: var(--muted); margin-top: 6px; }
+    .metrics-grid { display: grid; grid-template-columns: repeat(4, minmax(150px, 1fr)); gap: 12px; margin-bottom: 18px; }
+    .metric-card { background: var(--warm-white); border: 1px solid var(--border); border-radius: 14px; padding: 16px; }
+    .metric-label { font-size: 12px; color: var(--muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.05em; }
+    .metric-value { font-size: 26px; font-weight: 700; line-height: 1; }
+    .list-card { background: var(--warm-white); border: 1px solid var(--border); border-radius: 16px; padding: 14px; }
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; min-width: 560px; }
+    th, td { text-align: left; padding: 12px 10px; border-bottom: 1px solid var(--border); font-size: 14px; }
+    th { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; }
+    .muted { color: var(--muted); }
+    .role-pill { display: inline-block; padding: 3px 10px; border-radius: var(--r-pill); font-size: 12px; font-weight: 600; }
+    .role-creator { background: rgba(255, 77, 46, 0.14); color: var(--coral); }
+    .role-buyer { background: rgba(61, 107, 79, 0.14); color: var(--sage); }
+    @media (max-width: 768px) {
+      .stats-wrapper { padding: 80px 20px 55px; }
+      .metrics-grid { grid-template-columns: repeat(2, minmax(120px, 1fr)); }
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="index.html" class="nav-logo">
+      <div class="nav-logo-mark">S</div>
+      <div><div class="nav-logo-text">ScriptBridge</div></div>
+    </a>
+    <div class="nav-right">
+      <div class="lang-pill">
+        <button id="lang-en" type="button">EN</button>
+        <button id="lang-zh" type="button">中文</button>
+      </div>
+      <a id="back-home" href="index.html" class="btn btn-outline">Back Home</a>
+    </div>
+  </nav>
+
+  <main class="stats-wrapper">
+    <div class="stats-container">
+      <header class="stats-header">
+        <h1 id="page-title">Waitlist Dashboard</h1>
+        <p id="page-subtitle">Live signups from landing page and role split.</p>
+      </header>
+
+      <section class="metrics-grid">
+        <div class="metric-card"><div class="metric-label" id="label-total">Total</div><div class="metric-value" id="total-count">0</div></div>
+        <div class="metric-card"><div class="metric-label" id="label-today">Today</div><div class="metric-value" id="today-count">0</div></div>
+        <div class="metric-card"><div class="metric-label" id="label-creator">Creators</div><div class="metric-value" id="creator-count">0</div></div>
+        <div class="metric-card"><div class="metric-label" id="label-buyer">Buyers</div><div class="metric-value" id="buyer-count">0</div></div>
+      </section>
+
+      <section class="list-card">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th id="th-email">Email</th>
+                <th id="th-role">Role</th>
+                <th id="th-time">Joined At</th>
+              </tr>
+            </thead>
+            <tbody id="recent-body">
+              <tr><td colspan="3" class="muted" id="loading-row">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-client.js"></script>
+  <script>
+    const langEnBtn = document.getElementById('lang-en');
+    const langZhBtn = document.getElementById('lang-zh');
+    let currentLang = localStorage.getItem('scriptbridge_lang') || 'en';
+
+    const I18N = {
+      en: {
+        back: 'Back Home',
+        title: 'Waitlist Dashboard',
+        subtitle: 'Live signups from landing page and role split.',
+        total: 'Total',
+        today: 'Today',
+        creator: 'Creators',
+        buyer: 'Buyers',
+        email: 'Email',
+        role: 'Role',
+        time: 'Joined At',
+        loading: 'Loading...',
+        empty: 'No data yet.',
+        unknown: 'Unknown'
+      },
+      zh: {
+        back: '返回首页',
+        title: '候补统计面板',
+        subtitle: '显示首页候补实时数据与角色分布。',
+        total: '总人数',
+        today: '今日新增',
+        creator: '创作者',
+        buyer: '买家',
+        email: '邮箱',
+        role: '角色',
+        time: '加入时间',
+        loading: '加载中...',
+        empty: '暂无数据',
+        unknown: '未知'
+      }
+    };
+
+    function t(key) { return I18N[currentLang][key]; }
+
+    function setLang(lang) {
+      currentLang = lang === 'zh' ? 'zh' : 'en';
+      document.body.classList.toggle('zh', currentLang === 'zh');
+      document.documentElement.lang = currentLang === 'zh' ? 'zh-CN' : 'en';
+      langEnBtn.classList.toggle('active', currentLang === 'en');
+      langZhBtn.classList.toggle('active', currentLang === 'zh');
+      localStorage.setItem('scriptbridge_lang', currentLang);
+
+      document.getElementById('back-home').textContent = t('back');
+      document.getElementById('page-title').textContent = t('title');
+      document.getElementById('page-subtitle').textContent = t('subtitle');
+      document.getElementById('label-total').textContent = t('total');
+      document.getElementById('label-today').textContent = t('today');
+      document.getElementById('label-creator').textContent = t('creator');
+      document.getElementById('label-buyer').textContent = t('buyer');
+      document.getElementById('th-email').textContent = t('email');
+      document.getElementById('th-role').textContent = t('role');
+      document.getElementById('th-time').textContent = t('time');
+    }
+
+    function maskEmail(email) {
+      if (!email || !email.includes('@')) return t('unknown');
+      const [name, domain] = email.split('@');
+      const start = name.slice(0, 2);
+      const hidden = '*'.repeat(Math.max(2, name.length - 2));
+      return `${start}${hidden}@${domain}`;
+    }
+
+    function formatTime(iso) {
+      if (!iso) return '—';
+      return new Date(iso).toLocaleString();
+    }
+
+    async function loadStats() {
+      const recentBody = document.getElementById('recent-body');
+      recentBody.innerHTML = `<tr><td colspan="3" class="muted">${t('loading')}</td></tr>`;
+
+      const { data: allRows, error: allErr } = await window.supabase_client
+        .from('waitlist_signups')
+        .select('email, role, created_at');
+
+      if (allErr) {
+        recentBody.innerHTML = `<tr><td colspan="3" class="muted">${allErr.message}</td></tr>`;
+        return;
+      }
+
+      const rows = allRows || [];
+      const total = rows.length;
+      const todayStart = new Date();
+      todayStart.setHours(0, 0, 0, 0);
+      const todayCount = rows.filter((r) => new Date(r.created_at) >= todayStart).length;
+      const creatorCount = rows.filter((r) => r.role === 'creator').length;
+      const buyerCount = rows.filter((r) => r.role === 'buyer').length;
+
+      document.getElementById('total-count').textContent = total;
+      document.getElementById('today-count').textContent = todayCount;
+      document.getElementById('creator-count').textContent = creatorCount;
+      document.getElementById('buyer-count').textContent = buyerCount;
+
+      const recentRows = [...rows]
+        .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+        .slice(0, 20);
+
+      if (!recentRows.length) {
+        recentBody.innerHTML = `<tr><td colspan="3" class="muted">${t('empty')}</td></tr>`;
+        return;
+      }
+
+      recentBody.innerHTML = recentRows.map((row) => {
+        const roleText = row.role === 'creator'
+          ? (currentLang === 'zh' ? '创作者' : 'Creator')
+          : (currentLang === 'zh' ? '买家' : 'Buyer');
+        const roleClass = row.role === 'creator' ? 'role-creator' : 'role-buyer';
+        return `<tr>
+          <td>${maskEmail(row.email)}</td>
+          <td><span class="role-pill ${roleClass}">${roleText}</span></td>
+          <td>${formatTime(row.created_at)}</td>
+        </tr>`;
+      }).join('');
+    }
+
+    langEnBtn.addEventListener('click', () => { setLang('en'); loadStats(); });
+    langZhBtn.addEventListener('click', () => { setLang('zh'); loadStats(); });
+
+    window.addEventListener('DOMContentLoaded', async () => {
+      setLang(currentLang);
+      await loadStats();
+      setInterval(loadStats, 30000);
+    });
+  </script>
+</body>
+</html>
