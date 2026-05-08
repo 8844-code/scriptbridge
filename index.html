@@ -61,12 +61,13 @@ nav {
   background: rgba(245,240,232,0.88);
   backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--border);
-  transition: transform 0.28s ease, background 0.2s ease, border-color 0.2s ease;
+  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.35s ease, background 0.2s ease, border-color 0.2s ease, padding 0.3s ease;
   will-change: transform;
 }
 html.nav-hidden nav {
   transform: translateY(calc(-100% - 8px));
-  opacity: 0.12;
+  opacity: 0;
+  pointer-events: none;
 }
 html.nav-compact nav {
   padding-top: 7px;

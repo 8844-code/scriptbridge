@@ -3,13 +3,26 @@
   const ROOT = document.documentElement;
   let lastY = window.scrollY || 0;
   let ticking = false;
+  let navHidden = false;
+  let lastToggleY = lastY;
+  let lastToggleAt = 0;
 
   function showNav() {
-    ROOT.classList.remove('nav-hidden');
+    if (navHidden) {
+      ROOT.classList.remove('nav-hidden');
+      navHidden = false;
+      lastToggleY = window.scrollY || 0;
+      lastToggleAt = performance.now();
+    }
   }
 
   function hideNav() {
-    ROOT.classList.add('nav-hidden');
+    if (!navHidden) {
+      ROOT.classList.add('nav-hidden');
+      navHidden = true;
+      lastToggleY = window.scrollY || 0;
+      lastToggleAt = performance.now();
+    }
   }
 
   function setCompact(compact) {
@@ -19,22 +32,32 @@
   function updateNav() {
     const currentY = window.scrollY || 0;
     const delta = currentY - lastY;
+    const isMobile = MOBILE_QUERY.matches;
+    const downThreshold = isMobile ? 5 : 7;
+    const upThreshold = isMobile ? -5 : -7;
+    const hideAfter = isMobile ? 72 : 96;
+    const compactAfter = isMobile ? 20 : 36;
+    const minToggleDistance = isMobile ? 18 : 26;
+    const minToggleInterval = 110;
+    const movedSinceToggle = Math.abs(currentY - lastToggleY);
+    const enoughTimePassed = (performance.now() - lastToggleAt) > minToggleInterval;
 
-    if (!MOBILE_QUERY.matches) {
+    setCompact(currentY > compactAfter);
+
+    if (currentY <= 6) {
       showNav();
-      setCompact(false);
-      lastY = currentY;
-      ticking = false;
-      return;
-    }
-
-    setCompact(currentY > 24);
-
-    if (currentY <= 8) {
-      showNav();
-    } else if (delta > 6 && currentY > 72) {
+    } else if (
+      delta > downThreshold &&
+      currentY > hideAfter &&
+      movedSinceToggle > minToggleDistance &&
+      enoughTimePassed
+    ) {
       hideNav();
-    } else if (delta < -6) {
+    } else if (
+      delta < upThreshold &&
+      movedSinceToggle > minToggleDistance &&
+      enoughTimePassed
+    ) {
       showNav();
     }
 
@@ -51,6 +74,11 @@
 
   window.addEventListener('scroll', onScroll, { passive: true });
   window.addEventListener('touchstart', showNav, { passive: true });
+  window.addEventListener('mousemove', () => {
+    if (!MOBILE_QUERY.matches && (window.scrollY || 0) > 6) {
+      showNav();
+    }
+  }, { passive: true });
   window.addEventListener('resize', updateNav);
   MOBILE_QUERY.addEventListener('change', updateNav);
 
