@@ -146,6 +146,37 @@
 
     .switch-link a:hover {
       color: var(--coral);
+    }
+
+    /* LANGUAGE */
+    .en-only { display: block; }
+    .zh-only { display: none; }
+    body.zh .en-only { display: none; }
+    body.zh .zh-only { display: block; }
+
+    .lang-pill {
+      display: flex;
+      background: var(--ink);
+      border-radius: 100px;
+      overflow: hidden;
+      padding: 3px;
+      gap: 2px;
+    }
+    .lang-pill button {
+      border: none;
+      background: transparent;
+      color: rgba(255, 255, 255, 0.5);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 12px;
+      font-weight: 500;
+      padding: 4px 12px;
+      border-radius: 100px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .lang-pill button.active {
+      background: var(--coral);
+      color: #fff;
       border-bottom-color: var(--coral);
     }
 
@@ -170,7 +201,12 @@
       </div>
     </a>
     <div class="nav-right">
-      <a href="login.html" class="btn btn-outline">Already have an account?</a>
+      <div class="lang-pill">
+        <button class="active" onclick="setLang('en')">EN</button>
+        <button onclick="setLang('zh')">中文</button>
+      </div>
+      <a href="login.html" class="btn btn-outline en-only">Already have an account?</a>
+      <a href="login.html" class="btn btn-outline zh-only">已有账户？</a>
     </div>
   </nav>
 
@@ -179,8 +215,8 @@
     <div class="auth-container">
       <div class="auth-card">
         <div class="signup-header">
-          <h1>Create Account</h1>
-          <p>Join ScriptBridge to share and discover scripts</p>
+          <h1><span class="en-only">Create Account</span><span class="zh-only">创建账户</span></h1>
+          <p><span class="en-only">Join ScriptBridge to share and discover scripts</span><span class="zh-only">加入 ScriptBridge 分享和发现剧本</span></p>
         </div>
 
         <div id="alert-container"></div>
@@ -188,49 +224,50 @@
         <form id="signup-form">
           <!-- 角色选择 -->
           <div class="form-group">
-            <label>I am a...</label>
+            <label><span class="en-only">I am a...</span><span class="zh-only">我的身份...</span></label>
             <div class="role-selector">
               <div class="role-option">
                 <input type="radio" id="role-creator" name="role" value="creator" required>
-                <label for="role-creator">Script Creator</label>
+                <label for="role-creator"><span class="en-only">Script Creator</span><span class="zh-only">剧本创作者</span></label>
               </div>
               <div class="role-option">
                 <input type="radio" id="role-buyer" name="role" value="buyer" required>
-                <label for="role-buyer">Buyer</label>
+                <label for="role-buyer"><span class="en-only">Buyer</span><span class="zh-only">买家</span></label>
               </div>
             </div>
           </div>
 
           <!-- 邮箱 -->
           <div class="form-group">
-            <label for="email">Email Address</label>
+            <label for="email"><span class="en-only">Email Address</span><span class="zh-only">邮箱</span></label>
             <input type="email" id="email" name="email" required placeholder="your@email.com">
             <div class="form-error" id="email-error"></div>
           </div>
 
           <!-- 密码 -->
           <div class="form-group">
-            <label for="password">Password</label>
+            <label for="password"><span class="en-only">Password</span><span class="zh-only">密码</span></label>
             <input type="password" id="password" name="password" required placeholder="At least 8 characters">
             <div class="form-error" id="password-error"></div>
           </div>
 
           <!-- 确认密码 -->
           <div class="form-group">
-            <label for="confirm-password">Confirm Password</label>
+            <label for="confirm-password"><span class="en-only">Confirm Password</span><span class="zh-only">确认密码</span></label>
             <input type="password" id="confirm-password" name="confirm_password" required placeholder="Confirm your password">
             <div class="form-error" id="confirm-error"></div>
           </div>
 
           <!-- 提交按钮 -->
           <button type="submit" class="btn btn-primary" style="width: 100%;">
-            <span id="btn-text">Create Account</span>
+            <span id="btn-text"><span class="en-only">Create Account</span><span class="zh-only">创建账户</span></span>
             <span id="btn-spinner" class="spinner" style="display: none;"></span>
           </button>
         </form>
 
         <div class="switch-link">
-          Already have an account? <a href="login.html">Sign in</a>
+          <span class="en-only">Already have an account? <a href="login.html">Sign in</a></span>
+          <span class="zh-only">已有账户？<a href="login.html">立即登录</a></span>
         </div>
       </div>
     </div>
@@ -243,6 +280,21 @@
   <script src="js/supabase-client.js"></script>
 
   <script>
+    // 语言切换
+    function setLang(lang) {
+      document.body.classList.toggle('zh', lang === 'zh');
+      document.querySelectorAll('.lang-pill button').forEach((btn, i) => {
+        btn.classList.toggle('active', (i === 0 && lang === 'en') || (i === 1 && lang === 'zh'));
+      });
+      localStorage.setItem('scriptbridge_lang', lang);
+    }
+
+    // 初始化语言
+    window.addEventListener('DOMContentLoaded', () => {
+      const savedLang = localStorage.getItem('scriptbridge_lang') || 'en';
+      setLang(savedLang);
+    });
+
     const form = document.getElementById('signup-form');
     const emailInput = document.getElementById('email');
     const passwordInput = document.getElementById('password');
