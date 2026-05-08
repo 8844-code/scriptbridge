@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Scripts — ScriptBridge</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23FF4D2E'/%3E%3Ctext x='16' y='23' font-family='Georgia,serif' font-size='20' font-weight='700' fill='white' text-anchor='middle'%3ES%3C/text%3E%3C/svg%3E">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300;1,9..40,400&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;0,9..144,700;1,9..144,300;1,9..144,500;1,9..144,700&family=Noto+Sans+SC:wght@300;400;500&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/common.css">
+
+  <style>
+    .list-wrapper {
+      min-height: 100vh;
+      padding: 100px 40px 80px;
+      position: relative;
+    }
+
+    .list-wrapper::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 10% 10%, rgba(255, 77, 46, 0.07), transparent 34%),
+        radial-gradient(circle at 90% 90%, rgba(61, 107, 79, 0.09), transparent 34%);
+      pointer-events: none;
+    }
+
+    .list-container {
+      max-width: 1080px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+    }
+
+    .list-header {
+      margin-bottom: 22px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .list-header h1 {
+      font-family: 'Fraunces', serif;
+      font-size: 36px;
+      font-weight: 600;
+      color: var(--ink);
+      letter-spacing: -0.02em;
+    }
+
+    .list-header p {
+      color: var(--muted);
+      font-size: 15px;
+      margin-top: 6px;
+    }
+
+    .list-card {
+      background: rgba(253, 250, 244, 0.92);
+      border: 1px solid rgba(26, 26, 26, 0.12);
+      border-radius: 22px;
+      padding: 20px;
+      box-shadow: 0 14px 36px rgba(26, 26, 26, 0.08);
+      backdrop-filter: blur(4px);
+    }
+
+    .table-wrapper {
+      overflow-x: auto;
+    }
+
+    .scripts-table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 760px;
+    }
+
+    .scripts-table th,
+    .scripts-table td {
+      text-align: left;
+      padding: 14px 12px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+
+    .scripts-table th {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .scripts-table td {
+      font-size: 14px;
+      color: var(--ink);
+    }
+
+    .script-title {
+      font-weight: 600;
+      max-width: 280px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .price-pill {
+      display: inline-block;
+      background: rgba(61, 107, 79, 0.12);
+      color: var(--sage);
+      border-radius: var(--r-pill);
+      padding: 4px 10px;
+      font-weight: 600;
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .btn-sm {
+      padding: 8px 12px;
+      font-size: 13px;
+      border-radius: 10px;
+    }
+
+    .btn-danger {
+      background: var(--error);
+      color: #fff;
+      border: none;
+    }
+
+    .btn-danger:hover {
+      background: #c53030;
+    }
+
+    .btn-disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 52px 20px;
+    }
+
+    .empty-state-icon {
+      font-size: 44px;
+      margin-bottom: 12px;
+    }
+
+    .empty-state h2 {
+      font-size: 24px;
+      margin-bottom: 8px;
+      color: var(--ink);
+    }
+
+    .empty-state p {
+      color: var(--muted);
+      margin-bottom: 20px;
+    }
+
+    .btn-primary {
+      border-radius: 12px;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+      background: linear-gradient(140deg, #2f5a40 0%, #3d6b4f 100%);
+      box-shadow: 0 10px 18px rgba(61, 107, 79, 0.24);
+    }
+
+    .btn-primary:hover {
+      background: linear-gradient(140deg, #2a5139 0%, #365f46 100%);
+      transform: translateY(-1px);
+    }
+
+    .nav-user-menu {
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 500;
+      background: rgba(255, 255, 255, 0.55);
+      border: 1px solid var(--border);
+      border-radius: var(--r-pill);
+      padding: 8px 14px;
+      max-width: 240px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .loading-row {
+      text-align: center;
+      color: var(--muted);
+      padding: 26px;
+    }
+
+    .preview-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(26, 26, 26, 0.45);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 200;
+    }
+
+    .preview-modal.show {
+      display: flex;
+    }
+
+    .preview-content {
+      width: 100%;
+      max-width: 640px;
+      max-height: 85vh;
+      overflow-y: auto;
+      background: var(--warm-white);
+      border-radius: 18px;
+      border: 1px solid var(--border);
+      padding: 24px;
+    }
+
+    .preview-content h3 {
+      font-size: 22px;
+      margin-bottom: 8px;
+    }
+
+    .preview-meta {
+      color: var(--muted);
+      font-size: 14px;
+      margin-bottom: 14px;
+    }
+
+    .preview-body {
+      white-space: pre-wrap;
+      line-height: 1.65;
+      color: var(--ink);
+      font-size: 15px;
+    }
+
+    .preview-actions {
+      margin-top: 16px;
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    @media (max-width: 768px) {
+      .list-wrapper {
+        padding: 80px 20px 60px;
+      }
+
+      .list-header h1 {
+        font-size: 28px;
+      }
+
+      .list-card {
+        padding: 14px;
+      }
+
+      .scripts-table {
+        min-width: 680px;
+      }
+
+      .nav-user-menu {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="dashboard.html" class="nav-logo">
+      <div class="nav-logo-mark">S</div>
+      <div>
+        <div class="nav-logo-text">ScriptBridge</div>
+      </div>
+    </a>
+    <div class="nav-right">
+      <a href="dashboard.html" class="btn btn-outline back-link">← Back</a>
+      <div id="nav-user-menu" class="nav-user-menu">Loading user...</div>
+      <button type="button" class="btn btn-logout" onclick="logout()">Log Out</button>
+    </div>
+  </nav>
+
+  <main class="list-wrapper">
+    <div class="list-container">
+      <header class="list-header">
+        <div>
+          <h1>My Scripts</h1>
+          <p>Manage all scripts you have uploaded.</p>
+        </div>
+        <a href="scripts-upload.html" class="btn btn-primary">Upload Script</a>
+      </header>
+
+      <section class="list-card">
+        <div id="alert-container"></div>
+
+        <div id="table-section" class="table-wrapper">
+          <table class="scripts-table">
+            <thead>
+              <tr>
+                <th>Title</th>
+                <th>Type</th>
+                <th>Price</th>
+                <th>Uploaded At</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="scripts-table-body">
+              <tr>
+                <td colspan="5" class="loading-row">
+                  <span class="spinner" style="vertical-align: middle;"></span>
+                  <span style="margin-left: 8px;">Loading scripts...</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div id="empty-state" class="empty-state" style="display: none;">
+          <div class="empty-state-icon">📝</div>
+          <h2>No Scripts Yet</h2>
+          <p>You have not uploaded any script. Start by uploading your first one.</p>
+          <a href="scripts-upload.html" class="btn btn-primary">Upload Script</a>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <div id="preview-modal" class="preview-modal" role="dialog" aria-modal="true" aria-labelledby="preview-title">
+    <div class="preview-content">
+      <h3 id="preview-title">Script Title</h3>
+      <div id="preview-meta" class="preview-meta"></div>
+      <div id="preview-body" class="preview-body"></div>
+      <div class="preview-actions">
+        <a id="preview-file-link" href="#" target="_blank" rel="noopener" class="btn btn-outline">Open File</a>
+        <button type="button" class="btn btn-secondary" id="close-preview-btn">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/auth.js"></script>
+
+  <script>
+    const alertContainer = document.getElementById('alert-container');
+    const tableSection = document.getElementById('table-section');
+    const tableBody = document.getElementById('scripts-table-body');
+    const emptyState = document.getElementById('empty-state');
+    const navUserMenu = document.getElementById('nav-user-menu');
+    const previewModal = document.getElementById('preview-modal');
+    const previewTitle = document.getElementById('preview-title');
+    const previewMeta = document.getElementById('preview-meta');
+    const previewBody = document.getElementById('preview-body');
+    const previewFileLink = document.getElementById('preview-file-link');
+    const closePreviewBtn = document.getElementById('close-preview-btn');
+
+    let currentUser = null;
+    let scriptsData = [];
+
+    function showAlert(message, type) {
+      alertContainer.innerHTML = '<div class="alert alert-' + type + '">' + message + '</div>';
+      window.scrollTo(0, 0);
+    }
+
+    function formatDate(isoString) {
+      if (!isoString) return '—';
+      return new Date(isoString).toLocaleDateString();
+    }
+
+    function formatPrice(price) {
+      return '¥ ' + Number(price || 0).toFixed(2);
+    }
+
+    function renderEmptyState() {
+      tableSection.style.display = 'none';
+      emptyState.style.display = 'block';
+    }
+
+    function renderTableRows(items) {
+      const rowsHtml = items.map((item) => {
+        const safeTitle = (item.title || '').replace(/"/g, '&quot;');
+        return '<tr>' +
+          '<td><div class="script-title" title="' + safeTitle + '">' + (item.title || 'Untitled') + '</div></td>' +
+          '<td>' + (item.script_type || '—') + '</td>' +
+          '<td><span class="price-pill">' + formatPrice(item.price) + '</span></td>' +
+          '<td>' + formatDate(item.created_at) + '</td>' +
+          '<td>' +
+            '<div class="action-buttons">' +
+              '<button class="btn btn-outline btn-sm" onclick="openPreview(\'' + item.id + '\')">Preview</button>' +
+              '<button class="btn btn-outline btn-sm btn-disabled" onclick="showEditDisabled(event)">Edit</button>' +
+              '<button class="btn btn-danger btn-sm" onclick="deleteScript(\'' + item.id + '\')">Delete</button>' +
+            '</div>' +
+          '</td>' +
+        '</tr>';
+      }).join('');
+
+      tableBody.innerHTML = rowsHtml;
+      tableSection.style.display = 'block';
+      emptyState.style.display = 'none';
+    }
+
+    function extractStoragePath(fileUrl) {
+      if (!fileUrl) return null;
+      const marker = '/storage/v1/object/public/scripts-files/';
+      const idx = fileUrl.indexOf(marker);
+      if (idx === -1) return null;
+      return decodeURIComponent(fileUrl.slice(idx + marker.length));
+    }
+
+    async function loadScripts() {
+      const { data, error } = await window.supabase_client
+        .from('scripts')
+        .select('*')
+        .eq('user_id', currentUser.id)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      scriptsData = data || [];
+
+      if (!scriptsData.length) {
+        renderEmptyState();
+        return;
+      }
+
+      renderTableRows(scriptsData);
+    }
+
+    async function initPage() {
+      try {
+        const session = await requireAuth();
+        if (!session) return;
+
+        currentUser = await getCurrentUser();
+        if (!currentUser) {
+          window.location.href = 'login.html';
+          return;
+        }
+
+        navUserMenu.textContent = currentUser.email || currentUser.id;
+        await loadScripts();
+      } catch (error) {
+        showAlert('Failed to load scripts: ' + error.message, 'error');
+        tableBody.innerHTML = '<tr><td colspan="5" class="loading-row">Unable to load data.</td></tr>';
+      }
+    }
+
+    function showEditDisabled(event) {
+      event.preventDefault();
+      showAlert('Edit feature is temporarily disabled.', 'error');
+    }
+
+    function openPreview(scriptId) {
+      const item = scriptsData.find((script) => String(script.id) === String(scriptId));
+      if (!item) return;
+
+      previewTitle.textContent = item.title || 'Untitled';
+      previewMeta.textContent = (item.script_type || '—') + '  |  ' + formatPrice(item.price) + '  |  ' + formatDate(item.created_at);
+      previewBody.textContent = item.description || 'No description.';
+      previewFileLink.href = item.file_url || '#';
+      previewFileLink.style.pointerEvents = item.file_url ? 'auto' : 'none';
+      previewFileLink.style.opacity = item.file_url ? '1' : '0.5';
+      previewModal.classList.add('show');
+    }
+
+    function closePreview() {
+      previewModal.classList.remove('show');
+    }
+
+    async function deleteScript(scriptId) {
+      const target = scriptsData.find((script) => String(script.id) === String(scriptId));
+      if (!target) return;
+
+      const confirmed = window.confirm('Delete "' + (target.title || 'this script') + '"? This action cannot be undone.');
+      if (!confirmed) return;
+
+      try {
+        if (target.file_url) {
+          const filePath = extractStoragePath(target.file_url);
+          if (filePath) {
+            const { error: removeFileError } = await window.supabase_client.storage
+              .from('scripts-files')
+              .remove([filePath]);
+            if (removeFileError) throw removeFileError;
+          }
+        }
+
+        const { error: deleteError } = await window.supabase_client
+          .from('scripts')
+          .delete()
+          .eq('id', target.id)
+          .eq('user_id', currentUser.id);
+
+        if (deleteError) throw deleteError;
+
+        showAlert('Script deleted successfully.', 'success');
+        await loadScripts();
+      } catch (error) {
+        showAlert('Delete failed: ' + error.message, 'error');
+      }
+    }
+
+    closePreviewBtn.addEventListener('click', closePreview);
+    previewModal.addEventListener('click', (e) => {
+      if (e.target === previewModal) closePreview();
+    });
+
+    window.openPreview = openPreview;
+    window.showEditDisabled = showEditDisabled;
+    window.deleteScript = deleteScript;
+
+    window.addEventListener('DOMContentLoaded', initPage);
+  </script>
+</body>
+</html>

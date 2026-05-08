@@ -3,17 +3,17 @@
   "title": "Implement ScriptBridge MVP with Supabase",
   "titleGenerationStatus": "success",
   "createdAt": 1778175922659,
-  "updatedAt": 1778250029535,
-  "lastResponseAt": 1778250029535,
+  "updatedAt": 1778250378829,
+  "lastResponseAt": 1778250378829,
   "sessionId": "5531a550-2ba7-4fa6-9e0c-aa8696afa095",
   "sdkSessionId": "5531a550-2ba7-4fa6-9e0c-aa8696afa095",
   "usage": {
     "model": "haiku",
-    "inputTokens": 10,
-    "cacheCreationInputTokens": 15,
-    "cacheReadInputTokens": 130556,
+    "inputTokens": 8,
+    "cacheCreationInputTokens": 1486,
+    "cacheReadInputTokens": 142952,
     "contextWindow": 200000,
-    "contextTokens": 130581,
-    "percentage": 65
+    "contextTokens": 144446,
+    "percentage": 72
   }
 }

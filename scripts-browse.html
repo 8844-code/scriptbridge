@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Browse Scripts — ScriptBridge</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23FF4D2E'/%3E%3Ctext x='16' y='23' font-family='Georgia,serif' font-size='20' font-weight='700' fill='white' text-anchor='middle'%3ES%3C/text%3E%3C/svg%3E">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300;1,9..40,400&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;0,9..144,700;1,9..144,300;1,9..144,500;1,9..144,700&family=Noto+Sans+SC:wght@300;400;500&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/common.css">
+
+  <style>
+    .browse-wrapper {
+      min-height: 100vh;
+      padding: 100px 40px 80px;
+      position: relative;
+    }
+
+    .browse-wrapper::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 8% 12%, rgba(255, 77, 46, 0.07), transparent 35%),
+        radial-gradient(circle at 92% 88%, rgba(61, 107, 79, 0.09), transparent 35%);
+      pointer-events: none;
+    }
+
+    .browse-container {
+      max-width: 1180px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+    }
+
+    .browse-header {
+      margin-bottom: 22px;
+    }
+
+    .browse-header h1 {
+      font-family: 'Fraunces', serif;
+      font-size: 36px;
+      font-weight: 600;
+      color: var(--ink);
+      letter-spacing: -0.02em;
+    }
+
+    .browse-header p {
+      color: var(--muted);
+      margin-top: 6px;
+      font-size: 15px;
+    }
+
+    .filters-card {
+      background: rgba(253, 250, 244, 0.92);
+      border: 1px solid rgba(26, 26, 26, 0.12);
+      border-radius: 18px;
+      padding: 16px;
+      margin-bottom: 18px;
+      box-shadow: 0 8px 22px rgba(26, 26, 26, 0.06);
+      display: grid;
+      gap: 12px;
+      grid-template-columns: 1.6fr 1fr 1fr;
+    }
+
+    .filters-card input,
+    .filters-card select {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid rgba(26, 26, 26, 0.14);
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.88);
+      font-size: 15px;
+      color: var(--ink);
+      font-family: 'DM Sans', 'Noto Sans SC', sans-serif;
+    }
+
+    .filters-card input:focus,
+    .filters-card select:focus {
+      outline: none;
+      border-color: rgba(61, 107, 79, 0.65);
+      box-shadow: 0 0 0 3px rgba(61, 107, 79, 0.15);
+    }
+
+    .scripts-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 16px;
+    }
+
+    .script-card {
+      background: var(--warm-white);
+      border: 1px solid var(--border);
+      border-radius: var(--r-lg);
+      padding: 18px;
+      text-decoration: none;
+      color: var(--ink);
+      transition: all 0.2s;
+      min-height: 190px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .script-card:hover {
+      border-color: var(--coral);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 14px rgba(255, 77, 46, 0.18);
+    }
+
+    .script-card-title {
+      font-size: 18px;
+      font-weight: 600;
+      line-height: 1.35;
+      min-height: 48px;
+    }
+
+    .script-card-author {
+      font-size: 14px;
+      color: var(--muted);
+    }
+
+    .script-card-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .script-type-pill {
+      display: inline-block;
+      background: rgba(61, 107, 79, 0.1);
+      color: var(--sage);
+      border-radius: var(--r-pill);
+      padding: 4px 10px;
+      font-size: 13px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .script-price {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--ink);
+    }
+
+    .script-date {
+      margin-top: auto;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .nav-user-menu {
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 500;
+      background: rgba(255, 255, 255, 0.55);
+      border: 1px solid var(--border);
+      border-radius: var(--r-pill);
+      padding: 8px 14px;
+      max-width: 240px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .empty-state {
+      text-align: center;
+      color: var(--muted);
+      background: rgba(253, 250, 244, 0.92);
+      border: 1px dashed rgba(26, 26, 26, 0.2);
+      border-radius: 18px;
+      padding: 36px 20px;
+      margin-top: 6px;
+    }
+
+    .loading-state {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      color: var(--muted);
+      padding: 30px 0;
+    }
+
+    @media (max-width: 860px) {
+      .filters-card {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .browse-wrapper {
+        padding: 80px 20px 60px;
+      }
+
+      .browse-header h1 {
+        font-size: 28px;
+      }
+
+      .nav-user-menu {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="dashboard.html" class="nav-logo">
+      <div class="nav-logo-mark">S</div>
+      <div>
+        <div class="nav-logo-text">ScriptBridge</div>
+      </div>
+    </a>
+    <div class="nav-right">
+      <a href="dashboard.html" class="btn btn-outline back-link">← Back</a>
+      <div id="nav-user-menu" class="nav-user-menu">Loading user...</div>
+      <button type="button" class="btn btn-logout" onclick="logout()">Log Out</button>
+    </div>
+  </nav>
+
+  <main class="browse-wrapper">
+    <div class="browse-container">
+      <header class="browse-header">
+        <h1>Browse Scripts</h1>
+        <p>Find stories and IP from creators.</p>
+      </header>
+
+      <section class="filters-card">
+        <input type="text" id="search-input" placeholder="Search by script title...">
+
+        <select id="type-filter">
+          <option value="all">All Types</option>
+          <option value="短剧剧本">短剧剧本</option>
+          <option value="电影剧本">电影剧本</option>
+          <option value="小说IP">小说IP</option>
+        </select>
+
+        <select id="sort-select">
+          <option value="latest">Latest</option>
+          <option value="price_asc">Price: Low to High</option>
+          <option value="price_desc">Price: High to Low</option>
+        </select>
+      </section>
+
+      <div id="loading-state" class="loading-state">
+        <span class="spinner"></span>
+        <span>Loading scripts...</span>
+      </div>
+
+      <section id="scripts-grid" class="scripts-grid" style="display: none;"></section>
+      <section id="empty-state" class="empty-state" style="display: none;">No scripts found</section>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/auth.js"></script>
+
+  <script>
+    const navUserMenu = document.getElementById('nav-user-menu');
+    const searchInput = document.getElementById('search-input');
+    const typeFilter = document.getElementById('type-filter');
+    const sortSelect = document.getElementById('sort-select');
+    const loadingState = document.getElementById('loading-state');
+    const scriptsGrid = document.getElementById('scripts-grid');
+    const emptyState = document.getElementById('empty-state');
+
+    let currentUser = null;
+    let allScripts = [];
+    let authorMap = {};
+
+    function formatDate(isoString) {
+      if (!isoString) return '—';
+      return new Date(isoString).toLocaleDateString();
+    }
+
+    function formatPrice(price) {
+      return '¥ ' + Number(price || 0).toFixed(2);
+    }
+
+    function escapeHtml(value) {
+      return String(value || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    async function loadAuthors(userIds) {
+      if (!userIds.length) return;
+      const { data, error } = await window.supabase_client
+        .from('users')
+        .select('user_id, full_name, email')
+        .in('user_id', userIds);
+
+      if (error) {
+        console.warn('Failed to load user names:', error.message);
+        return;
+      }
+
+      authorMap = {};
+      (data || []).forEach((user) => {
+        authorMap[user.user_id] = user.full_name || user.email || 'Unknown author';
+      });
+    }
+
+    async function loadScripts() {
+      const { data, error } = await window.supabase_client
+        .from('scripts')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      allScripts = data || [];
+      const userIds = [...new Set(allScripts.map((item) => item.user_id).filter(Boolean))];
+      await loadAuthors(userIds);
+    }
+
+    function applyFilters() {
+      const keyword = searchInput.value.trim().toLowerCase();
+      const selectedType = typeFilter.value;
+      const sortValue = sortSelect.value;
+
+      let list = allScripts.filter((item) => {
+        const title = (item.title || '').toLowerCase();
+        const byTitle = !keyword || title.includes(keyword);
+        const byType = selectedType === 'all' || item.script_type === selectedType;
+        return byTitle && byType;
+      });
+
+      list.sort((a, b) => {
+        if (sortValue === 'price_asc') return Number(a.price || 0) - Number(b.price || 0);
+        if (sortValue === 'price_desc') return Number(b.price || 0) - Number(a.price || 0);
+        return new Date(b.created_at || 0) - new Date(a.created_at || 0);
+      });
+
+      renderScripts(list);
+    }
+
+    function renderScripts(list) {
+      if (!list.length) {
+        scriptsGrid.style.display = 'none';
+        emptyState.style.display = 'block';
+        return;
+      }
+
+      const html = list.map((item) => {
+        const author = authorMap[item.user_id] || 'Unknown author';
+        return (
+          '<a class="script-card" href="script-detail.html?id=' + encodeURIComponent(item.id) + '">' +
+            '<div class="script-card-title">' + escapeHtml(item.title || 'Untitled Script') + '</div>' +
+            '<div class="script-card-author">By ' + escapeHtml(author) + '</div>' +
+            '<div class="script-card-row">' +
+              '<span class="script-type-pill">' + escapeHtml(item.script_type || '—') + '</span>' +
+              '<span class="script-price">' + formatPrice(item.price) + '</span>' +
+            '</div>' +
+            '<div class="script-date">Uploaded: ' + formatDate(item.created_at) + '</div>' +
+          '</a>'
+        );
+      }).join('');
+
+      scriptsGrid.innerHTML = html;
+      scriptsGrid.style.display = 'grid';
+      emptyState.style.display = 'none';
+    }
+
+    async function initPage() {
+      try {
+        const session = await requireAuth();
+        if (!session) return;
+
+        currentUser = await getCurrentUser();
+        if (!currentUser) {
+          window.location.href = 'login.html';
+          return;
+        }
+
+        navUserMenu.textContent = currentUser.email || currentUser.id;
+
+        await loadScripts();
+        loadingState.style.display = 'none';
+        applyFilters();
+      } catch (error) {
+        loadingState.innerHTML = 'Failed to load scripts: ' + escapeHtml(error.message);
+      }
+    }
+
+    searchInput.addEventListener('input', applyFilters);
+    typeFilter.addEventListener('change', applyFilters);
+    sortSelect.addEventListener('change', applyFilters);
+
+    window.addEventListener('DOMContentLoaded', initPage);
+  </script>
+</body>
+</html>
