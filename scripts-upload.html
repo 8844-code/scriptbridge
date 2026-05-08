@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Upload Script — ScriptBridge</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23FF4D2E'/%3E%3Ctext x='16' y='23' font-family='Georgia,serif' font-size='20' font-weight='700' fill='white' text-anchor='middle'%3ES%3C/text%3E%3C/svg%3E">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300;1,9..40,400&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;0,9..144,700;1,9..144,300;1,9..144,500;1,9..144,700&family=Noto+Sans+SC:wght@300;400;500&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/common.css">
+
+  <style>
+    .upload-wrapper {
+      min-height: 100vh;
+      padding: 100px 40px 80px;
+      position: relative;
+    }
+
+    .upload-wrapper::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 10% 10%, rgba(255, 77, 46, 0.07), transparent 34%),
+        radial-gradient(circle at 90% 90%, rgba(61, 107, 79, 0.09), transparent 34%);
+      pointer-events: none;
+    }
+
+    .upload-container {
+      max-width: 760px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+    }
+
+    .upload-header {
+      margin-bottom: 24px;
+    }
+
+    .upload-header h1 {
+      font-family: 'Fraunces', serif;
+      font-size: 36px;
+      font-weight: 600;
+      color: var(--ink);
+      letter-spacing: -0.02em;
+      margin-bottom: 6px;
+    }
+
+    .upload-header p {
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .upload-card {
+      background: rgba(253, 250, 244, 0.92);
+      border: 1px solid rgba(26, 26, 26, 0.12);
+      border-radius: 22px;
+      padding: 32px;
+      box-shadow: 0 14px 36px rgba(26, 26, 26, 0.08);
+      backdrop-filter: blur(4px);
+    }
+
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+      border-radius: 12px;
+      border: 1px solid rgba(26, 26, 26, 0.14);
+      background: rgba(255, 255, 255, 0.84);
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus,
+    .form-group select:focus {
+      border-color: rgba(61, 107, 79, 0.65);
+      box-shadow: 0 0 0 3px rgba(61, 107, 79, 0.15);
+    }
+
+    .form-group textarea {
+      min-height: 130px;
+    }
+
+    .rights-group {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .rights-option {
+      position: relative;
+      min-width: 130px;
+      flex: 1;
+    }
+
+    .rights-option input {
+      display: none;
+    }
+
+    .rights-option label {
+      display: block;
+      border: 1px solid rgba(26, 26, 26, 0.16);
+      border-radius: 12px;
+      padding: 12px 14px;
+      text-align: center;
+      background: rgba(255, 255, 255, 0.8);
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+
+    .rights-option input:checked + label {
+      border-color: rgba(61, 107, 79, 0.8);
+      background: rgba(61, 107, 79, 0.1);
+      color: var(--sage);
+      font-weight: 600;
+    }
+
+    .rights-option label:hover {
+      border-color: rgba(61, 107, 79, 0.6);
+    }
+
+    .btn-primary {
+      width: 100%;
+      border-radius: 12px;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+      background: linear-gradient(140deg, #2f5a40 0%, #3d6b4f 100%);
+      box-shadow: 0 10px 18px rgba(61, 107, 79, 0.24);
+    }
+
+    .btn-primary:hover {
+      background: linear-gradient(140deg, #2a5139 0%, #365f46 100%);
+      transform: translateY(-1px);
+    }
+
+    .nav-user-menu {
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 500;
+      background: rgba(255, 255, 255, 0.55);
+      border: 1px solid var(--border);
+      border-radius: var(--r-pill);
+      padding: 8px 14px;
+      max-width: 240px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    @media (max-width: 768px) {
+      .upload-wrapper {
+        padding: 80px 20px 60px;
+      }
+
+      .upload-header h1 {
+        font-size: 28px;
+      }
+
+      .upload-card {
+        padding: 22px;
+      }
+
+      .nav-user-menu {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="dashboard.html" class="nav-logo">
+      <div class="nav-logo-mark">S</div>
+      <div>
+        <div class="nav-logo-text">ScriptBridge</div>
+      </div>
+    </a>
+    <div class="nav-right">
+      <a href="dashboard.html" class="btn btn-outline back-link">← Back</a>
+      <div id="nav-user-menu" class="nav-user-menu">Loading user...</div>
+      <button type="button" class="btn btn-logout" onclick="logout()">Log Out</button>
+    </div>
+  </nav>
+
+  <main class="upload-wrapper">
+    <div class="upload-container">
+      <header class="upload-header">
+        <h1>Upload Your Script</h1>
+        <p>Fill in script details and submit to the marketplace.</p>
+      </header>
+
+      <section class="upload-card">
+        <div id="alert-container"></div>
+
+        <form id="upload-form">
+          <div class="form-group">
+            <label for="title">Script Title</label>
+            <input type="text" id="title" name="title" placeholder="Enter your script title" required>
+            <div class="form-error" id="title-error"></div>
+          </div>
+
+          <div class="form-group">
+            <label for="description">Script Description</label>
+            <textarea id="description" name="description" placeholder="Describe your script idea, genre and highlights..." required></textarea>
+            <div class="form-error" id="description-error"></div>
+          </div>
+
+          <div class="form-group">
+            <label for="script-type">Script Type</label>
+            <select id="script-type" name="script_type">
+              <option value="短剧剧本">短剧剧本</option>
+              <option value="电影剧本">电影剧本</option>
+              <option value="小说IP">小说IP</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="script-file">Script File (.pdf .doc .docx .txt)</label>
+            <input type="file" id="script-file" name="script_file" accept=".pdf,.doc,.docx,.txt" required>
+            <div class="form-error" id="file-error"></div>
+          </div>
+
+          <div class="form-group">
+            <label for="price">Price (CNY)</label>
+            <input type="number" id="price" name="price" min="0" step="0.01" placeholder="e.g. 299.00" required>
+            <div class="form-error" id="price-error"></div>
+          </div>
+
+          <div class="form-group">
+            <label>Rights Type</label>
+            <div class="rights-group">
+              <div class="rights-option">
+                <input type="radio" id="rights-buyout" name="rights_type" value="买断" checked>
+                <label for="rights-buyout">买断</label>
+              </div>
+              <div class="rights-option">
+                <input type="radio" id="rights-license" name="rights_type" value="授权">
+                <label for="rights-license">授权</label>
+              </div>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary" id="submit-btn">
+            <span id="btn-text">Submit Script</span>
+            <span id="btn-spinner" class="spinner" style="display: none;"></span>
+          </button>
+        </form>
+      </section>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/auth.js"></script>
+
+  <script>
+    const form = document.getElementById('upload-form');
+    const titleInput = document.getElementById('title');
+    const descriptionInput = document.getElementById('description');
+    const scriptTypeInput = document.getElementById('script-type');
+    const fileInput = document.getElementById('script-file');
+    const priceInput = document.getElementById('price');
+    const rightsInputs = document.querySelectorAll('input[name="rights_type"]');
+    const submitBtn = document.getElementById('submit-btn');
+    const btnText = document.getElementById('btn-text');
+    const btnSpinner = document.getElementById('btn-spinner');
+    const alertContainer = document.getElementById('alert-container');
+    const navUserMenu = document.getElementById('nav-user-menu');
+
+    let currentUser = null;
+
+    function showAlert(message, type) {
+      alertContainer.innerHTML = '<div class="alert alert-' + type + '">' + message + '</div>';
+      window.scrollTo(0, 0);
+    }
+
+    function clearErrors() {
+      document.getElementById('title-error').textContent = '';
+      document.getElementById('description-error').textContent = '';
+      document.getElementById('price-error').textContent = '';
+      document.getElementById('file-error').textContent = '';
+    }
+
+    function validateForm() {
+      clearErrors();
+      let isValid = true;
+
+      if (!titleInput.value.trim()) {
+        document.getElementById('title-error').textContent = 'Title is required';
+        isValid = false;
+      }
+
+      if (!descriptionInput.value.trim()) {
+        document.getElementById('description-error').textContent = 'Description is required';
+        isValid = false;
+      }
+
+      if (!priceInput.value || Number(priceInput.value) < 0) {
+        document.getElementById('price-error').textContent = 'Please enter a valid price';
+        isValid = false;
+      }
+
+      if (!fileInput.files.length) {
+        document.getElementById('file-error').textContent = 'Please select a script file';
+        isValid = false;
+      }
+
+      return isValid;
+    }
+
+    async function uploadFileToStorage(file, userId) {
+      const ext = file.name.split('.').pop().toLowerCase();
+      const filePath = userId + '/' + Date.now() + '-' + Math.random().toString(36).slice(2, 8) + '.' + ext;
+
+      const { data, error } = await window.supabase_client.storage
+        .from('scripts-files')
+        .upload(filePath, file, { upsert: false });
+
+      if (error) {
+        throw new Error('File upload failed: ' + error.message);
+      }
+
+      const { data: publicData } = window.supabase_client.storage
+        .from('scripts-files')
+        .getPublicUrl(data.path);
+
+      return publicData.publicUrl || data.path;
+    }
+
+    function setSubmitting(isSubmitting) {
+      submitBtn.disabled = isSubmitting;
+      btnText.style.display = isSubmitting ? 'none' : 'inline';
+      btnSpinner.style.display = isSubmitting ? 'inline-block' : 'none';
+    }
+
+    async function initPage() {
+      const session = await requireAuth();
+      if (!session) return;
+
+      currentUser = await getCurrentUser();
+      if (!currentUser) {
+        window.location.href = 'login.html';
+        return;
+      }
+
+      navUserMenu.textContent = currentUser.email || currentUser.id;
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      if (!currentUser) {
+        showAlert('Please sign in again and try submitting.', 'error');
+        return;
+      }
+
+      if (!validateForm()) return;
+
+      setSubmitting(true);
+
+      try {
+        const selectedFile = fileInput.files[0];
+        const rightsType = document.querySelector('input[name="rights_type"]:checked').value;
+        const fileUrl = await uploadFileToStorage(selectedFile, currentUser.id);
+
+        const { error } = await window.supabase_client
+          .from('scripts')
+          .insert({
+            user_id: currentUser.id,
+            title: titleInput.value.trim(),
+            description: descriptionInput.value.trim(),
+            script_type: scriptTypeInput.value,
+            price: Number(priceInput.value),
+            rights_type: rightsType,
+            file_url: fileUrl,
+            created_at: new Date().toISOString(),
+          });
+
+        if (error) throw error;
+
+        showAlert('Script uploaded successfully! Redirecting to dashboard...', 'success');
+
+        setTimeout(() => {
+          window.location.href = 'dashboard.html';
+        }, 2000);
+      } catch (error) {
+        showAlert('Upload failed: ' + error.message, 'error');
+        setSubmitting(false);
+      }
+    });
+
+    window.addEventListener('DOMContentLoaded', initPage);
+  </script>
+</body>
+</html>
