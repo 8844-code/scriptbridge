@@ -157,3 +157,108 @@ git push origin main
 
 ✅ 对接时间：2026-05-09 02:48 (UTC+8) — Cursor  
 ✅ 对接状态：已完成，可无缝交接给 Claude
+
+---
+
+## 🎯 新任务（Claude 分配，2026-05-09）
+
+**优先级：🔴 立即执行**  
+**任务名：小功能三件套**
+
+---
+
+### 📋 任务 A：忘记密码页（forgot-password.html）
+
+**新建文件** `forgot-password.html`，放在项目根目录。
+
+**功能要求：**
+- 一个输入邮箱的表单
+- 点击"发送重置链接"后调用：
+  ```js
+  const { error } = await window.supabase_client.auth.resetPasswordForEmail(email, {
+    redirectTo: 'https://8844-code.github.io/scriptbridge/reset-password.html'
+  });
+  ```
+- 成功后显示提示："Reset link sent! Check your email." / "重置链接已发送，请查收邮件。"
+- 失败时显示错误信息
+
+**样式要求：**
+- 风格与 `login.html` 完全一致（复制页面框架）
+- 支持双语切换（en-only / zh-only）
+- 引入 `js/theme.js`、`js/nav-mobile.js`、`css/common.css`、`js/supabase-client.js`
+
+**在 `login.html` 里添加跳转链接：**  
+在登录表单的密码输入框下方，加上：
+```html
+<p style="text-align:right; margin-top: 6px; font-size: 13px;">
+  <a href="forgot-password.html" class="en-only" style="color: var(--text-muted); text-decoration: underline;">Forgot password?</a>
+  <a href="forgot-password.html" class="zh-only" style="color: var(--text-muted); text-decoration: underline;">忘记密码？</a>
+</p>
+```
+
+---
+
+### 📋 任务 B：重复邮箱检测（index.html 候补表单）
+
+**在 `index.html` 里，** 找到候补表单提交的逻辑（处理 Supabase 写入的部分）。
+
+在插入数据库之前，先查一下邮箱是否已存在：
+```js
+// 先检查是否已经报名
+const { data: existing } = await window.supabase_client
+  .from('waitlist')
+  .select('id')
+  .eq('email', email)
+  .maybeSingle();
+
+if (existing) {
+  // 已存在，显示友好提示，不重复插入
+  showSuccess("You're already on the list! We'll be in touch soon.", "你已经在候补名单里了！我们会尽快联系你。");
+  return;
+}
+```
+
+**注意：**
+- `showSuccess` 改成你实际用的提示函数名
+- 只需要判断邮箱，不报错，友好提示
+
+---
+
+### 📋 任务 C：404 页面（404.html）
+
+**新建文件** `404.html`，放在项目根目录。
+
+**内容要求：**
+- 大标题：`404` 
+- 副标题（双语）：
+  - EN: "Page not found — this script may have been moved or deleted."
+  - ZH: "页面不存在 — 这个剧本可能已移动或删除。"
+- 一个"Back to Home"/"回到首页"按钮，链接 `index.html`
+- 风格与全站一致，简洁
+
+**引入：** `css/common.css`、`js/theme.js`
+
+---
+
+### ✅ 完成后
+
+1. 提交三个改动：
+```bash
+git add forgot-password.html 404.html index.html login.html
+git commit -m "feat: Add forgot-password page, 404 page, and duplicate email detection
+
+- Add forgot-password.html with Supabase password reset flow
+- Add 404.html with bilingual copy and home link
+- Add duplicate email check to waitlist form in index.html
+- Add forgot password link to login.html"
+git push origin main
+```
+
+2. 在本文件末尾添加完成状态：
+```
+✅ 完成时间：[时间]
+✅ 任务A（忘记密码）：完成/失败
+✅ 任务B（重复邮箱）：完成/失败
+✅ 任务C（404页）：完成/失败
+✅ 推送状态：成功/失败
+```
