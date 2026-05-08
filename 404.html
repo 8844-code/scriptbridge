@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>404 — ScriptBridge</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23FF4D2E'/%3E%3Ctext x='16' y='23' font-family='Georgia,serif' font-size='20' font-weight='700' fill='white' text-anchor='middle'%3ES%3C/text%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Fraunces:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/common.css">
+  <script src="js/theme.js" defer></script>
+  <style>
+    .not-found-wrap {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 110px 20px 40px;
+      text-align: center;
+    }
+    .not-found-card {
+      max-width: 680px;
+      background: var(--warm-white);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      padding: 44px 28px;
+      box-shadow: 0 14px 32px rgba(15, 23, 42, 0.08);
+    }
+    .not-found-code {
+      font-family: 'Fraunces', serif;
+      font-size: clamp(64px, 12vw, 120px);
+      line-height: 1;
+      color: var(--coral);
+      letter-spacing: -0.03em;
+      margin-bottom: 12px;
+    }
+    .not-found-sub {
+      font-size: 18px;
+      color: var(--muted);
+      line-height: 1.7;
+      margin-bottom: 26px;
+    }
+    @media (max-width: 768px) {
+      .not-found-card { padding: 30px 18px; }
+      .not-found-sub { font-size: 16px; }
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="index.html" class="nav-logo">
+      <div class="nav-logo-mark">S</div>
+      <div><div class="nav-logo-text">ScriptBridge</div></div>
+    </a>
+    <div class="nav-right"></div>
+  </nav>
+
+  <main class="not-found-wrap">
+    <section class="not-found-card">
+      <div class="not-found-code">404</div>
+      <p class="not-found-sub en-only">Page not found — this script may have been moved or deleted.</p>
+      <p class="not-found-sub zh-only">页面不存在 — 这个剧本可能已移动或删除。</p>
+      <a href="index.html" class="btn btn-primary en-only">Back to Home</a>
+      <a href="index.html" class="btn btn-primary zh-only">回到首页</a>
+    </section>
+  </main>
+
+  <script>
+    (function initLang() {
+      const lang = localStorage.getItem('scriptbridge_lang') || 'en';
+      document.body.classList.toggle('zh', lang === 'zh');
+    })();
+  </script>
+</body>
+</html>

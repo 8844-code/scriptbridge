@@ -1177,7 +1177,18 @@ async function fetchWaitlistCount() {
 }
 
 async function saveWaitlistToSupabase(email, role) {
-  if (!window.supabase_client) return;
+  if (!window.supabase_client) return { alreadyExists: false };
+  const { data: existing, error: checkError } = await window.supabase_client
+    .from('waitlist_signups')
+    .select('id')
+    .eq('email', email)
+    .maybeSingle();
+  if (checkError) {
+    console.warn('Failed to check waitlist duplicate:', checkError.message);
+  }
+  if (existing) {
+    return { alreadyExists: true };
+  }
   const { error } = await window.supabase_client
     .from('waitlist_signups')
     .upsert(
@@ -1191,6 +1202,18 @@ async function saveWaitlistToSupabase(email, role) {
   if (error) {
     console.warn('Failed to save waitlist signup:', error.message);
   }
+  return { alreadyExists: false };
+}
+
+function showWaitlistSuccess(message) {
+  const successEl = document.getElementById('signup-success');
+  const isZh = document.body.classList.contains('zh');
+  const defaultMsg = isZh ? '✓ 已收到！我们会第一时间联系你。' : "✓ You're on the list. We'll be in touch.";
+  const textContainer = successEl.firstElementChild;
+  textContainer.textContent = message || defaultMsg;
+  document.getElementById('signup-form').style.display = 'none';
+  document.querySelector('.signup-note').style.display = 'none';
+  successEl.style.display = 'block';
 }
 
 async function handleSignup() {
@@ -1220,11 +1243,17 @@ async function handleSignup() {
     });
     const data = await res.json();
     if (data.success) {
-      await saveWaitlistToSupabase(email, selectedRole);
+      const { alreadyExists } = await saveWaitlistToSupabase(email, selectedRole);
       fetchWaitlistCount();
-      document.getElementById('signup-form').style.display = 'none';
-      document.querySelector('.signup-note').style.display = 'none';
-      document.getElementById('signup-success').style.display = 'block';
+      if (alreadyExists) {
+        showWaitlistSuccess(
+          document.body.classList.contains('zh')
+            ? '✓ 你已经在候补名单里了！我们会尽快联系你。'
+            : "✓ You're already on the list! We'll be in touch soon."
+        );
+      } else {
+        showWaitlistSuccess();
+      }
     } else {
       throw new Error('submission failed');
     }
