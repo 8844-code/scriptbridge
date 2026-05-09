@@ -27,21 +27,21 @@
 - 检查项目当前状态（git log, git diff）
 - 理解已完成的功能
 - 确认下一步优先级
-- 给 Cursor 一个明确的任务清单
+- 给 Cursor 一个明确的任务清单（写入 CURSOR_TASK.md）
 ```
 
 ### 2️⃣ 执行阶段（Cursor）
 ```
-- 收到 Claude 的任务清单
+- 打开项目，自动读取 CURSOR_TASK.md 找最新未完成任务
 - 在本地 IDE 中实现功能
 - 在浏览器中测试看效果
-- 如遇问题，直接调整代码
-- 完成后提交代码（git commit）
+- 完成后 git commit + git push
+- 在 CURSOR_TASK.md 末尾写完成状态
 ```
 
 ### 3️⃣ 验证阶段（Claude）
 ```
-- 检查 git status 和新提交
+- 检查 git log 和新提交
 - 审查代码逻辑是否正确
 - 如发现问题，反馈给 Cursor
 - 否则，规划下一个任务
@@ -49,181 +49,92 @@
 
 ---
 
-## 当前任务清单（优先级排序）
+## 当前项目状态（2026-05-09 更新）
 
-### ✅ 已完成
-- [x] 登录/注册页面双语支持
-- [x] 脚本详情页
-- [x] CSS 语言切换规则
+### ✅ 已完成的全部页面
 
-### 🔄 进行中（Cursor 正在做）
-**任务 1：提交并推送首页改动**
-- [ ] 提交 index.html（添加认证入口链接）
-- [ ] 推送到 GitHub
-- [ ] 验证 https://8844-code.github.io/scriptbridge/ 能看到登录链接
-- [ ] 截图确认
+| 页面 | 功能 | 状态 |
+|------|------|------|
+| `index.html` | 首页候补名单，双语，实时人数，重复邮箱检测，Browse 入口 | ✅ |
+| `login.html` | 登录，双语，忘记密码入口 | ✅ |
+| `signup.html` | 注册，双语，角色选择（创作者/买家） | ✅ |
+| `forgot-password.html` | 密码重置邮件发送 | ✅ |
+| `reset-password.html` | 重置密码表单 | ✅ |
+| `dashboard.html` | 个人主页，双语，角色对应功能入口，编辑资料入口 | ✅ |
+| `profile-edit.html` | 编辑显示名称和简介 | ✅ |
+| `scripts-upload.html` | 上传作品，可见性选择（公开/草稿），Supabase Storage | ✅ |
+| `scripts-browse.html` | 浏览作品（需登录），搜索+类型筛选+价格区间，仅显示 published | ✅ |
+| `scripts-list-author.html` | 我的作品，状态徽章，下架/上架按钮，Edit 按钮 | ✅ |
+| `script-detail.html` | 作品详情，联系卖家（mailto），购买按钮（待开发） | ✅ |
+| `script-edit.html` | 编辑已上传作品信息 | ✅ |
+| `marketplace.html` | 公开市场（无需登录），仅显示 published 作品 | ✅ |
+| `admin-waitlist.html` | 候补后台（管理员专属），实时数据，CSV 导出 | ✅ |
+| `terms.html` | 服务条款，双语 | ✅ |
+| `privacy.html` | 隐私政策，双语 | ✅ |
+| `404.html` | 404 错误页，双语 | ✅ |
 
-**验收标准：**
-- 导航栏右上角能看到"Sign In | Sign Up"或"登录 | 注册"
-- 候补表单下方有"创建账户"和"已有账户？登录"链接
-- 语言切换正常工作
+### ✅ 已完成的系统功能
 
-### ⏳ 待做（优先级排序）
+- `js/theme.js` — 深色/浅色/自动主题，持久化
+- `js/nav-mobile.js` — 滚动隐藏导航（手机+桌面）
+- `js/auth.js` — requireAuth() 和 getCurrentUser()
+- `js/supabase-client.js` — Supabase 客户端（window.supabase_client）
+- `css/common.css` — 全局样式，en-only/zh-only 语言切换系统
+- Supabase Storage RLS 权限已配置（scripts-files bucket）
+- `scripts` 表含 `status` 字段（published/draft）
+- 全站中文文案规范（作品/个人主页）
+- `.cursorrules` — Cursor 自动读任务工作流
 
-**任务 2：完整流程测试**
-- [ ] 从首页注册一个测试账户（选择 Creator）
-- [ ] 登录后进入 Dashboard
-- [ ] 上传一个测试脚本
-- [ ] 在浏览页看到这个脚本
-- [ ] 点击进入详情页查看完整信息
-- [ ] 记录任何 bug 或错误
+### ❌ 尚未开始（按优先级）
 
-**验收标准：**
-- 整个注册→上传→浏览→详情的流程无报错
-- 数据正确显示（标题、价格、作者等）
-- 文件能预览/下载
-
-**任务 3：修复双语支持**
-- [ ] Dashboard 页面添加双语标签
-- [ ] Scripts Upload 页面添加双语标签
-- [ ] Scripts Browse 页面添加双语标签
-- [ ] 验证语言切换正常
-
-**验收标准：**
-- 切换"中文"后，所有页面内容变成中文
-- 切换"EN"后，变回英文
-
-**任务 4：Bug 修复**
-- [ ] 根据任务 2 发现的 bug 列表逐个修复
-- [ ] 测试每个 fix 是否真的解决了问题
+| 优先级 | 功能 | 说明 |
+|--------|------|------|
+| 🔴 高 | **购买询盘系统** | 买家发意向→创作者接收→平台撮合 |
+| 🔴 高 | **我的询盘页** | 买家看发出的询盘，创作者看收到的询盘 |
+| 🟠 中 | 试读保护 | 全文锁定，只给30%试读，未购买不能下载全文 |
+| 🟠 中 | 真实支付集成 | Stripe/微信/支付宝，需要营业执照 |
+| 🟡 低 | 邮箱验证 | 注册后发验证邮件 |
+| 🟡 低 | 自定义域名 | 替换 github.io 地址 |
 
 ---
 
 ## 提交规范
 
-### 提交消息格式
-```
+```bash
+# 提交消息格式
 git commit -m "类型: 简短描述
 
 详细说明（可选）"
 ```
 
-### 类型
-- `feat:` 新功能
-- `fix:` 修复 bug
-- `refactor:` 代码重构
-- `test:` 测试相关
-- `style:` 样式调整
-
-### 示例
-```
-git commit -m "feat: Add bilingual support to dashboard
-
-- Add en-only/zh-only labels to page titles and buttons
-- Implement language persistence in localStorage
-- Test language toggle on all elements"
-```
+类型：`feat` / `fix` / `refactor` / `style` / `docs` / `chore`
 
 ---
 
-## 沟通规则
+## 沟通规范
 
-**Cursor 完成一个任务后，告诉 Claude：**
+**Cursor 完成任务后写入 CURSOR_TASK.md：**
 ```
-✅ 完成：[任务名]
-- 做了什么
-- 推送了哪些文件
-- 遇到的问题（如有）
-- 验收标准是否满足：是/否
+✅ 完成时间：[时间 UTC+8]
+✅ 任务A（xxx）：完成/失败
+✅ 推送状态：成功/失败
 ```
 
-**Claude 接到反馈后：**
-```
-- 检查 git log
-- 审查代码
-- 决定是否继续下一个任务或反馈问题
-```
-
----
-
-## 当前优先级
-
-🔴 **立即做：任务 1（Cursor 现在做）**
-- 提交 index.html
-- 推送到 GitHub
-- 验证效果
-
-⏳ **接下来：任务 2** 
-- 完整流程测试，找出所有 bug
-
----
-
-## 项目文件结构
-
-```
-ScriptBridge/
-├── index.html              ← 首页（候补名单 + 认证入口）
-├── login.html              ← 登录页（双语✅）
-├── signup.html             ← 注册页（双语✅）
-├── dashboard.html          ← 用户主页
-├── scripts-upload.html     ← 上传页
-├── scripts-browse.html     ← 浏览页
-├── script-detail.html      ← 详情页✅
-├── js/
-│   ├── auth.js
-│   └── supabase-client.js
-└── css/
-    └── common.css          ← 全局样式（包含.en-only/.zh-only✅）
-```
-
----
-
-## 常见命令
-
+**Claude 每次开始先检查：**
 ```bash
-# 检查状态
-git status
-
-# 查看最近提交
 git log --oneline -10
-
-# 查看具体改动
-git diff <filename>
-
-# 提交改动
-git add <files>
-git commit -m "提交信息"
-
-# 推送
-git push origin main
 ```
+然后读 CURSOR_TASK.md 末尾状态确认是否完成。
 
 ---
 
-**最后：这个流程就是 Claude 和 Cursor 的协作方式。清晰、可重复、高效。**
+## 禁止提交的文件
+
+- `.claude/`
+- `.obsidian/`
+- `.DS_Store`
+- 任何 `.env` 文件
 
 ---
 
-## Cursor 最新交接（2026-05-09 凌晨）
-
-### 已完成（可直接给 Claude Code 查看）
-- [x] 首页、登录、注册、Dashboard、Upload、Browse、Author List、Detail 页接入统一主题系统
-- [x] 新增 `js/theme.js`：支持 `light / dark / system`，并持久化到 `scriptbridge_theme`
-- [x] 暗色模式可读性修复（字体对比、边框、按钮、导航背景）
-- [x] 首页候补提交写入 Supabase（保留 Web3Forms 邮件）
-- [x] 首页候补人数改为数据库读取，并每 30 秒刷新
-- [x] 新增 SQL 脚本：`sql/waitlist_setup.sql`（表+RLS 策略）
-- [x] Supabase SQL 已由用户在控制台执行成功
-
-### 当前线上状态
-- 最新代码已推送到 `main`
-- 关键功能：语言切换、主题切换、候补实时人数均已在代码中接通
-
-### 待继续（建议 Claude Code 下一步）
-1. 增加重复邮箱提示（例如“你已在候补名单中”）
-2. 增加运营后台页 `admin-waitlist.html`：
-   - 总人数
-   - 今日新增
-   - 角色占比（creator/buyer）
-   - 最近报名列表
-3. 移动端进一步减负导航（保持收集入口强曝光）
+**最后更新：2026-05-09**
