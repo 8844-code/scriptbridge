@@ -842,3 +842,218 @@ git push origin main
 ✅ 任务C（浏览页过滤）：完成（含新建 `marketplace.html` 仅展示 `published`）
 ✅ 任务D（编辑页可见性）：完成
 ✅ 推送状态：成功
+
+---
+
+## 🎯 新任务（Claude 分配，2026-05-09）
+
+**优先级：🔴 立即执行**
+**任务名：用户资料编辑 + 服务条款 + 隐私政策**
+
+---
+
+### 📋 任务 A：用户资料编辑页（profile-edit.html）
+
+**新建文件** `profile-edit.html`，放在项目根目录。
+
+**功能：**
+1. 页面加载时从 Supabase `profiles` 表读取当前用户的 `full_name`、`bio`，填入表单
+2. 用户可修改：
+   - 显示名称（full_name）
+   - 个人简介（bio）
+3. 点击保存后调用：
+```js
+const { error } = await window.supabase_client
+  .from('profiles')
+  .update({ full_name: nameInput.value.trim(), bio: bioInput.value.trim() })
+  .eq('user_id', currentUser.id);
+```
+4. 保存成功后提示"已保存"，2秒后跳回 `dashboard.html`
+
+**样式：** 与 `scripts-upload.html` 完全一致，引入 `js/theme.js`、`js/nav-mobile.js`、`css/common.css`、`js/supabase-client.js`、`js/auth.js`
+
+**双语文案：**
+- 页面标题：Edit Profile / 编辑资料
+- 显示名称：Display Name / 显示名称
+- 个人简介：Bio / 个人简介
+- 保存按钮：Save Changes / 保存修改
+- 取消：← Back to Dashboard / ← 返回主页
+
+**同时修改 `dashboard.html`：**
+在"账号信息"卡片里，简介那行旁边加一个编辑入口按钮：
+```html
+<a href="profile-edit.html" class="btn btn-outline" style="font-size:13px;padding:6px 14px;">
+  <span class="en-only">Edit Profile</span>
+  <span class="zh-only">编辑资料</span>
+</a>
+```
+
+---
+
+### 📋 任务 B：服务条款页（terms.html）
+
+**新建文件** `terms.html`，放在项目根目录。
+
+**页面框架：** 与 `404.html` 类似的简洁静态页，引入 `css/common.css`、`js/theme.js`、`js/nav-mobile.js`
+
+**导航栏：** 只需要 Logo + 返回首页按钮，不需要登录状态
+
+**页面内容（直接用以下文本，中英双语分块）：**
+
+```html
+<article style="max-width:760px;margin:0 auto;padding:100px 40px 80px;line-height:1.8;">
+
+  <h1 style="font-family:'Fraunces',serif;font-size:36px;margin-bottom:8px;">
+    <span class="en-only">Terms of Service</span>
+    <span class="zh-only">服务条款</span>
+  </h1>
+  <p style="color:var(--muted);font-size:14px;margin-bottom:40px;">
+    <span class="en-only">Last updated: May 2026 · This is a draft for MVP stage and has not been reviewed by legal counsel.</span>
+    <span class="zh-only">最后更新：2026年5月 · 本文档为MVP阶段草稿，尚未经过专业法律审查。</span>
+  </p>
+
+  <!-- Section 1 -->
+  <h2 class="en-only">1. Platform Nature</h2>
+  <h2 class="zh-only">1. 平台性质</h2>
+  <p class="en-only">ScriptBridge is an information platform that connects script creators and buyers. We facilitate copyright transactions but are not a party to any transaction between users.</p>
+  <p class="zh-only">ScriptBridge 是一个连接剧本创作者与买家的信息撮合平台。平台为用户之间的版权交易提供技术支持，但不作为任何交易的当事方。</p>
+
+  <!-- Section 2 -->
+  <h2 class="en-only">2. User Registration</h2>
+  <h2 class="zh-only">2. 用户注册</h2>
+  <p class="en-only">You must provide accurate information when registering. You are responsible for keeping your account credentials secure. Each user may only register one account.</p>
+  <p class="zh-only">注册时须提供真实有效的信息。用户须自行妥善保管账号密码。每位用户仅可注册一个账号。</p>
+
+  <!-- Section 3 -->
+  <h2 class="en-only">3. Creator Responsibilities</h2>
+  <h2 class="zh-only">3. 创作者责任</h2>
+  <p class="en-only">By uploading content, you confirm that: (a) you are the original author or hold the rights to distribute the work; (b) the content does not infringe any third party's intellectual property; (c) you take full legal responsibility for any copyright disputes arising from your uploads.</p>
+  <p class="zh-only">上传作品即表示你确认：(a) 你是作品原创作者或拥有合法的版权授权；(b) 作品内容不侵犯任何第三方知识产权；(c) 因你上传的内容引发的任何版权纠纷，由你承担全部法律责任。</p>
+
+  <!-- Section 4 -->
+  <h2 class="en-only">4. Platform Disclaimer</h2>
+  <h2 class="zh-only">4. 平台免责声明</h2>
+  <p class="en-only">ScriptBridge does not verify the originality or legal status of uploaded works. We are not liable for disputes between users. The platform reserves the right to remove content that violates these terms.</p>
+  <p class="zh-only">ScriptBridge 不对上传作品的原创性或版权状态进行核实。平台不对用户之间产生的纠纷承担责任。平台保留删除违规内容的权利。</p>
+
+  <!-- Section 5 -->
+  <h2 class="en-only">5. Prohibited Activities</h2>
+  <h2 class="zh-only">5. 禁止行为</h2>
+  <p class="en-only">Users must not: upload plagiarized or infringing content; impersonate others; attempt to circumvent platform fees; harass other users.</p>
+  <p class="zh-only">用户不得：上传抄袭或侵权内容；冒充他人身份；绕过平台收费机制；骚扰其他用户。</p>
+
+  <!-- Section 6 -->
+  <h2 class="en-only">6. Changes to Terms</h2>
+  <h2 class="zh-only">6. 条款变更</h2>
+  <p class="en-only">We may update these terms at any time. Continued use of the platform after changes constitutes acceptance of the new terms.</p>
+  <p class="zh-only">平台可随时更新本条款。继续使用平台视为接受更新后的条款。</p>
+
+  <!-- Contact -->
+  <h2 class="en-only">7. Contact</h2>
+  <h2 class="zh-only">7. 联系方式</h2>
+  <p>
+    <span class="en-only">For questions about these terms, contact us at </span>
+    <span class="zh-only">如对本条款有疑问，请联系 </span>
+    <a href="mailto:qtian904@gmail.com">qtian904@gmail.com</a>
+  </p>
+
+</article>
+```
+
+---
+
+### 📋 任务 C：隐私政策页（privacy.html）
+
+**新建文件** `privacy.html`，放在项目根目录。同样的页面框架。
+
+**页面内容：**
+
+```html
+<article style="max-width:760px;margin:0 auto;padding:100px 40px 80px;line-height:1.8;">
+
+  <h1 style="font-family:'Fraunces',serif;font-size:36px;margin-bottom:8px;">
+    <span class="en-only">Privacy Policy</span>
+    <span class="zh-only">隐私政策</span>
+  </h1>
+  <p style="color:var(--muted);font-size:14px;margin-bottom:40px;">
+    <span class="en-only">Last updated: May 2026</span>
+    <span class="zh-only">最后更新：2026年5月</span>
+  </p>
+
+  <h2 class="en-only">1. Information We Collect</h2>
+  <h2 class="zh-only">1. 我们收集的信息</h2>
+  <p class="en-only">We collect: your email address (for registration and login); your display name and bio (optional, set by you); content you upload (scripts and associated files); usage data such as login times.</p>
+  <p class="zh-only">我们收集：你的邮箱地址（用于注册和登录）；你设置的显示名称和简介（可选）；你上传的内容（作品文件及相关信息）；使用数据（如登录时间）。</p>
+
+  <h2 class="en-only">2. How We Use Your Information</h2>
+  <h2 class="zh-only">2. 信息用途</h2>
+  <p class="en-only">Your information is used to: provide and maintain platform services; enable communication between creators and buyers; send important platform notifications (no marketing spam).</p>
+  <p class="zh-only">你的信息用于：提供和维护平台服务；促成创作者与买家之间的联系；发送重要平台通知（不发送垃圾营销邮件）。</p>
+
+  <h2 class="en-only">3. Data Sharing</h2>
+  <h2 class="zh-only">3. 数据共享</h2>
+  <p class="en-only">We do not sell your personal data. Your email is only visible to platform administrators. Your display name is shown publicly on your uploaded works.</p>
+  <p class="zh-only">我们不出售你的个人信息。你的邮箱仅平台管理员可见。你的显示名称会在你上传的作品页面公开显示。</p>
+
+  <h2 class="en-only">4. Data Storage</h2>
+  <h2 class="zh-only">4. 数据存储</h2>
+  <p class="en-only">Your data is stored securely via Supabase (supabase.com). Uploaded files are stored in Supabase Storage. We apply reasonable security measures to protect your data.</p>
+  <p class="zh-only">你的数据通过 Supabase（supabase.com）安全存储。上传的文件存储在 Supabase Storage 中。我们采取合理的安全措施保护你的数据。</p>
+
+  <h2 class="en-only">5. Your Rights</h2>
+  <h2 class="zh-only">5. 你的权利</h2>
+  <p class="en-only">You may request deletion of your account and associated data at any time by contacting us. You can update your profile information from your dashboard.</p>
+  <p class="zh-only">你可随时联系我们申请删除账号及相关数据。你可在个人主页中自行更新资料信息。</p>
+
+  <h2 class="en-only">6. Contact</h2>
+  <h2 class="zh-only">6. 联系方式</h2>
+  <p>
+    <span class="en-only">Privacy questions: </span>
+    <span class="zh-only">隐私相关问题：</span>
+    <a href="mailto:qtian904@gmail.com">qtian904@gmail.com</a>
+  </p>
+
+</article>
+```
+
+---
+
+### 📋 任务 D：在 Footer 加条款链接
+
+在所有主要页面的底部（或 `index.html` 的 footer 里），加上：
+```html
+<a href="terms.html" class="en-only">Terms of Service</a>
+<span> · </span>
+<a href="privacy.html" class="en-only">Privacy Policy</a>
+<a href="terms.html" class="zh-only">服务条款</a>
+<span> · </span>
+<a href="privacy.html" class="zh-only">隐私政策</a>
+```
+
+至少在 `index.html` 的 footer 里加上就行，其他页面有时间再加。
+
+---
+
+### ✅ 完成后
+
+```bash
+git add profile-edit.html terms.html privacy.html dashboard.html index.html
+git commit -m "feat: Add profile editing, terms of service, and privacy policy
+
+- profile-edit.html: edit display name and bio, saves to Supabase profiles table
+- dashboard.html: add Edit Profile button linking to profile-edit.html
+- terms.html: bilingual terms of service (MVP draft)
+- privacy.html: bilingual privacy policy (MVP draft)
+- index.html footer: add links to terms and privacy pages"
+git push origin main
+```
+
+在本文件末尾写完成状态：
+```
+✅ 完成时间：[时间]
+✅ 任务A（资料编辑）：完成/失败
+✅ 任务B（服务条款）：完成/失败
+✅ 任务C（隐私政策）：完成/失败
+✅ 任务D（Footer链接）：完成/失败
+✅ 推送状态：成功/失败
+```
