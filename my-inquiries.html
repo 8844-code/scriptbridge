@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Inquiries — ScriptBridge</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23FF4D2E'/%3E%3Ctext x='16' y='23' font-family='Georgia,serif' font-size='20' font-weight='700' fill='white' text-anchor='middle'%3ES%3C/text%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300;1,9..40,400&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;0,9..144,700;1,9..144,300;1,9..144,500;1,9..144,700&family=Noto+Sans+SC:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/common.css">
+  <script src="js/theme.js" defer></script>
+  <script src="js/nav-mobile.js" defer></script>
+  <style>
+    .list-wrapper { min-height: 100vh; padding: 100px 40px 80px; position: relative; }
+    .list-wrapper::before { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at 10% 10%, rgba(255, 77, 46, 0.07), transparent 34%), radial-gradient(circle at 90% 90%, rgba(61, 107, 79, 0.09), transparent 34%); pointer-events: none; }
+    .list-container { max-width: 1080px; margin: 0 auto; position: relative; z-index: 1; }
+    .list-header { margin-bottom: 22px; display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+    .list-header h1 { font-family: 'Fraunces', serif; font-size: 36px; font-weight: 600; color: var(--ink); letter-spacing: -0.02em; }
+    .list-header p { color: var(--muted); font-size: 15px; margin-top: 6px; }
+    .section-card { background: rgba(253, 250, 244, 0.92); border: 1px solid rgba(26, 26, 26, 0.12); border-radius: 22px; padding: 20px; box-shadow: 0 14px 36px rgba(26, 26, 26, 0.08); backdrop-filter: blur(4px); margin-bottom: 16px; }
+    .section-title { margin: 0 0 12px; font-size: 18px; font-weight: 700; }
+    .inquiry-item { border: 1px solid var(--border); border-radius: 14px; padding: 14px; background: rgba(255,255,255,0.7); margin-bottom: 10px; }
+    .inquiry-item:last-child { margin-bottom: 0; }
+    .title-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-bottom: 8px; }
+    .script-link { font-weight: 600; color: var(--ink); text-decoration: none; }
+    .script-link:hover { text-decoration: underline; }
+    .status-badge { font-size: 12px; font-weight: 600; border-radius: var(--r-pill); padding: 4px 10px; }
+    .status-pending { color: #8a6a00; background: rgba(255, 193, 7, 0.18); }
+    .status-accepted { color: var(--sage); background: rgba(61, 107, 79, 0.14); }
+    .status-rejected { color: var(--coral); background: rgba(255, 77, 46, 0.14); }
+    .meta { color: var(--muted); font-size: 13px; margin-bottom: 8px; }
+    .message { font-size: 14px; color: var(--ink); line-height: 1.6; white-space: pre-wrap; }
+    .actions { margin-top: 10px; display: flex; gap: 8px; }
+    .empty { color: var(--muted); font-size: 14px; padding: 8px 0; }
+    .nav-user-menu { color: var(--muted); font-size: 14px; font-weight: 500; background: rgba(255, 255, 255, 0.55); border: 1px solid var(--border); border-radius: var(--r-pill); padding: 8px 14px; max-width: 240px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    @media (max-width: 768px) {
+      .list-wrapper { padding: 80px 20px 60px; }
+      .list-header h1 { font-size: 28px; }
+      .section-card { padding: 14px; }
+      .nav-user-menu { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="dashboard.html" class="nav-logo">
+      <div class="nav-logo-mark">S</div>
+      <div><div class="nav-logo-text">ScriptBridge</div></div>
+    </a>
+    <div class="nav-right">
+      <div class="lang-pill">
+        <button id="lang-en" type="button">EN</button>
+        <button id="lang-zh" type="button">中文</button>
+      </div>
+      <a href="dashboard.html" class="btn btn-outline" id="back-link">← Back</a>
+      <div id="nav-user-menu" class="nav-user-menu">Loading user...</div>
+      <button type="button" class="btn btn-logout" id="logout-btn" onclick="logout()">Log Out</button>
+    </div>
+  </nav>
+
+  <main class="list-wrapper">
+    <div class="list-container">
+      <header class="list-header">
+        <div>
+          <h1 id="page-title">My Inquiries</h1>
+          <p id="page-subtitle">View purchase inquiries you've sent or received.</p>
+        </div>
+      </header>
+
+      <section id="received-section" class="section-card">
+        <h2 id="received-title" class="section-title">Received</h2>
+        <div id="received-list"></div>
+      </section>
+
+      <section id="sent-section" class="section-card">
+        <h2 id="sent-title" class="section-title">Sent</h2>
+        <div id="sent-list"></div>
+      </section>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    const navUserMenu = document.getElementById('nav-user-menu');
+    const langEnBtn = document.getElementById('lang-en');
+    const langZhBtn = document.getElementById('lang-zh');
+    const receivedSection = document.getElementById('received-section');
+    const sentSection = document.getElementById('sent-section');
+    const receivedList = document.getElementById('received-list');
+    const sentList = document.getElementById('sent-list');
+
+    let currentUser = null;
+    let currentProfile = null;
+    let currentLang = localStorage.getItem('scriptbridge_lang') || 'en';
+
+    const I18N = {
+      en: { pageTitle: 'My Inquiries', pageSubtitle: "View purchase inquiries you've sent or received.", back: '← Back', logout: 'Log Out', received: 'Received', sent: 'Sent', pending: 'Pending', accepted: 'Accepted', rejected: 'Rejected', empty: 'No inquiries yet.', sentAt: 'Sent at: ', accept: 'Accept', reject: 'Reject' },
+      zh: { pageTitle: '我的询盘', pageSubtitle: '查看你发出或收到的购买询盘。', back: '← 返回', logout: '退出登录', received: '收到的询盘', sent: '发出的询盘', pending: '待处理', accepted: '已接受', rejected: '已拒绝', empty: '暂无询盘。', sentAt: '发送时间：', accept: '接受', reject: '拒绝' }
+    };
+
+    function t(key) { return I18N[currentLang][key]; }
+    function formatDate(iso) { return iso ? new Date(iso).toLocaleString() : '—'; }
+    function escapeHtml(value) { return String(value || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;'); }
+
+    function statusLabel(status) {
+      if (status === 'accepted') return t('accepted');
+      if (status === 'rejected') return t('rejected');
+      return t('pending');
+    }
+
+    function statusClass(status) {
+      if (status === 'accepted') return 'status-accepted';
+      if (status === 'rejected') return 'status-rejected';
+      return 'status-pending';
+    }
+
+    function setLang(lang) {
+      currentLang = lang === 'zh' ? 'zh' : 'en';
+      document.body.classList.toggle('zh', currentLang === 'zh');
+      document.documentElement.lang = currentLang === 'zh' ? 'zh-CN' : 'en';
+      localStorage.setItem('scriptbridge_lang', currentLang);
+      langEnBtn.classList.toggle('active', currentLang === 'en');
+      langZhBtn.classList.toggle('active', currentLang === 'zh');
+      document.getElementById('page-title').textContent = t('pageTitle');
+      document.getElementById('page-subtitle').textContent = t('pageSubtitle');
+      document.getElementById('back-link').textContent = t('back');
+      document.getElementById('logout-btn').textContent = t('logout');
+      document.getElementById('received-title').textContent = t('received');
+      document.getElementById('sent-title').textContent = t('sent');
+    }
+
+    function renderList(targetEl, items, isReceived) {
+      if (!items.length) {
+        targetEl.innerHTML = '<div class="empty">' + t('empty') + '</div>';
+        return;
+      }
+      targetEl.innerHTML = items.map((item) => {
+        const canReview = isReceived && item.status === 'pending';
+        return '<div class="inquiry-item">' +
+          '<div class="title-row">' +
+            '<a class="script-link" href="script-detail.html?id=' + encodeURIComponent(item.script_id) + '">' + escapeHtml(item.script_title || 'Untitled') + '</a>' +
+            '<span class="status-badge ' + statusClass(item.status) + '">' + statusLabel(item.status) + '</span>' +
+          '</div>' +
+          '<div class="meta">' + t('sentAt') + formatDate(item.created_at) + '</div>' +
+          '<div class="message">' + escapeHtml(item.message || '') + '</div>' +
+          (canReview ? '<div class="actions"><button class="btn btn-primary btn-sm" onclick="updateStatus(\'' + item.id + '\',\'accepted\')">' + t('accept') + '</button><button class="btn btn-outline btn-sm" onclick="updateStatus(\'' + item.id + '\',\'rejected\')">' + t('reject') + '</button></div>' : '') +
+        '</div>';
+      }).join('');
+    }
+
+    async function loadInquiries() {
+      const { data: received, error: receivedError } = await window.supabase_client
+        .from('purchase_requests')
+        .select('*')
+        .eq('seller_id', currentUser.id)
+        .order('created_at', { ascending: false });
+
+      const { data: sent, error: sentError } = await window.supabase_client
+        .from('purchase_requests')
+        .select('*')
+        .eq('buyer_id', currentUser.id)
+        .order('created_at', { ascending: false });
+
+      if (receivedError || sentError) {
+        const msg = escapeHtml((receivedError || sentError).message);
+        receivedList.innerHTML = '<div class="empty">' + msg + '</div>';
+        sentList.innerHTML = '<div class="empty">' + msg + '</div>';
+        return;
+      }
+
+      const role = currentProfile?.role;
+      if (role === 'creator') {
+        receivedSection.style.display = 'block';
+        sentSection.style.display = 'none';
+      } else if (role === 'buyer') {
+        receivedSection.style.display = 'none';
+        sentSection.style.display = 'block';
+      } else {
+        receivedSection.style.display = 'block';
+        sentSection.style.display = 'block';
+      }
+
+      renderList(receivedList, received || [], true);
+      renderList(sentList, sent || [], false);
+    }
+
+    async function updateStatus(id, newStatus) {
+      await window.supabase_client
+        .from('purchase_requests')
+        .update({ status: newStatus })
+        .eq('id', id)
+        .eq('seller_id', currentUser.id);
+      loadInquiries();
+    }
+    window.updateStatus = updateStatus;
+
+    async function initPage() {
+      setLang(currentLang);
+      const session = await requireAuth();
+      if (!session) return;
+      currentUser = await getCurrentUser();
+      if (!currentUser) { window.location.href = 'login.html'; return; }
+      navUserMenu.textContent = currentUser.email || currentUser.id;
+      const { data: profile } = await window.supabase_client.from('profiles').select('role').eq('user_id', currentUser.id).maybeSingle();
+      currentProfile = profile || null;
+      await loadInquiries();
+    }
+
+    window.addEventListener('DOMContentLoaded', initPage);
+    langEnBtn.addEventListener('click', () => { setLang('en'); loadInquiries(); });
+    langZhBtn.addEventListener('click', () => { setLang('zh'); loadInquiries(); });
+  </script>
+</body>
+</html>

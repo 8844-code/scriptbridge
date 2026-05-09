@@ -404,7 +404,7 @@
               <span class="en-only">💬 Contact Seller</span>
               <span class="zh-only">💬 联系卖家</span>
             </button>
-            <button class="btn btn-primary" id="purchase-btn" style="display: none;">
+            <button class="btn btn-primary" id="buy-btn" style="display: none;">
               <span class="en-only">🛒 Purchase License</span>
               <span class="zh-only">🛒 购买版权</span>
             </button>
@@ -413,6 +413,32 @@
       </div>
     </div>
   </main>
+
+  <div id="inquiry-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:1000; align-items:center; justify-content:center;">
+    <div style="background:var(--warm-white); border-radius:18px; padding:32px; max-width:480px; width:90%; position:relative;">
+      <button onclick="closeInquiryModal()" style="position:absolute;top:14px;right:18px;background:none;border:none;font-size:20px;cursor:pointer;color:var(--muted);">✕</button>
+      <h3 style="font-family:'Fraunces',serif;font-size:22px;margin-bottom:8px;">
+        <span class="en-only">Send Purchase Inquiry</span>
+        <span class="zh-only">发送购买询盘</span>
+      </h3>
+      <p style="color:var(--muted);font-size:13px;margin-bottom:20px;">
+        <span class="en-only">Tell the creator why you're interested. They'll review and get back to you.</span>
+        <span class="zh-only">告诉创作者你的购买意向，他们会尽快与你联系。</span>
+      </p>
+      <textarea id="inquiry-message" rows="4" placeholder="e.g. I'm a producer looking for short drama scripts..." style="width:100%;border:1px solid var(--border);border-radius:10px;padding:12px;font-size:14px;resize:vertical;font-family:inherit;background:var(--bg);color:var(--text);box-sizing:border-box;"></textarea>
+      <div style="margin-top:14px; display:flex; gap:10px; justify-content:flex-end;">
+        <button onclick="closeInquiryModal()" class="btn btn-outline" style="font-size:13px;">
+          <span class="en-only">Cancel</span>
+          <span class="zh-only">取消</span>
+        </button>
+        <button onclick="submitInquiry()" class="btn btn-primary" id="inquiry-submit-btn" style="font-size:13px;">
+          <span class="en-only">Send Inquiry</span>
+          <span class="zh-only">发送询盘</span>
+        </button>
+      </div>
+      <p id="inquiry-result" style="margin-top:12px;font-size:13px;text-align:center;display:none;"></p>
+    </div>
+  </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase-client.js"></script>
@@ -426,6 +452,7 @@
 
     let currentUser = null;
     let scriptData = null;
+    let sendingInquiry = false;
 
     (function initLang() {
       const lang = localStorage.getItem('scriptbridge_lang') || 'en';
@@ -495,6 +522,7 @@
       }
 
       scriptData = script;
+      window._scriptData = script;
 
       document.getElementById('script-title').textContent = script.title || 'Untitled Script';
       document.getElementById('script-type').textContent = script.script_type || '—';
@@ -514,6 +542,12 @@
 
         downloadBtn.href = script.file_url;
         downloadBtn.download = script.title + (getFileExtension(script.file_url) || '.pdf');
+      }
+
+      if (currentUser && String(currentUser.id) !== String(script.user_id)) {
+        document.getElementById('buy-btn').style.display = 'inline-flex';
+      } else {
+        document.getElementById('buy-btn').style.display = 'none';
       }
 
       loadingState.style.display = 'none';
@@ -577,6 +611,7 @@
           window.location.href = 'login.html';
           return;
         }
+        window._currentUser = currentUser;
 
         navUserMenu.textContent = currentUser.email || currentUser.id;
 
@@ -598,8 +633,76 @@
       }
     });
 
-    document.getElementById('purchase-btn').addEventListener('click', () => {
-      alert('Purchase system is under development. Thank you for your interest!');
+    function openInquiryModal() {
+      const modal = document.getElementById('inquiry-modal');
+      modal.style.display = 'flex';
+      document.getElementById('inquiry-message').value = '';
+      document.getElementById('inquiry-result').style.display = 'none';
+    }
+
+    function closeInquiryModal() {
+      document.getElementById('inquiry-modal').style.display = 'none';
+    }
+    window.closeInquiryModal = closeInquiryModal;
+
+    async function submitInquiry() {
+      if (sendingInquiry) return;
+      const btn = document.getElementById('inquiry-submit-btn');
+      const resultEl = document.getElementById('inquiry-result');
+      const message = document.getElementById('inquiry-message').value.trim();
+      const isZh = document.body.classList.contains('zh');
+
+      if (!window._scriptData || !window._currentUser) {
+        window.location.href = 'login.html';
+        return;
+      }
+
+      if (!message) {
+        resultEl.style.display = 'block';
+        resultEl.style.color = 'var(--coral)';
+        resultEl.textContent = isZh ? '请输入询盘内容。' : 'Please enter your inquiry message.';
+        return;
+      }
+
+      sendingInquiry = true;
+      btn.disabled = true;
+      btn.textContent = isZh ? '发送中...' : 'Sending...';
+
+      const { error } = await window.supabase_client
+        .from('purchase_requests')
+        .insert({
+          script_id: window._scriptData.id,
+          script_title: window._scriptData.title,
+          buyer_id: window._currentUser.id,
+          seller_id: window._scriptData.user_id,
+          message: message,
+          status: 'pending'
+        });
+
+      sendingInquiry = false;
+      btn.disabled = false;
+      btn.innerHTML = '<span class="en-only">Send Inquiry</span><span class="zh-only">发送询盘</span>';
+
+      resultEl.style.display = 'block';
+      if (error) {
+        resultEl.style.color = 'var(--coral)';
+        resultEl.textContent = error.message;
+      } else {
+        resultEl.style.color = 'var(--sage)';
+        resultEl.textContent = isZh
+          ? '✅ 询盘已发送！创作者会尽快与你联系。'
+          : '✅ Inquiry sent! The creator will be in touch soon.';
+        setTimeout(closeInquiryModal, 2500);
+      }
+    }
+    window.submitInquiry = submitInquiry;
+
+    document.getElementById('buy-btn').addEventListener('click', () => {
+      if (!window._currentUser) {
+        window.location.href = 'login.html';
+        return;
+      }
+      openInquiryModal();
     });
 
     window.addEventListener('DOMContentLoaded', initPage);
