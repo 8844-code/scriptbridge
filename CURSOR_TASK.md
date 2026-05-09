@@ -400,3 +400,164 @@ git push origin main
 ✅ script-edit.html：完成
 ✅ Edit 按钮启用：完成
 ✅ 推送状态：成功
+
+---
+
+## 🎯 新任务（Claude 分配，2026-05-09）
+
+**优先级：🔴 立即执行**
+**任务名：价格筛选 + 联系卖家**
+
+---
+
+### 📋 任务 A：浏览页加价格区间筛选（scripts-browse.html）
+
+**目标：** 在现有筛选栏（搜索框 + 类型筛选 + 排序）旁边，加两个价格输入框。
+
+**第一步：在 `filters-card` 区域加两个 input（`id="price-min"` 和 `id="price-max"`）：**
+
+找到这段 HTML（大约在 `<section class="filters-card">` 里）：
+```html
+<select id="sort-select">
+  ...
+</select>
+```
+在它后面加：
+```html
+<input type="number" id="price-min" placeholder="Min price" min="0" style="width: 100px;">
+<input type="number" id="price-max" placeholder="Max price" min="0" style="width: 100px;">
+```
+
+**第二步：在 JS 里获取这两个值：**
+```js
+const priceMinInput = document.getElementById('price-min');
+const priceMaxInput = document.getElementById('price-max');
+```
+
+**第三步：在 `applyFilters()` 函数里，加价格过滤逻辑：**
+
+找到 `applyFilters` 函数里已有的 filter 逻辑（已有关键字和类型筛选），在其中加：
+```js
+const minPrice = parseFloat(priceMinInput.value) || 0;
+const maxPrice = parseFloat(priceMaxInput.value) || Infinity;
+
+list = list.filter(item => {
+  const price = parseFloat(item.price) || 0;
+  return price >= minPrice && price <= maxPrice;
+});
+```
+
+**第四步：绑定事件（触发 applyFilters）：**
+```js
+priceMinInput.addEventListener('input', applyFilters);
+priceMaxInput.addEventListener('input', applyFilters);
+```
+
+**第五步：双语 placeholder 跟着语言切换：**
+在 `i18n` 的 `en` 和 `zh` 对象中加：
+```js
+// en:
+priceMinPh: 'Min price',
+priceMaxPh: 'Max price',
+// zh:
+priceMinPh: '最低价',
+priceMaxPh: '最高价',
+```
+然后在 `setLang()` 里加：
+```js
+priceMinInput.placeholder = t('priceMinPh');
+priceMaxInput.placeholder = t('priceMaxPh');
+```
+
+---
+
+### 📋 任务 B：联系卖家功能（script-detail.html）
+
+**目标：** "Contact Seller" 按钮现在只弹 alert，改为真实显示卖家邮箱并支持一键发邮件。
+
+**第一步：修改 `loadAuthor()` 函数，让它同时返回 email：**
+
+找到现有的 `loadAuthor` 函数：
+```js
+async function loadAuthor(userId) {
+  ...
+  return data.full_name || data.email || 'Unknown author';
+}
+```
+改为返回一个对象：
+```js
+async function loadAuthor(userId) {
+  if (!userId) return { name: 'Unknown author', email: null };
+  const { data, error } = await window.supabase_client
+    .from('profiles')
+    .select('full_name, email')
+    .eq('user_id', userId)
+    .maybeSingle();
+  if (error || !data) return { name: 'Unknown author', email: null };
+  return {
+    name: data.full_name || data.email || 'Unknown author',
+    email: data.email || null
+  };
+}
+```
+
+**第二步：在调用处保存 email：**
+
+找到使用 loadAuthor 的地方（大约如下）：
+```js
+const author = await loadAuthor(data.user_id);
+document.getElementById('script-author').textContent = escapeHtml(author);
+```
+改为：
+```js
+const { name: authorName, email: authorEmail } = await loadAuthor(data.user_id);
+document.getElementById('script-author').textContent = escapeHtml(authorName);
+// 把 email 存起来供联系按钮使用
+window._authorEmail = authorEmail;
+```
+
+**第三步：改 contact-btn 的点击事件：**
+
+找到：
+```js
+document.getElementById('contact-btn').addEventListener('click', () => {
+  alert('Contact feature coming soon...');
+});
+```
+改为：
+```js
+document.getElementById('contact-btn').addEventListener('click', () => {
+  const email = window._authorEmail;
+  if (email) {
+    window.location.href = `mailto:${email}`;
+  } else {
+    const msg = document.body.classList.contains('zh')
+      ? '暂无卖家联系方式。'
+      : 'No contact info available for this seller.';
+    alert(msg);
+  }
+});
+```
+
+---
+
+### ✅ 完成后
+
+```bash
+git add scripts-browse.html script-detail.html
+git commit -m "feat: Add price range filter to browse page and enable contact seller
+
+- Add min/max price inputs to browse filters with bilingual placeholder
+- Wire price filter into applyFilters() function
+- Update loadAuthor() to return email alongside name
+- Contact Seller button now opens mailto: link with seller's email"
+git push origin main
+```
+
+在本文件末尾写完成状态：
+```
+✅ 完成时间：[时间]
+✅ 任务A（价格筛选）：完成/失败
+✅ 任务B（联系卖家）：完成/失败
+✅ 推送状态：成功/失败
+```
