@@ -93,9 +93,16 @@ html.nav-compact nav {
 }
 
 html.nav-compact .nav-logo-mark {
-  width: 26px;
-  height: 26px;
-  font-size: 13px;
+  width: 30px;
+  height: 30px;
+}
+
+html.nav-compact .nav-logo-zh {
+  font-size: 15px;
+}
+
+html.nav-compact .nav-logo-en {
+  font-size: 10px;
 }
 
 html.nav-compact .nav-logo-text {
@@ -124,31 +131,63 @@ html.nav-compact .btn-logout {
 .nav-logo {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   text-decoration: none;
   color: var(--ink);
 }
 
 .nav-logo-mark {
-  width: 32px;
-  height: 32px;
-  background: var(--coral);
-  border-radius: var(--r-sm);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: 'Fraunces', serif;
-  font-size: 16px;
-  color: #fff;
-  font-weight: 700;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border-radius: 10px;
+  background: url('../images/scriptbridge-mark.svg') center / contain no-repeat;
+  box-shadow:
+    0 1px 2px rgba(28, 36, 48, 0.12),
+    0 4px 12px rgba(242, 106, 79, 0.28);
 }
 
+.nav-logo-text-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0;
+  line-height: 1.15;
+}
+
+.nav-logo-zh {
+  font-family: 'Noto Sans SC', 'PingFang SC', 'Hiragino Sans GB', sans-serif;
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: var(--ink);
+}
+
+.nav-logo-en {
+  font-family: 'Fraunces', serif;
+  font-size: 11px;
+  font-weight: 500;
+  font-style: italic;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  text-transform: none;
+}
+
+/* Legacy single-line title (optional fallbacks) */
 .nav-logo-text {
   font-family: 'Fraunces', serif;
   font-size: 18px;
   font-weight: 600;
   color: var(--ink);
   letter-spacing: -0.02em;
+}
+
+:root.theme-dark .nav-logo-zh {
+  color: #f8fafc;
+}
+
+:root.theme-dark .nav-logo-en {
+  color: rgba(248, 250, 252, 0.58);
 }
 
 .nav-right {

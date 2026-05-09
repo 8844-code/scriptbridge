@@ -3,11 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ScriptBridge — Chinese IP Marketplace</title>
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23FF4D2E'/%3E%3Ctext x='16' y='23' font-family='Georgia,serif' font-size='20' font-weight='700' fill='white' text-anchor='middle'%3ES%3C/text%3E%3C/svg%3E">
+<title>剧桥 · ScriptBridge — Chinese IP Marketplace</title>
+<link rel="icon" type="image/svg+xml" href="images/scriptbridge-mark.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300;1,9..40,400&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;0,9..144,700;1,9..144,300;1,9..144,500;1,9..144,700&family=Noto+Sans+SC:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300;1,9..40,400&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;0,9..144,700;1,9..144,300;1,9..144,500;1,9..144,700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/common.css">
 <script src="js/theme.js" defer></script>
 <script src="js/nav-mobile.js" defer></script>
 <style>
@@ -74,12 +75,14 @@ html.nav-compact nav {
   padding-bottom: 7px;
 }
 html.nav-compact .nav-logo-mark {
-  width: 26px;
-  height: 26px;
-  font-size: 13px;
+  width: 30px;
+  height: 30px;
 }
-html.nav-compact .nav-logo-text {
+html.nav-compact .nav-logo-zh {
   font-size: 15px;
+}
+html.nav-compact .nav-logo-en {
+  font-size: 10px;
 }
 html.nav-compact .btn-nav {
   padding: 7px 12px;
@@ -94,19 +97,6 @@ html.nav-compact .theme-pill button {
   background: rgba(8, 13, 23, 0.95);
   border-bottom-color: rgba(248, 250, 252, 0.28);
 }
-.nav-logo { display: flex; align-items: center; gap: 10px; }
-.nav-logo-mark {
-  width: 32px; height: 32px;
-  background: var(--coral);
-  border-radius: var(--r-sm);
-  display: flex; align-items: center; justify-content: center;
-  font-family: 'Fraunces', serif;
-  font-size: 16px; color: #fff; font-weight: 700;
-}
-.nav-logo-text { font-family: 'Fraunces', serif; font-size: 18px; font-weight: 600; color: var(--ink); letter-spacing: -0.02em; }
-.nav-logo-sub { font-size: 11px; color: var(--muted); letter-spacing: 0.04em; font-weight: 300; }
-:root.theme-dark .nav-logo-text { color: #f8fafc; }
-:root.theme-dark .nav-logo-sub { color: rgba(248, 250, 252, 0.72); }
 .nav-right { display: flex; align-items: center; gap: 12px; }
 .auth-nav-links {
   display: inline-flex;
@@ -588,8 +578,11 @@ section { padding: 80px 40px; }
 
 /* FOOTER */
 footer { padding: 40px; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border); margin-top: 24px; }
-.footer-logo { font-family: 'Fraunces', serif; font-size: 16px; font-weight: 600; letter-spacing: -0.01em; }
-.footer-logo span { color: var(--coral); }
+.footer-logo { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 10px; font-size: 15px; }
+.footer-logo-zh { font-family: 'Noto Sans SC', sans-serif; font-weight: 700; letter-spacing: 0.14em; color: var(--ink); }
+.footer-logo-en { font-family: 'Fraunces', serif; font-size: 13px; font-weight: 500; font-style: italic; color: var(--muted); }
+.footer-logo-en span { color: var(--coral); font-style: italic; }
+.footer-logo-tag { font-size: 11px; color: var(--muted); letter-spacing: 0.04em; width: 100%; margin-top: 2px; }
 .footer-meta { font-size: 12px; color: var(--muted); text-align: right; line-height: 1.6; }
 
 .gap-section { height: 24px; }
@@ -614,8 +607,8 @@ body:not(.zh) .zh-only { display: none !important; }
     gap: 10px;
     flex-wrap: wrap;
   }
-  .nav-logo-sub { display: none; }
-  .nav-logo-text { font-size: 16px; }
+  .nav-logo-zh { font-size: 15px; letter-spacing: 0.1em; }
+  .nav-logo-en { font-size: 10px; }
   .nav-right {
     width: 100%;
     gap: 8px;
@@ -663,13 +656,11 @@ body:not(.zh) .zh-only { display: none !important; }
   nav {
     padding: 8px 10px;
   }
-  .nav-logo-text {
-    font-size: 15px;
-  }
+  .nav-logo-zh { font-size: 14px; }
+  .nav-logo-en { font-size: 9px; }
   .nav-logo-mark {
-    width: 26px;
-    height: 26px;
-    font-size: 13px;
+    width: 28px;
+    height: 28px;
   }
   .nav-right {
     justify-content: space-between;
@@ -712,11 +703,11 @@ body:not(.zh) .zh-only { display: none !important; }
 <body>
 
 <nav>
-  <a href="index.html" class="nav-logo" title="Back to homepage">
-    <div class="nav-logo-mark">S</div>
-    <div>
-      <div class="nav-logo-text">ScriptBridge</div>
-      <div class="nav-logo-sub">剧权场 · Chinese IP Marketplace</div>
+  <a href="index.html" class="nav-logo" title="剧桥 ScriptBridge — Home">
+    <div class="nav-logo-mark" aria-hidden="true"></div>
+    <div class="nav-logo-text-wrap">
+      <span class="nav-logo-zh">剧桥</span>
+      <span class="nav-logo-en">ScriptBridge</span>
     </div>
   </a>
   <div class="nav-right">
@@ -1136,7 +1127,11 @@ body:not(.zh) .zh-only { display: none !important; }
 <div class="gap-section"></div>
 
 <footer>
-  <div class="footer-logo">Script<span>Bridge</span> · 剧权场</div>
+  <div class="footer-logo" aria-label="剧桥 ScriptBridge">
+    <span class="footer-logo-zh">剧桥</span>
+    <span class="footer-logo-en">Script<span>Bridge</span></span>
+    <span class="footer-logo-tag">Chinese IP Marketplace</span>
+  </div>
   <div class="footer-meta">
     <div>Global Chinese Script Marketplace · V1.1 · 2026</div>
     <div style="opacity:0.5;margin-top:4px">中文剧本版权交易平台 · 连接创作者与全球买家</div>
