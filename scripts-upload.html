@@ -280,6 +280,42 @@
             </div>
           </div>
 
+          <div class="form-group" id="region-group" style="display: none;">
+            <label>
+              <span class="en-only">License Region</span>
+              <span class="zh-only">授权地区</span>
+            </label>
+            <select id="region-select" style="width:100%;margin-top:8px;padding:12px 14px;border-radius:12px;border:1px solid rgba(26, 26, 26, 0.14);background:rgba(255, 255, 255, 0.84);">
+              <option value="mainland">中国大陆 / Mainland China</option>
+              <option value="greater_china">大中华区 / Greater China</option>
+              <option value="asia">亚洲 / Asia</option>
+              <option value="global" selected>全球 / Global</option>
+            </select>
+          </div>
+
+          <div class="form-group" id="rights-years-group" style="display: none;">
+            <label>
+              <span class="en-only">License Duration</span>
+              <span class="zh-only">授权年限</span>
+            </label>
+            <select id="rights-years-select" style="width:100%;margin-top:8px;padding:12px 14px;border-radius:12px;border:1px solid rgba(26, 26, 26, 0.14);background:rgba(255, 255, 255, 0.84);">
+              <option value="1year">1年 / 1 Year</option>
+              <option value="3years">3年 / 3 Years</option>
+              <option value="5years">5年 / 5 Years</option>
+              <option value="permanent" selected>永久 / Permanent</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;">
+              <input type="checkbox" id="copyright-confirm" required style="margin-top:3px;flex-shrink:0;">
+              <span style="font-size:13px;color:var(--muted);line-height:1.6;">
+                <span class="en-only">I confirm that I am the sole copyright holder of this work. I take full legal responsibility for any copyright disputes arising from this upload.</span>
+                <span class="zh-only">我确认我是本作品的唯一版权持有人。如因上传内容引发任何版权纠纷，由我承担全部法律责任。</span>
+              </span>
+            </label>
+          </div>
+
           <button type="submit" class="btn btn-primary" id="submit-btn">
             <span id="btn-text">Submit Script</span>
             <span id="btn-spinner" class="spinner" style="display: none;"></span>
@@ -334,6 +370,7 @@
         errDescription: 'Description is required',
         errPrice: 'Please enter a valid price',
         errFile: 'Please select a script file',
+        errCopyright: 'Please confirm copyright ownership.',
         errSignin: 'Please sign in again and try submitting.',
         uploadFailed: 'File upload failed: ',
         success: 'Script uploaded successfully! Redirecting to dashboard...',
@@ -361,6 +398,7 @@
         errDescription: '请输入简介',
         errPrice: '请输入有效价格',
         errFile: '请选择作品文件',
+        errCopyright: '请勾选版权确认。',
         errSignin: '请重新登录后再提交。',
         uploadFailed: '文件上传失败：',
         success: '作品上传成功！即将跳转到个人主页…',
@@ -435,7 +473,20 @@
         isValid = false;
       }
 
+      if (!document.getElementById('copyright-confirm').checked) {
+        showAlert(t('errCopyright'), 'error');
+        isValid = false;
+      }
+
       return isValid;
+    }
+
+    function updateRightsLicenseFields() {
+      const isBuyout = document.querySelector('input[name="rights_type"]:checked')?.value === '买断';
+      const rg = document.getElementById('region-group');
+      const yg = document.getElementById('rights-years-group');
+      if (rg) rg.style.display = isBuyout ? 'none' : '';
+      if (yg) yg.style.display = isBuyout ? 'none' : '';
     }
 
     async function uploadFileToStorage(file, userId) {
@@ -465,6 +516,8 @@
 
     async function initPage() {
       setLang(currentLang);
+      rightsInputs.forEach((el) => el.addEventListener('change', updateRightsLicenseFields));
+      updateRightsLicenseFields();
 
       const session = await requireAuth();
       if (!session) return;
@@ -493,6 +546,7 @@
       try {
         const selectedFile = fileInput.files[0];
         const rightsType = document.querySelector('input[name="rights_type"]:checked').value;
+        const isBuyout = rightsType === '买断';
         const fileUrl = await uploadFileToStorage(selectedFile, currentUser.id);
 
         const { error } = await window.supabase_client
@@ -506,6 +560,9 @@
             rights_type: rightsType,
             file_url: fileUrl,
             status: document.querySelector('input[name="visibility"]:checked').value,
+            region: isBuyout ? 'global' : document.getElementById('region-select').value,
+            rights_years: isBuyout ? 'permanent' : document.getElementById('rights-years-select').value,
+            copyright_confirmed: true,
             created_at: new Date().toISOString(),
           });
 

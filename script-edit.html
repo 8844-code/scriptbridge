@@ -301,11 +301,47 @@
             </div>
           </div>
 
+          <div class="form-group" id="region-group" style="display: none;">
+            <label>
+              <span class="en-only">License Region</span>
+              <span class="zh-only">授权地区</span>
+            </label>
+            <select id="region-select" style="width:100%;margin-top:8px;padding:12px 14px;border-radius:12px;border:1px solid rgba(26, 26, 26, 0.14);background:rgba(255, 255, 255, 0.84);">
+              <option value="mainland">中国大陆 / Mainland China</option>
+              <option value="greater_china">大中华区 / Greater China</option>
+              <option value="asia">亚洲 / Asia</option>
+              <option value="global" selected>全球 / Global</option>
+            </select>
+          </div>
+
+          <div class="form-group" id="rights-years-group" style="display: none;">
+            <label>
+              <span class="en-only">License Duration</span>
+              <span class="zh-only">授权年限</span>
+            </label>
+            <select id="rights-years-select" style="width:100%;margin-top:8px;padding:12px 14px;border-radius:12px;border:1px solid rgba(26, 26, 26, 0.14);background:rgba(255, 255, 255, 0.84);">
+              <option value="1year">1年 / 1 Year</option>
+              <option value="3years">3年 / 3 Years</option>
+              <option value="5years">5年 / 5 Years</option>
+              <option value="permanent" selected>永久 / Permanent</option>
+            </select>
+          </div>
+
           <div class="form-group">
             <label for="script-file" id="label-file">Replace Script File (.pdf .doc .docx .txt)</label>
             <input type="file" id="script-file" name="script_file" accept=".pdf,.doc,.docx,.txt">
             <p class="file-note" id="file-note">Leave empty to keep current file.</p>
             <div class="form-error" id="file-error"></div>
+          </div>
+
+          <div class="form-group">
+            <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;">
+              <input type="checkbox" id="copyright-confirm" required style="margin-top:3px;flex-shrink:0;">
+              <span style="font-size:13px;color:var(--muted);line-height:1.6;">
+                <span class="en-only">I confirm that I am the sole copyright holder of this work. I take full legal responsibility for any copyright disputes arising from this upload.</span>
+                <span class="zh-only">我确认我是本作品的唯一版权持有人。如因上传内容引发任何版权纠纷，由我承担全部法律责任。</span>
+              </span>
+            </label>
           </div>
 
           <div class="action-row">
@@ -373,7 +409,8 @@
         uploadFailed: 'File upload failed: ',
         loadFailed: 'Failed to load script: ',
         saveSuccess: 'Script updated successfully! Redirecting...',
-        saveFailed: 'Save failed: '
+        saveFailed: 'Save failed: ',
+        errCopyright: 'Please confirm copyright ownership.'
       },
       zh: {
         back: '← 返回',
@@ -405,7 +442,8 @@
         uploadFailed: '文件上传失败：',
         loadFailed: '加载作品失败：',
         saveSuccess: '作品更新成功！正在跳转…',
-        saveFailed: '保存失败：'
+        saveFailed: '保存失败：',
+        errCopyright: '请勾选版权确认。'
       }
     };
 
@@ -469,7 +507,19 @@
         document.getElementById('price-error').textContent = t('errPrice');
         isValid = false;
       }
+      if (!document.getElementById('copyright-confirm').checked) {
+        showAlert(t('errCopyright'), 'error');
+        isValid = false;
+      }
       return isValid;
+    }
+
+    function updateRightsLicenseFields() {
+      const isBuyout = document.querySelector('input[name="rights_type"]:checked')?.value === '买断';
+      const rg = document.getElementById('region-group');
+      const yg = document.getElementById('rights-years-group');
+      if (rg) rg.style.display = isBuyout ? 'none' : '';
+      if (yg) yg.style.display = isBuyout ? 'none' : '';
     }
 
     function setSubmitting(isSubmitting) {
@@ -533,6 +583,16 @@
       const vis = (data.status === 'draft') ? 'draft' : 'published';
       const visEl = document.querySelector('input[name="visibility"][value="' + vis + '"]');
       if (visEl) visEl.checked = true;
+      if (data.region) {
+        const rs = document.getElementById('region-select');
+        if (rs) rs.value = data.region;
+      }
+      if (data.rights_years) {
+        const ys = document.getElementById('rights-years-select');
+        if (ys) ys.value = data.rights_years;
+      }
+      document.getElementById('copyright-confirm').checked = !!data.copyright_confirmed;
+      updateRightsLicenseFields();
     }
 
     async function initPage() {
@@ -547,6 +607,10 @@
         }
         navUserMenu.textContent = currentUser.email || currentUser.id;
         await loadScriptDetail();
+        document.querySelectorAll('input[name="rights_type"]').forEach((el) => {
+          el.addEventListener('change', updateRightsLicenseFields);
+        });
+        updateRightsLicenseFields();
       } catch (error) {
         showAlert(t('loadFailed') + error.message, 'error');
       }
@@ -561,13 +625,18 @@
       if (!validateForm()) return;
       setSubmitting(true);
       try {
+        const rightsType = document.querySelector('input[name="rights_type"]:checked').value;
+        const isBuyout = rightsType === '买断';
         const updatePayload = {
           title: titleInput.value.trim(),
           description: descriptionInput.value.trim(),
           script_type: scriptTypeInput.value,
           price: Number(priceInput.value),
-          rights_type: document.querySelector('input[name="rights_type"]:checked').value,
-          status: document.querySelector('input[name="visibility"]:checked').value
+          rights_type: rightsType,
+          status: document.querySelector('input[name="visibility"]:checked').value,
+          region: isBuyout ? 'global' : document.getElementById('region-select').value,
+          rights_years: isBuyout ? 'permanent' : document.getElementById('rights-years-select').value,
+          copyright_confirmed: true
         };
 
         if (fileInput.files.length) {

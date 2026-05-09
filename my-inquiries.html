@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>My Inquiries — ScriptBridge</title>
+  <title>My Applications — ScriptBridge</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23FF4D2E'/%3E%3Ctext x='16' y='23' font-family='Georgia,serif' font-size='20' font-weight='700' fill='white' text-anchor='middle'%3ES%3C/text%3E%3C/svg%3E">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -63,8 +63,8 @@
     <div class="list-container">
       <header class="list-header">
         <div>
-          <h1 id="page-title">My Inquiries</h1>
-          <p id="page-subtitle">View purchase inquiries you've sent or received.</p>
+          <h1 id="page-title">My Applications</h1>
+          <p id="page-subtitle">View license applications you've sent or received.</p>
         </div>
       </header>
 
@@ -96,9 +96,11 @@
     let currentProfile = null;
     let currentLang = localStorage.getItem('scriptbridge_lang') || 'en';
 
+    let _receivedData = [];
+
     const I18N = {
-      en: { pageTitle: 'My Inquiries', pageSubtitle: "View purchase inquiries you've sent or received.", back: '← Back', logout: 'Log Out', received: 'Received', sent: 'Sent', pending: 'Pending', accepted: 'Accepted', rejected: 'Rejected', empty: 'No inquiries yet.', sentAt: 'Sent at: ', accept: 'Accept', reject: 'Reject' },
-      zh: { pageTitle: '我的询盘', pageSubtitle: '查看你发出或收到的购买询盘。', back: '← 返回', logout: '退出登录', received: '收到的询盘', sent: '发出的询盘', pending: '待处理', accepted: '已接受', rejected: '已拒绝', empty: '暂无询盘。', sentAt: '发送时间：', accept: '接受', reject: '拒绝' }
+      en: { pageTitle: 'My Applications', pageSubtitle: "View license applications you've sent or received.", back: '← Back', logout: 'Log Out', received: 'Received Applications', sent: 'Sent Applications', pending: 'Pending', accepted: 'Accepted', rejected: 'Rejected', empty: 'No applications yet.', sentAt: 'Sent at: ', accept: 'Accept', reject: 'Reject' },
+      zh: { pageTitle: '我的申请', pageSubtitle: '查看你发出或收到的授权申请。', back: '← 返回', logout: '退出登录', received: '收到的申请', sent: '发出的申请', pending: '待处理', accepted: '已接受', rejected: '已拒绝', empty: '暂无申请。', sentAt: '发送时间：', accept: '接受', reject: '拒绝' }
     };
 
     function t(key) { return I18N[currentLang][key]; }
@@ -139,6 +141,9 @@
       }
       targetEl.innerHTML = items.map((item) => {
         const canReview = isReceived && item.status === 'pending';
+        const downloadLink = item.status === 'accepted'
+          ? '<a href="script-detail.html?id=' + encodeURIComponent(item.script_id) + '" class="btn btn-primary btn-sm" style="margin-top:10px;display:inline-block;"><span class="en-only">↓ Go to Download</span><span class="zh-only">↓ 前往下载</span></a>'
+          : '';
         return '<div class="inquiry-item">' +
           '<div class="title-row">' +
             '<a class="script-link" href="script-detail.html?id=' + encodeURIComponent(item.script_id) + '">' + escapeHtml(item.script_title || 'Untitled') + '</a>' +
@@ -146,6 +151,7 @@
           '</div>' +
           '<div class="meta">' + t('sentAt') + formatDate(item.created_at) + '</div>' +
           '<div class="message">' + escapeHtml(item.message || '') + '</div>' +
+          downloadLink +
           (canReview ? '<div class="actions"><button class="btn btn-primary btn-sm" onclick="updateStatus(\'' + item.id + '\',\'accepted\')">' + t('accept') + '</button><button class="btn btn-outline btn-sm" onclick="updateStatus(\'' + item.id + '\',\'rejected\')">' + t('reject') + '</button></div>' : '') +
         '</div>';
       }).join('');
@@ -171,6 +177,8 @@
         return;
       }
 
+      _receivedData = received || [];
+
       const role = currentProfile?.role;
       if (role === 'creator') {
         receivedSection.style.display = 'block';
@@ -193,6 +201,26 @@
         .update({ status: newStatus })
         .eq('id', id)
         .eq('seller_id', currentUser.id);
+
+      if (newStatus === 'accepted') {
+        const req = (_receivedData || []).find((r) => String(r.id) === String(id));
+        if (req && req.script_id) {
+          const { data: scriptData } = await window.supabase_client
+            .from('scripts')
+            .select('rights_type')
+            .eq('id', req.script_id)
+            .maybeSingle();
+
+          const rt = scriptData && scriptData.rights_type;
+          if (rt === 'exclusive' || rt === '独家授权' || rt === '独家') {
+            await window.supabase_client
+              .from('scripts')
+              .update({ status: 'sold' })
+              .eq('id', req.script_id);
+          }
+        }
+      }
+
       loadInquiries();
     }
     window.updateStatus = updateStatus;

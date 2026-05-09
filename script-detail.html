@@ -370,6 +370,19 @@
                 <div class="rights-badge" id="script-rights">—</div>
               </div>
             </div>
+
+            <div id="license-extra-row" style="display:none; margin-top:16px; padding:14px 16px; border:1px solid rgba(26, 26, 26, 0.1); border-radius:14px; background:rgba(255,255,255,0.5); font-size:14px; color:var(--ink); line-height:1.6;">
+              <div style="margin-bottom:6px;">
+                <span class="en-only" style="color:var(--muted);font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;">License Region</span>
+                <span class="zh-only" style="color:var(--muted);font-size:12px;font-weight:600;">授权地区</span>
+                <div id="script-region" style="margin-top:4px;font-weight:600;">—</div>
+              </div>
+              <div>
+                <span class="en-only" style="color:var(--muted);font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;">License Duration</span>
+                <span class="zh-only" style="color:var(--muted);font-size:12px;font-weight:600;">授权年限</span>
+                <div id="script-rights-years" style="margin-top:4px;font-weight:600;">—</div>
+              </div>
+            </div>
           </div>
 
           <div class="detail-section">
@@ -378,6 +391,18 @@
               <span class="zh-only">描述</span>
             </label>
             <p class="description-text" id="script-description">—</p>
+          </div>
+
+          <div id="preview-section" class="detail-section" style="display:none;">
+            <h3 style="font-size:16px;font-weight:600;margin-bottom:12px;">
+              <span class="en-only">📖 Preview</span>
+              <span class="zh-only">📖 试读片段</span>
+            </h3>
+            <div id="preview-text" style="white-space:pre-wrap;font-size:14px;line-height:1.9;background:var(--warm-white);border:1px solid var(--border);border-radius:12px;padding:20px;color:var(--text);max-height:300px;overflow-y:auto;"></div>
+            <p style="font-size:12px;color:var(--muted);margin-top:8px;">
+              <span class="en-only">🔒 Full script available after your application is accepted.</span>
+              <span class="zh-only">🔒 申请授权并获创作者接受后，可下载完整作品。</span>
+            </p>
           </div>
 
           <div class="detail-section">
@@ -401,12 +426,12 @@
               <span class="zh-only">⬇ 下载</span>
             </a>
             <button class="btn btn-primary" id="contact-btn">
-              <span class="en-only">💬 Contact Seller</span>
-              <span class="zh-only">💬 联系卖家</span>
+              <span class="en-only">💬 Contact Creator</span>
+              <span class="zh-only">💬 联系创作者</span>
             </button>
             <button class="btn btn-primary" id="buy-btn" style="display: none;">
-              <span class="en-only">🛒 Purchase License</span>
-              <span class="zh-only">🛒 购买版权</span>
+              <span class="en-only">📝 Apply for License</span>
+              <span class="zh-only">📝 申请授权</span>
             </button>
           </div>
         </div>
@@ -418,12 +443,12 @@
     <div style="background:var(--warm-white); border-radius:18px; padding:32px; max-width:480px; width:90%; position:relative;">
       <button onclick="closeInquiryModal()" style="position:absolute;top:14px;right:18px;background:none;border:none;font-size:20px;cursor:pointer;color:var(--muted);">✕</button>
       <h3 style="font-family:'Fraunces',serif;font-size:22px;margin-bottom:8px;">
-        <span class="en-only">Send Purchase Inquiry</span>
-        <span class="zh-only">发送购买询盘</span>
+        <span class="en-only">License Application</span>
+        <span class="zh-only">授权申请</span>
       </h3>
       <p style="color:var(--muted);font-size:13px;margin-bottom:20px;">
         <span class="en-only">Tell the creator why you're interested. They'll review and get back to you.</span>
-        <span class="zh-only">告诉创作者你的购买意向，他们会尽快与你联系。</span>
+        <span class="zh-only">告诉创作者你的授权意向，他们会尽快与你联系。</span>
       </p>
       <textarea id="inquiry-message" rows="4" placeholder="e.g. I'm a producer looking for short drama scripts..." style="width:100%;border:1px solid var(--border);border-radius:10px;padding:12px;font-size:14px;resize:vertical;font-family:inherit;background:var(--bg);color:var(--text);box-sizing:border-box;"></textarea>
       <div style="margin-top:14px; display:flex; gap:10px; justify-content:flex-end;">
@@ -432,8 +457,8 @@
           <span class="zh-only">取消</span>
         </button>
         <button onclick="submitInquiry()" class="btn btn-primary" id="inquiry-submit-btn" style="font-size:13px;">
-          <span class="en-only">Send Inquiry</span>
-          <span class="zh-only">发送询盘</span>
+          <span class="en-only">Apply for License</span>
+          <span class="zh-only">申请授权</span>
         </button>
       </div>
       <p id="inquiry-result" style="margin-top:12px;font-size:13px;text-align:center;display:none;"></p>
@@ -531,6 +556,33 @@
       document.getElementById('script-rights').textContent = script.rights_type || '—';
       document.getElementById('script-description').textContent = script.description || '—';
 
+      if (script.preview_text && String(script.preview_text).trim()) {
+        document.getElementById('preview-section').style.display = 'block';
+        document.getElementById('preview-text').textContent = script.preview_text;
+      } else {
+        document.getElementById('preview-section').style.display = 'none';
+      }
+
+      const licenseRow = document.getElementById('license-extra-row');
+      const isZhMeta = document.body.classList.contains('zh');
+      const regionMapZh = { mainland: '中国大陆', greater_china: '大中华区', asia: '亚洲', global: '全球' };
+      const regionMapEn = { mainland: 'Mainland China', greater_china: 'Greater China', asia: 'Asia', global: 'Global' };
+      const yearsMapZh = { '1year': '1年', '3years': '3年', '5years': '5年', permanent: '永久' };
+      const yearsMapEn = { '1year': '1 Year', '3years': '3 Years', '5years': '5 Years', permanent: 'Permanent' };
+      if (script.rights_type && script.rights_type !== '买断') {
+        licenseRow.style.display = 'block';
+        const rm = isZhMeta ? regionMapZh : regionMapEn;
+        const ym = isZhMeta ? yearsMapZh : yearsMapEn;
+        document.getElementById('script-region').textContent = script.region
+          ? (rm[script.region] || script.region)
+          : '—';
+        document.getElementById('script-rights-years').textContent = script.rights_years
+          ? (ym[script.rights_years] || script.rights_years)
+          : '—';
+      } else {
+        licenseRow.style.display = 'none';
+      }
+
       // Setup file buttons
       if (script.file_url) {
         const previewBtn = document.getElementById('preview-btn');
@@ -583,8 +635,8 @@
       hint.className = 'download-lock-hint';
       hint.style.cssText = 'font-size:13px;color:var(--muted);margin-top:8px;';
       hint.innerHTML = document.body.classList.contains('zh')
-        ? '🔒 发送询盘并等待创作者接受后可下载完整文件。'
-        : '🔒 Send an inquiry and wait for the creator to accept before downloading.';
+        ? '🔒 发送授权申请并等待创作者接受后可下载完整文件。'
+        : '🔒 Send a license application and wait for the creator to accept before downloading.';
       btn.parentNode.insertBefore(hint, btn.nextSibling);
     }
 
@@ -678,7 +730,7 @@
         window.location.href = 'mailto:' + email;
       } else {
         const isZh = localStorage.getItem('scriptbridge_lang') === 'zh' || document.body.classList.contains('zh');
-        alert(isZh ? '暂无卖家联系方式。' : 'No contact info available for this seller.');
+        alert(isZh ? '暂无创作者联系方式。' : 'No contact info available for this creator.');
       }
     });
 
@@ -709,13 +761,13 @@
       if (!message) {
         resultEl.style.display = 'block';
         resultEl.style.color = 'var(--coral)';
-        resultEl.textContent = isZh ? '请输入询盘内容。' : 'Please enter your inquiry message.';
+        resultEl.textContent = isZh ? '请输入申请说明。' : 'Please enter your license application message.';
         return;
       }
 
       sendingInquiry = true;
       btn.disabled = true;
-      btn.textContent = isZh ? '发送中...' : 'Sending...';
+      btn.textContent = isZh ? '提交中...' : 'Sending...';
 
       const { error } = await window.supabase_client
         .from('purchase_requests')
@@ -730,7 +782,7 @@
 
       sendingInquiry = false;
       btn.disabled = false;
-      btn.innerHTML = '<span class="en-only">Send Inquiry</span><span class="zh-only">发送询盘</span>';
+      btn.innerHTML = '<span class="en-only">Apply for License</span><span class="zh-only">申请授权</span>';
 
       resultEl.style.display = 'block';
       if (error) {
@@ -739,8 +791,22 @@
       } else {
         resultEl.style.color = 'var(--sage)';
         resultEl.textContent = isZh
-          ? '✅ 询盘已发送！创作者会尽快与你联系。'
-          : '✅ Inquiry sent! The creator will be in touch soon.';
+          ? '✅ 申请已提交！创作者会尽快与你联系。'
+          : '✅ Application sent! The creator will be in touch soon.';
+        try {
+          const WEB3FORMS_KEY = 'cbfde96d-d025-42af-a16b-81461d91783c';
+          const notifyBody = new FormData();
+          notifyBody.append('access_key', WEB3FORMS_KEY);
+          notifyBody.append('subject', '[ScriptBridge] 新授权申请：' + (window._scriptData && window._scriptData.title ? window._scriptData.title : '未知作品'));
+          notifyBody.append('message',
+            '作品：' + (window._scriptData && window._scriptData.title ? window._scriptData.title : '') + '\n' +
+            '买家邮箱：' + (window._currentUser && window._currentUser.email ? window._currentUser.email : '') + '\n' +
+            '申请留言：' + (message || '（无留言）') + '\n' +
+            '时间：' + new Date().toLocaleString('zh-CN') + '\n\n' +
+            '请登录平台处理：https://8844-code.github.io/scriptbridge/my-inquiries.html'
+          );
+          fetch('https://api.web3forms.com/submit', { method: 'POST', body: notifyBody });
+        } catch (_) {}
         setTimeout(closeInquiryModal, 2500);
       }
     }
