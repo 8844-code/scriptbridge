@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Edit Profile — 剧桥 · ScriptBridge</title>
-  <link rel="icon" type="image/svg+xml" href="images/scriptbridge-mark.svg">
+  <link rel="icon" type="image/svg+xml" href="images/favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300;1,9..40,400&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;0,9..144,700;1,9..144,300;1,9..144,500;1,9..144,700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -58,11 +58,10 @@
     .form-group {
       margin-bottom: 18px;
     }
-    .form-group input,
+    /* 输入框沿用 common.css 主题变量；不在此写死浅色底，以免暗色模式发灰白块 */
+    .form-group input:not([type="radio"]):not([type="checkbox"]),
     .form-group textarea {
       border-radius: 12px;
-      border: 1px solid rgba(26, 26, 26, 0.14);
-      background: rgba(255, 255, 255, 0.84);
     }
     .form-group textarea {
       min-height: 130px;
@@ -273,7 +272,7 @@
 
     async function loadProfile() {
       const { data, error } = await window.supabase_client
-        .from('profiles')
+        .from('users')
         .select('full_name, bio')
         .eq('user_id', currentUser.id)
         .maybeSingle();
@@ -307,7 +306,7 @@
 
       try {
         const { error } = await window.supabase_client
-          .from('profiles')
+          .from('users')
           .update({ full_name: nameInput.value.trim(), bio: bioInput.value.trim() })
           .eq('user_id', currentUser.id);
 

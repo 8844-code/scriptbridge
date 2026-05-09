@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dashboard — 剧桥 · ScriptBridge</title>
-  <link rel="icon" type="image/svg+xml" href="images/scriptbridge-mark.svg">
+  <link rel="icon" type="image/svg+xml" href="images/favicon.svg">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -43,6 +43,20 @@
       align-items: center;
       gap: 16px;
       margin-bottom: 24px;
+    }
+
+    .user-avatar-link {
+      text-decoration: none;
+      flex-shrink: 0;
+      border-radius: 50%;
+      outline: none;
+      transition: box-shadow 0.2s, transform 0.2s;
+    }
+
+    .user-avatar-link:hover .user-avatar,
+    .user-avatar-link:focus-visible .user-avatar {
+      box-shadow: 0 0 0 3px rgba(242, 106, 79, 0.45);
+      transform: scale(1.04);
     }
 
     .user-avatar {
@@ -154,6 +168,13 @@
     .profile-field p {
       font-size: 16px;
       color: var(--ink);
+    }
+
+    .profile-edit-hint {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 8px;
+      line-height: 1.45;
     }
 
     .loading-spinner {
@@ -291,7 +312,9 @@
       <!-- 用户信息卡片 -->
       <div id="user-card" style="display: none;">
         <div class="user-info">
-          <div class="user-avatar" id="user-avatar">U</div>
+          <a href="profile-edit.html" class="user-avatar-link" id="avatar-to-profile" title="">
+            <div class="user-avatar" id="user-avatar" aria-hidden="true">U</div>
+          </a>
           <div class="user-details">
             <h2 id="user-name">Loading...</h2>
             <p id="user-email">Loading...</p>
@@ -314,14 +337,9 @@
             <p id="profile-role">—</p>
           </div>
           <div class="profile-field">
-            <div class="profile-label-row">
-              <label id="profile-label-bio">Bio</label>
-              <a href="profile-edit.html" class="btn btn-outline" style="font-size:13px;padding:6px 14px;">
-                <span class="en-only">Edit Profile</span>
-                <span class="zh-only">编辑资料</span>
-              </a>
-            </div>
+            <label id="profile-label-bio">Bio</label>
             <p id="profile-bio">—</p>
+            <p id="profile-avatar-hint" class="profile-edit-hint"></p>
           </div>
           <div class="profile-field">
             <label id="profile-label-joined">Member Since</label>
@@ -360,6 +378,7 @@
         labelRole: 'Role',
         labelBio: 'Bio',
         labelJoined: 'Member Since',
+        avatarHint: 'Click your avatar above to edit your display name and bio.',
         logout: 'Log Out',
         roleCreator: 'Script Creator',
         roleBuyer: 'Buyer',
@@ -428,6 +447,7 @@
         labelRole: '角色',
         labelBio: '简介',
         labelJoined: '注册时间',
+        avatarHint: '点击上方头像即可编辑显示名称与个人简介。',
         logout: '退出登录',
         roleCreator: '创作者',
         roleBuyer: '买家',
@@ -500,6 +520,7 @@
 
     function applyLanguageUI() {
       document.documentElement.lang = currentLang === 'zh' ? 'zh-CN' : 'en';
+      document.body.classList.toggle('zh', currentLang === 'zh');
       langEnBtn.classList.toggle('active', currentLang === 'en');
       langZhBtn.classList.toggle('active', currentLang === 'zh');
       document.getElementById('dashboard-title').textContent = t('dashboardTitle');
@@ -509,8 +530,13 @@
       document.getElementById('profile-label-role').textContent = t('labelRole');
       document.getElementById('profile-label-bio').textContent = t('labelBio');
       document.getElementById('profile-label-joined').textContent = t('labelJoined');
+      const hintEl = document.getElementById('profile-avatar-hint');
+      if (hintEl) hintEl.textContent = t('avatarHint');
       document.getElementById('nav-logout-btn').textContent = t('logout');
       document.getElementById('bottom-logout-btn').textContent = t('logout');
+
+      const avLink = document.getElementById('avatar-to-profile');
+      if (avLink) avLink.setAttribute('title', currentLang === 'zh' ? '编辑资料' : 'Edit profile');
     }
 
     function renderDashboardContent() {
@@ -529,6 +555,11 @@
       document.getElementById('profile-bio').textContent = currentProfile.bio || t('noBio');
       document.getElementById('profile-joined').textContent = new Date(currentProfile.created_at).toLocaleDateString();
       actionCardsEl.innerHTML = currentProfile.role === 'creator' ? t('creatorCards') : t('buyerCards');
+
+      const hintEl = document.getElementById('profile-avatar-hint');
+      if (hintEl) hintEl.textContent = t('avatarHint');
+      const avLink = document.getElementById('avatar-to-profile');
+      if (avLink) avLink.setAttribute('title', currentLang === 'zh' ? '编辑资料' : 'Edit profile');
     }
 
     function setLang(lang) {

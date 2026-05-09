@@ -190,6 +190,14 @@ html.nav-compact .btn-logout {
   color: rgba(248, 250, 252, 0.58);
 }
 
+/* 深色导航仍用同一套亮色 Logo，仅加轻描边与阴影，与白天版像素级一致 */
+:root.theme-dark .nav-logo-mark {
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.55),
+    0 10px 28px rgba(0, 0, 0, 0.38),
+    0 0 0 1px rgba(255, 255, 255, 0.16);
+}
+
 .nav-right {
   display: flex;
   align-items: center;
@@ -437,10 +445,25 @@ html.nav-compact .btn-logout {
 :root.theme-dark .filters-card,
 :root.theme-dark .detail-content,
 :root.theme-dark .error-state,
-:root.theme-dark .metric-card {
-  background: #1e293b !important;
-  border-color: rgba(248, 250, 252, 0.24) !important;
-  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.35) !important;
+:root.theme-dark .metric-card,
+:root.theme-dark .section-card {
+  background: rgba(30, 41, 59, 0.82) !important;
+  border-color: rgba(248, 250, 252, 0.2) !important;
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.42) !important;
+  backdrop-filter: blur(14px) !important;
+}
+
+:root.theme-dark .inquiry-item {
+  background: rgba(15, 23, 42, 0.72) !important;
+  border-color: rgba(248, 250, 252, 0.16) !important;
+}
+
+:root.theme-dark .section-title {
+  color: #f1f5f9 !important;
+}
+
+:root.theme-dark .section-card .empty {
+  color: #94a3b8 !important;
 }
 
 :root.theme-dark .form-group > label,
