@@ -1484,3 +1484,292 @@ git push origin main
 ✅ 完成时间：2026-05-09 17:55 CST（UTC+8）
 ✅ 下载权限保护：完成
 ✅ 推送状态：成功
+
+---
+
+## 🎯 新任务（Claude 分配，2026-05-09）
+
+**优先级：🔴 立即执行**
+**任务名：授权流程完善（7个问题一次打包）**
+
+> 本次任务对应问题清单 P2/P3/P4/P5/P6/P8/P10
+> Supabase `scripts` 表已新增字段：`region`、`rights_years`、`copyright_confirmed`（RJ 已执行 SQL）
+
+---
+
+### 📋 任务 A：全站用词统一（P10）
+
+以下替换在所有 HTML 文件中执行：
+
+| 原文 | 改为 |
+|------|------|
+| Send Inquiry / 发送询盘 | Apply for License / 申请授权 |
+| My Inquiries / 我的询盘 | My Applications / 我的申请 |
+| Received Inquiries / 收到的询盘 | Received Applications / 收到的申请 |
+| Sent Inquiries / 发出的询盘 | Sent Applications / 发出的申请 |
+| Purchase Inquiry / 购买询盘 | License Application / 授权申请 |
+| Contact Seller / 联系卖家 | Contact Creator / 联系创作者 |
+| inquiry-modal / inquiry-message 等 id 名 | 保留不变（只改显示文字，不改 JS 变量名） |
+
+页面范围：`script-detail.html`、`my-inquiries.html`、`dashboard.html`
+
+---
+
+### 📋 任务 B：上传/编辑页加三个新字段（P3/P8）
+
+**修改 `scripts-upload.html` 和 `script-edit.html`，在"版权类型"字段下方加：**
+
+#### B1：授权地区（仅当 rights_type ≠ 买断时显示）
+
+```html
+<div class="form-group" id="region-group">
+  <label>
+    <span class="en-only">License Region</span>
+    <span class="zh-only">授权地区</span>
+  </label>
+  <select id="region-select">
+    <option value="mainland">中国大陆 / Mainland China</option>
+    <option value="greater_china">大中华区 / Greater China</option>
+    <option value="asia">亚洲 / Asia</option>
+    <option value="global" selected>全球 / Global</option>
+  </select>
+</div>
+```
+
+#### B2：授权年限（仅当 rights_type ≠ 买断时显示）
+
+```html
+<div class="form-group" id="rights-years-group">
+  <label>
+    <span class="en-only">License Duration</span>
+    <span class="zh-only">授权年限</span>
+  </label>
+  <select id="rights-years-select">
+    <option value="1year">1年 / 1 Year</option>
+    <option value="3years">3年 / 3 Years</option>
+    <option value="5years">5年 / 5 Years</option>
+    <option value="permanent" selected>永久 / Permanent</option>
+  </select>
+</div>
+```
+
+#### B2 逻辑：当选择"买断"时隐藏这两个字段
+
+```js
+// 在版权类型选择的 change 事件里加：
+const isBuyout = document.querySelector('input[name="rights_type"]:checked')?.value === 'buyout';
+document.getElementById('region-group').style.display = isBuyout ? 'none' : '';
+document.getElementById('rights-years-group').style.display = isBuyout ? 'none' : '';
+```
+
+#### B3：版权声明确认框（放在提交按钮上方）
+
+```html
+<div class="form-group">
+  <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;">
+    <input type="checkbox" id="copyright-confirm" required style="margin-top:3px;flex-shrink:0;">
+    <span style="font-size:13px;color:var(--muted);line-height:1.6;">
+      <span class="en-only">I confirm that I am the sole copyright holder of this work. I take full legal responsibility for any copyright disputes arising from this upload.</span>
+      <span class="zh-only">我确认我是本作品的唯一版权持有人。如因上传内容引发任何版权纠纷，由我承担全部法律责任。</span>
+    </span>
+  </label>
+</div>
+```
+
+**在 Supabase INSERT / UPDATE 里加入新字段：**
+
+```js
+// scripts-upload.html 的 INSERT 加：
+region: isBuyout ? 'global' : document.getElementById('region-select').value,
+rights_years: isBuyout ? 'permanent' : document.getElementById('rights-years-select').value,
+copyright_confirmed: true,  // 勾选了才能提交，所以必然是 true
+
+// scripts-upload.html 提交前检查：
+if (!document.getElementById('copyright-confirm').checked) {
+  showError('请勾选版权确认 / Please confirm copyright ownership.');
+  return;
+}
+```
+
+**script-edit.html 加载数据时预填这两个字段（region / rights_years）。**
+
+---
+
+### 📋 任务 C：详情页展示试读片段（P4）
+
+**修改 `script-detail.html`，在简介和购买按钮之间加试读区块：**
+
+在读取 script 数据后，加：
+
+```js
+// 在 loadScript() 里，填充完 title/description 后加：
+if (script.preview_text && script.preview_text.trim()) {
+  document.getElementById('preview-section').style.display = 'block';
+  document.getElementById('preview-text').textContent = script.preview_text;
+}
+```
+
+HTML 结构（加在 description 下方、购买按钮上方）：
+
+```html
+<div id="preview-section" style="display:none; margin: 24px 0;">
+  <h3 style="font-size:16px;font-weight:600;margin-bottom:12px;">
+    <span class="en-only">📖 Preview</span>
+    <span class="zh-only">📖 试读片段</span>
+  </h3>
+  <div id="preview-text"
+    style="white-space:pre-wrap;font-size:14px;line-height:1.9;
+           background:var(--warm-white);border:1px solid var(--border);
+           border-radius:12px;padding:20px;color:var(--text);
+           max-height:300px;overflow-y:auto;">
+  </div>
+  <p style="font-size:12px;color:var(--muted);margin-top:8px;">
+    <span class="en-only">🔒 Full script available after your application is accepted.</span>
+    <span class="zh-only">🔒 申请授权并获创作者接受后，可下载完整作品。</span>
+  </p>
+</div>
+```
+
+同时，在详情页展示授权地区和年限（如果有）：
+
+```js
+// 在作品信息区加两行显示：
+if (script.region) {
+  const regionMap = { mainland:'中国大陆', greater_china:'大中华区', asia:'亚洲', global:'全球' };
+  document.getElementById('script-region').textContent = regionMap[script.region] || script.region;
+}
+if (script.rights_years) {
+  const yearsMap = { '1year':'1年', '3years':'3年', '5years':'5年', 'permanent':'永久' };
+  document.getElementById('script-rights-years').textContent = yearsMap[script.rights_years] || script.rights_years;
+}
+```
+
+在 HTML 信息列表里加对应的 `<span id="script-region">` 和 `<span id="script-rights-years">`。
+
+---
+
+### 📋 任务 D：我的申请页——已接受状态加下载链接（P6）
+
+**修改 `my-inquiries.html`，在已接受的申请卡片里加下载入口：**
+
+找到渲染申请列表的部分，对 `status === 'accepted'` 的条目加：
+
+```js
+const downloadLink = req.status === 'accepted'
+  ? `<a href="script-detail.html?id=${req.script_id}" class="btn btn-primary btn-sm" style="margin-top:10px;">
+       <span class="en-only">↓ Go to Download</span>
+       <span class="zh-only">↓ 前往下载</span>
+     </a>`
+  : '';
+```
+
+在卡片 HTML 里把 `${downloadLink}` 渲染出来。
+
+---
+
+### 📋 任务 E：独家授权接受后自动下架（P2）
+
+**修改 `my-inquiries.html` 的 `updateStatus()` 函数：**
+
+在创作者点"接受"后，额外检查该作品是否为独家授权。如果是，自动将作品 status 改为 `'sold'`：
+
+```js
+async function updateStatus(requestId, newStatus) {
+  // ... 现有逻辑 ...
+
+  if (newStatus === 'accepted') {
+    // 找到这条申请对应的 script_id
+    const req = (_receivedData || []).find(r => r.id === requestId);
+    if (req && req.script_id) {
+      // 查作品的 rights_type
+      const { data: scriptData } = await window.supabase_client
+        .from('scripts')
+        .select('rights_type')
+        .eq('id', req.script_id)
+        .maybeSingle();
+
+      if (scriptData && scriptData.rights_type === 'exclusive') {
+        // 独家授权 → 自动下架（改为 sold）
+        await window.supabase_client
+          .from('scripts')
+          .update({ status: 'sold' })
+          .eq('id', req.script_id);
+      }
+    }
+  }
+
+  // ... 后续刷新列表逻辑 ...
+}
+```
+
+> `marketplace.html` 和 `scripts-browse.html` 已过滤只显示 `status = 'published'`，
+> 所以改成 `'sold'` 后自动从市场消失，无需额外修改。
+
+---
+
+### 📋 任务 F：买家申请时邮件通知（P5）
+
+**修改 `script-detail.html` 的 `submitInquiry()` 函数：**
+
+在 Supabase INSERT 成功后，静默发一封邮件通知到管理员：
+
+```js
+// Supabase insert 成功后加：
+// 静默发通知邮件（失败不影响主流程）
+try {
+  const WEB3FORMS_KEY = 'cbfde96d-d025-42af-a16b-81461d91783c';
+  const notifyBody = new FormData();
+  notifyBody.append('access_key', WEB3FORMS_KEY);
+  notifyBody.append('subject', `[ScriptBridge] 新授权申请：${window._scriptData?.title || '未知作品'}`);
+  notifyBody.append('message',
+    `作品：${window._scriptData?.title || ''}\n` +
+    `买家邮箱：${window._currentUser?.email || ''}\n` +
+    `申请留言：${message || '（无留言）'}\n` +
+    `时间：${new Date().toLocaleString('zh-CN')}\n\n` +
+    `请登录平台处理：https://8844-code.github.io/scriptbridge/my-inquiries.html`
+  );
+  fetch('https://api.web3forms.com/submit', { method: 'POST', body: notifyBody });
+} catch (_) {}
+```
+
+---
+
+### ✅ 完成后
+
+```bash
+git add script-detail.html my-inquiries.html dashboard.html scripts-upload.html script-edit.html
+git commit -m "feat: Complete license flow — unified terms, new fields, preview, notifications
+
+- Rename inquiry → license application throughout (P10)
+- scripts-upload/edit: add region, rights_years, copyright confirmation (P3/P8)
+- script-detail: show preview_text excerpt and license details (P4)
+- script-detail: email admin on new application via Web3Forms (P5)
+- my-inquiries: show download link for accepted applications (P6)
+- my-inquiries: auto-unpublish script when exclusive license accepted (P2)"
+git push origin main
+```
+
+在本文件末尾写完成状态：
+```
+✅ 完成时间：[时间]
+✅ 任务A（用词统一）：完成/失败
+✅ 任务B（新字段）：完成/失败
+✅ 任务C（试读片段）：完成/失败
+✅ 任务D（下载链接）：完成/失败
+✅ 任务E（独家自动下架）：完成/失败
+✅ 任务F（邮件通知）：完成/失败
+✅ 推送状态：成功/失败
+```
+
+---
+
+### 执行记录（Cursor）
+
+✅ 完成时间：2026-05-09 19:15 CST（UTC+8）
+✅ 任务A（用词统一）：完成
+✅ 任务B（新字段）：完成
+✅ 任务C（试读片段）：完成
+✅ 任务D（下载链接）：完成
+✅ 任务E（独家自动下架）：完成
+✅ 任务F（邮件通知）：完成
+✅ 推送状态：成功
