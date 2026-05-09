@@ -566,3 +566,124 @@ git push origin main
 ✅ 任务A（价格筛选）：完成
 ✅ 任务B（联系卖家）：完成
 ✅ 推送状态：成功
+
+---
+
+## 🎯 新任务（Claude 分配，2026-05-09）
+
+**优先级：🔴 立即执行**
+**任务名：公开市场页（marketplace.html）+ 首页入口**
+
+---
+
+### 背景
+
+现在 `scripts-browse.html` 需要登录才能看，陌生访客根本无法了解平台上有什么内容。
+需要一个**不需要登录就能浏览**的公开市场页，作为平台的"橱窗"。
+
+---
+
+### 📋 任务 A：新建 marketplace.html（公开市场页）
+
+**新建文件** `marketplace.html`，放在项目根目录。
+
+**核心逻辑：**
+- **不需要登录** 即可浏览所有已上架作品
+- 从 Supabase `scripts` 表读取数据（公开 SELECT，无需 auth）
+- 有搜索框、类型筛选、价格排序（与 `scripts-browse.html` 一致）
+- 每张作品卡片点击后：
+  - **未登录** → 跳转 `login.html`（登录后才能查看详情/联系卖家）
+  - **已登录** → 跳转 `script-detail.html?id=xxx`
+
+**页面结构（参考 `scripts-browse.html`，但去掉 requireAuth）：**
+
+```js
+// 不需要 requireAuth()，直接加载数据
+window.addEventListener('DOMContentLoaded', async () => {
+  setLang(currentLang);
+  await loadScripts();
+  // 检查是否已登录（影响卡片点击行为）
+  const { data: { session } } = await window.supabase_client.auth.getSession();
+  window._isLoggedIn = !!session;
+});
+```
+
+**卡片点击逻辑：**
+```js
+function onCardClick(scriptId) {
+  if (window._isLoggedIn) {
+    window.location.href = 'script-detail.html?id=' + scriptId;
+  } else {
+    window.location.href = 'login.html';
+  }
+}
+```
+
+**导航栏（未登录状态显示登录/注册，已登录显示个人主页）：**
+```js
+// 根据登录状态动态显示
+if (window._isLoggedIn) {
+  // 显示"个人主页"按钮
+} else {
+  // 显示"登录"和"注册"按钮
+}
+```
+
+**样式要求：**
+- 与 `scripts-browse.html` 完全一致的视觉风格
+- 双语支持（en-only / zh-only）
+- 引入 `js/theme.js`、`js/nav-mobile.js`、`css/common.css`、`js/supabase-client.js`
+- **不引入** `js/auth.js`（因为不强制登录）
+
+**页面标题：**
+- EN: `Browse Marketplace — ScriptBridge`
+- ZH: `浏览市场 — ScriptBridge`
+
+**空状态文案（暂时没有上架作品时）：**
+- EN: `No scripts available yet. Check back soon.`
+- ZH: `暂无上架作品，敬请期待。`
+
+---
+
+### 📋 任务 B：修改 index.html，加市场入口
+
+在首页导航栏右侧（Sign In 按钮旁边），加一个"Browse"入口链接：
+
+```html
+<!-- 在 nav-right 里，Sign In 按钮前面加 -->
+<a href="marketplace.html" class="btn btn-outline en-only">Browse</a>
+<a href="marketplace.html" class="btn btn-outline zh-only">浏览市场</a>
+```
+
+同时在首页 Hero 区域（候补表单下方，或 CTA 按钮旁边），加一行小字引导：
+```html
+<p style="margin-top:12px; font-size:13px; color:rgba(245,240,232,0.5);" class="en-only">
+  Already a creator or buyer? <a href="marketplace.html" style="color:rgba(245,240,232,0.75); text-decoration:underline;">Browse the marketplace →</a>
+</p>
+<p style="margin-top:12px; font-size:13px; color:rgba(245,240,232,0.5);" class="zh-only">
+  已经是创作者或买家？<a href="marketplace.html" style="color:rgba(245,240,232,0.75); text-decoration:underline;">浏览市场 →</a>
+</p>
+```
+
+---
+
+### ✅ 完成后
+
+```bash
+git add marketplace.html index.html
+git commit -m "feat: Add public marketplace page and homepage entry
+
+- Add marketplace.html: public browse page, no login required
+- Clicking script card prompts login if not authenticated
+- Add Browse link to index.html nav and hero section
+- Bilingual support throughout"
+git push origin main
+```
+
+在本文件末尾写完成状态：
+```
+✅ 完成时间：[时间]
+✅ 任务A（marketplace.html）：完成/失败
+✅ 任务B（首页入口）：完成/失败
+✅ 推送状态：成功/失败
+```
