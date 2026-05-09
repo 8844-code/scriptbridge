@@ -65,7 +65,7 @@
       box-shadow: 0 8px 22px rgba(26, 26, 26, 0.06);
       display: grid;
       gap: 12px;
-      grid-template-columns: 1.6fr 1fr 1fr;
+      grid-template-columns: 1.6fr 1fr 1fr 0.8fr 0.8fr;
     }
 
     .filters-card input,
@@ -256,6 +256,8 @@
           <option value="price_asc" id="sort-asc-option">Price: Low to High</option>
           <option value="price_desc" id="sort-desc-option">Price: High to Low</option>
         </select>
+        <input type="number" id="price-min" placeholder="Min price" min="0">
+        <input type="number" id="price-max" placeholder="Max price" min="0">
       </section>
 
       <div id="loading-state" class="loading-state">
@@ -277,6 +279,8 @@
     const searchInput = document.getElementById('search-input');
     const typeFilter = document.getElementById('type-filter');
     const sortSelect = document.getElementById('sort-select');
+    const priceMinInput = document.getElementById('price-min');
+    const priceMaxInput = document.getElementById('price-max');
     const loadingState = document.getElementById('loading-state');
     const scriptsGrid = document.getElementById('scripts-grid');
     const emptyState = document.getElementById('empty-state');
@@ -298,6 +302,8 @@
         sortLatest: 'Latest',
         sortAsc: 'Price: Low to High',
         sortDesc: 'Price: High to Low',
+        priceMinPh: 'Min price',
+        priceMaxPh: 'Max price',
         loading: 'Loading scripts...',
         empty: 'No scripts found',
         unknownAuthor: 'Unknown author',
@@ -316,6 +322,8 @@
         sortLatest: '最新发布',
         sortAsc: '价格：从低到高',
         sortDesc: '价格：从高到低',
+        priceMinPh: '最低价',
+        priceMaxPh: '最高价',
         loading: '正在加载中...',
         empty: '暂无作品',
         unknownAuthor: '未知作者',
@@ -346,6 +354,8 @@
       document.getElementById('sort-latest-option').textContent = t('sortLatest');
       document.getElementById('sort-asc-option').textContent = t('sortAsc');
       document.getElementById('sort-desc-option').textContent = t('sortDesc');
+      priceMinInput.placeholder = t('priceMinPh');
+      priceMaxInput.placeholder = t('priceMaxPh');
       document.getElementById('loading-text').textContent = t('loading');
       emptyState.textContent = t('empty');
     }
@@ -403,12 +413,19 @@
       const keyword = searchInput.value.trim().toLowerCase();
       const selectedType = typeFilter.value;
       const sortValue = sortSelect.value;
+      const minPrice = parseFloat(priceMinInput.value) || 0;
+      const maxPrice = parseFloat(priceMaxInput.value) || Infinity;
 
       let list = allScripts.filter((item) => {
         const title = (item.title || '').toLowerCase();
         const byTitle = !keyword || title.includes(keyword);
         const byType = selectedType === 'all' || item.script_type === selectedType;
         return byTitle && byType;
+      });
+
+      list = list.filter((item) => {
+        const price = parseFloat(item.price) || 0;
+        return price >= minPrice && price <= maxPrice;
       });
 
       list.sort((a, b) => {
@@ -473,6 +490,8 @@
     searchInput.addEventListener('input', applyFilters);
     typeFilter.addEventListener('change', applyFilters);
     sortSelect.addEventListener('change', applyFilters);
+    priceMinInput.addEventListener('input', applyFilters);
+    priceMaxInput.addEventListener('input', applyFilters);
     langEnBtn.addEventListener('click', () => setLang('en'));
     langZhBtn.addEventListener('click', () => setLang('zh'));
 

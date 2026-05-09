@@ -451,18 +451,35 @@
     }
 
     async function loadAuthor(userId) {
-      if (!userId) return 'Unknown author';
-      const { data, error } = await window.supabase_client
+      if (!userId) return { name: 'Unknown author', email: null };
+
+      const { data: profileData, error: profileError } = await window.supabase_client
+        .from('profiles')
+        .select('full_name, email')
+        .eq('user_id', userId)
+        .maybeSingle();
+
+      if (!profileError && profileData) {
+        return {
+          name: profileData.full_name || profileData.email || 'Unknown author',
+          email: profileData.email || null
+        };
+      }
+
+      const { data: userData, error: userError } = await window.supabase_client
         .from('users')
         .select('full_name, email')
         .eq('user_id', userId)
-        .single();
+        .maybeSingle();
 
-      if (error || !data) {
-        return 'Unknown author';
+      if (userError || !userData) {
+        return { name: 'Unknown author', email: null };
       }
 
-      return data.full_name || data.email || 'Unknown author';
+      return {
+        name: userData.full_name || userData.email || 'Unknown author',
+        email: userData.email || null
+      };
     }
 
     function renderScript(script) {
@@ -533,8 +550,9 @@
           return;
         }
 
-        const author = await loadAuthor(data.user_id);
-        document.getElementById('script-author').textContent = escapeHtml(author);
+        const { name: authorName, email: authorEmail } = await loadAuthor(data.user_id);
+        document.getElementById('script-author').textContent = escapeHtml(authorName);
+        window._authorEmail = authorEmail;
 
         renderScript(data);
       } catch (error) {
@@ -565,7 +583,13 @@
 
     // Setup action buttons
     document.getElementById('contact-btn').addEventListener('click', () => {
-      alert('Contact feature coming soon. For now, please check the seller\'s profile for contact information.');
+      const email = window._authorEmail;
+      if (email) {
+        window.location.href = 'mailto:' + email;
+      } else {
+        const isZh = localStorage.getItem('scriptbridge_lang') === 'zh' || document.body.classList.contains('zh');
+        alert(isZh ? '暂无卖家联系方式。' : 'No contact info available for this seller.');
+      }
     });
 
     document.getElementById('purchase-btn').addEventListener('click', () => {
