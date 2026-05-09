@@ -62,12 +62,13 @@
 | `reset-password.html` | 重置密码表单 | ✅ |
 | `dashboard.html` | 个人主页，双语，角色对应功能入口，编辑资料入口 | ✅ |
 | `profile-edit.html` | 编辑显示名称和简介 | ✅ |
-| `scripts-upload.html` | 上传作品，可见性选择（公开/草稿），Supabase Storage | ✅ |
-| `scripts-browse.html` | 浏览作品（需登录），搜索+类型筛选+价格区间，仅显示 published | ✅ |
-| `scripts-list-author.html` | 我的作品，状态徽章，下架/上架按钮，Edit 按钮 | ✅ |
-| `script-detail.html` | 作品详情，联系卖家（mailto），购买按钮（待开发） | ✅ |
-| `script-edit.html` | 编辑已上传作品信息 | ✅ |
-| `marketplace.html` | 公开市场（无需登录），仅显示 published 作品 | ✅ |
+| `scripts-upload.html` | 上传作品，可见性、版权类型、地区/年限、版权声明、Storage | ✅ |
+| `scripts-browse.html` | 浏览作品（需登录），筛选，仅 published | ✅ |
+| `scripts-list-author.html` | 我的作品，状态、上架/下架，Edit | ✅ |
+| `script-detail.html` | 详情，试读/地区年限，联系创作者，授权申请，下载门控 | ✅ |
+| `script-edit.html` | 编辑作品，可见性，地区/年限、声明 | ✅ |
+| `my-inquiries.html` | 我的申请，接受/拒绝，已接受下载入口 | ✅ |
+| `marketplace.html` | 公开市场（无需登录），仅 published | ✅ |
 | `admin-waitlist.html` | 候补后台（管理员专属），实时数据，CSV 导出 | ✅ |
 | `terms.html` | 服务条款，双语 | ✅ |
 | `privacy.html` | 隐私政策，双语 | ✅ |
@@ -81,20 +82,17 @@
 - `js/supabase-client.js` — Supabase 客户端（window.supabase_client）
 - `css/common.css` — 全局样式，en-only/zh-only 语言切换系统
 - Supabase Storage RLS 权限已配置（scripts-files bucket）
-- `scripts` 表含 `status` 字段（published/draft）
-- 全站中文文案规范（作品/个人主页）
-- `.cursorrules` — Cursor 自动读任务工作流
+- `scripts` 表：`status`、以及与授权相关的字段；`purchase_requests` 表
+- 全站中文文案规范；`.cursorrules`
 
 ### ❌ 尚未开始（按优先级）
 
 | 优先级 | 功能 | 说明 |
 |--------|------|------|
-| 🔴 高 | **购买询盘系统** | 买家发意向→创作者接收→平台撮合 |
-| 🔴 高 | **我的询盘页** | 买家看发出的询盘，创作者看收到的询盘 |
-| 🟠 中 | 试读保护 | 全文锁定，只给30%试读，未购买不能下载全文 |
-| 🟠 中 | 真实支付集成 | Stripe/微信/支付宝，需要营业执照 |
-| 🟡 低 | 邮箱验证 | 注册后发验证邮件 |
-| 🟡 低 | 自定义域名 | 替换 github.io 地址 |
+| 🟠 中 | **强试读/防盗链** | 前端门控已有；要防直链扒文需存储/服务端策略 |
+| 🟠 中 | **真实支付** | Stripe/微信/支付宝，资质与合规 |
+| 🟡 低 | 邮箱验证 | 注册后验证邮件 |
+| 🟡 低 | 自定义域名 | 替换 github.io |
 
 ---
 
@@ -137,4 +135,4 @@ git log --oneline -10
 
 ---
 
-**最后更新：2026-05-09**
+**最后更新：2026-05-10**

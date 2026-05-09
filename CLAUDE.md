@@ -66,8 +66,8 @@ ScriptBridge/
 
 ## 当前状态
 
-> **最后更新：** 2026-05-09
-> **状态：** 核心页面全部完成，购买/询盘系统开发中
+> **最后更新：** 2026-05-10
+> **状态：** 核心页面与「授权申请」闭环（申请→接受→下载门控）已上线；支付与强试读仍待迭代
 
 ### ✅ 已完成
 
@@ -75,54 +75,50 @@ ScriptBridge/
 
 | 页面 | 功能 |
 |------|------|
-| `index.html` | 首页候补名单，双语，实时人数，重复邮箱检测，Browse 入口 |
+| `index.html` | 首页候补名单，双语，实时人数，重复邮箱检测，Browse 入口，Footer 条款/隐私链接 |
 | `login.html` | 登录，双语，忘记密码入口 |
 | `signup.html` | 注册，双语，角色选择（创作者/买家） |
 | `forgot-password.html` | 密码重置邮件发送 |
 | `reset-password.html` | 重置密码表单 |
-| `dashboard.html` | 个人主页，双语，角色功能分流，编辑资料入口 |
-| `profile-edit.html` | 编辑显示名称和简介 |
-| `scripts-upload.html` | 上传作品，可见性选择（公开/草稿），Supabase Storage |
-| `scripts-browse.html` | 浏览作品（需登录），搜索+类型+价格筛选 |
-| `scripts-list-author.html` | 我的作品，状态徽章，下架/上架，Edit 按钮 |
-| `script-detail.html` | 作品详情，联系卖家（mailto），购买入口 |
-| `script-edit.html` | 编辑已上传作品信息和可见性 |
-| `marketplace.html` | 公开市场（无需登录），仅显示已上架作品 |
-| `admin-waitlist.html` | 候补后台（仅管理员），实时数据，CSV 导出 |
-| `terms.html` | 服务条款，中英双语 |
-| `privacy.html` | 隐私政策，中英双语 |
-| `404.html` | 404 错误页，双语 |
+| `dashboard.html` | 个人主页，双语，角色功能分流，编辑资料与「我的申请」入口 |
+| `profile-edit.html` | 编辑显示名称和简介（写入 `profiles`） |
+| `scripts-upload.html` | 上传作品，可见性、版权类型、授权地区/年限（非买断）、版权声明，`scripts` 新字段 |
+| `scripts-browse.html` | 浏览作品（需登录），筛选，仅 `status=published` |
+| `scripts-list-author.html` | 我的作品，状态徽章，上架/下架，Edit |
+| `script-detail.html` | 详情，试读片段（`preview_text`）、授权地区/年限展示，联系创作者，授权申请弹窗，下载/预览门控（创作者本人或已接受申请），新申请 Web3Forms 通知 |
+| `script-edit.html` | 编辑作品信息与可见性，同上地区/年限/声明 |
+| `my-inquiries.html` | 我的申请：发出/收到列表，接受/拒绝，已接受可跳转下载，独家授权接受后可自动 `sold` |
+| `marketplace.html` | 公开市场（无需登录），仅 published |
+| `admin-waitlist.html` | 候补后台（仅管理员），CSV 导出 |
+| `terms.html` / `privacy.html` | 服务条款与隐私政策，双语 |
+| `404.html` | 404，双语 |
 
 **系统与基础设施**
-- 用户认证（Supabase Auth：注册/登录/重置密码）
-- 文件上传（Supabase Storage，scripts-files bucket，RLS 已配置）
-- 数据库（scripts 表含 status 字段，waitlist_signups 表）
-- 全站主题切换（深色/浅色/自动，js/theme.js）
-- 滚动隐藏导航（手机+桌面，js/nav-mobile.js）
-- 全站双语系统（en-only/zh-only CSS class）
-- Cursor 自动工作流（.cursorrules）
+- 用户认证（Supabase Auth）
+- Storage（`scripts-files`，RLS）
+- 数据库：`scripts`（含 `status`、`region`、`rights_years`、`copyright_confirmed` 等）、`purchase_requests`、`waitlist_signups`、`profiles`
+- 授权申请流程：买家提交 → 卖家接受/拒绝 → 已接受则前端允许下载（仍需注意：公开文件 URL 不等于服务端强隔离）
+- 全站主题 / 导航 / 双语 / `.cursorrules`
 
 **推广**
-- 小红书账号 @HiiiiGia，两篇帖子已发布
-- 候补名单实时写入 Supabase，管理员可随时导出 CSV
+- 小红书账号 @HiiiiGia；候补名单 Supabase + 导出
 
 ### 🔄 进行中
 
-- 小红书持续发帖，观察哪类内容有效
-- 购买询盘系统开发中（Cursor 执行）
+- 小红书内容与转化观察
+- 试读字段在库里的填充、以及「真·全文不泄露」方案（当前为展示片段 + 前端门控）
 
-### ❌ 尚未开始
+### ❌ 尚未开始（或仅部分）
 
 | 优先级 | 功能 | 说明 |
 |--------|------|------|
-| 🔴 高 | **购买询盘系统** | 买家发意向→创作者接收，Supabase purchase_requests 表 |
-| 🔴 高 | **我的询盘页** | 买卖双方各自查看询盘状态 |
-| 🟠 中 | 试读保护 | 全文锁定，只展示前30%，购买后解锁全文下载 |
-| 🟠 中 | 真实支付集成 | Stripe/微信/支付宝，需营业执照，后期 |
-| 🟡 低 | 注册邮箱验证 | 注册后发验证邮件 |
+| 🟠 中 | **强试读/防盗链** | 若需「未授权绝不可下载全文」，需对象存储策略或后端分片，不止前端隐藏按钮 |
+| 🟠 中 | **真实支付** | Stripe/微信/支付宝，资质与合同流 |
+| 🟡 低 | 注册邮箱验证 | 注册后邮件验证 |
 | 🟡 低 | 自定义域名 | 替换 github.io |
 
-### 待决策
+### 待决策（仍建议 Claude/RJ 拍板）
 
-- 付费方式：先用询盘（手动撮合）还是直接集成 Stripe？
-- 试读保护技术方案：前端截断 vs 后端分片存储？
+- 「授权」与**独家**在数据库里的取值（当前自动下架主要匹配 `exclusive` / 中文独家类；与字段 `买断`/`授权`并存时需统一规则）
+- 付费是先线下撮合还是上支付通道
+- 试读：仅 `preview_text` 录入 vs 服务端截断全文
