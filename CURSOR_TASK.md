@@ -1068,3 +1068,290 @@ git push origin main
 ✅ 任务D（Footer链接）：完成/失败
 ✅ 推送状态：成功/失败
 ```
+
+---
+
+## 🎯 新任务（Claude 分配，2026-05-09）
+
+**优先级：🔴 立即执行**
+**任务名：购买询盘系统**
+
+---
+
+### 背景
+
+现在买家点"Purchase / 购买"按钮只弹出"under development"提示，交易无法发生。
+MVP 阶段不需要真实支付，但需要一个**询盘流程**——买家发意向，创作者收到通知，平台管理员撮合。
+
+---
+
+### ⚠️ 前置步骤（RJ 需要在 Supabase 控制台执行以下 SQL）
+
+在 Supabase 控制台 > SQL Editor 运行：
+
+```sql
+-- 创建询盘表
+CREATE TABLE IF NOT EXISTS purchase_requests (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  script_id UUID REFERENCES scripts(id) ON DELETE CASCADE,
+  script_title TEXT,
+  buyer_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+  seller_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+  message TEXT,
+  status TEXT DEFAULT 'pending',
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+
+-- 启用 RLS
+ALTER TABLE purchase_requests ENABLE ROW LEVEL SECURITY;
+
+-- 买家可以创建询盘
+CREATE POLICY "buyers can create requests" ON purchase_requests
+  FOR INSERT TO authenticated
+  WITH CHECK (buyer_id = auth.uid());
+
+-- 买家和卖家可以查看自己相关的询盘
+CREATE POLICY "users can view own requests" ON purchase_requests
+  FOR SELECT TO authenticated
+  USING (buyer_id = auth.uid() OR seller_id = auth.uid());
+
+-- 卖家可以更新状态（接受/拒绝）
+CREATE POLICY "sellers can update status" ON purchase_requests
+  FOR UPDATE TO authenticated
+  USING (seller_id = auth.uid());
+```
+
+SQL 执行成功后，通知 Claude 或直接让 Cursor 继续执行下面的任务。
+
+---
+
+### 📋 任务 A：修改 script-detail.html — 购买按钮改为询盘弹窗
+
+找到 `script-detail.html` 中的购买按钮（`id="buy-btn"` 或类似）。
+
+**第一步：** 在页面内加一个询盘弹窗（modal）：
+
+```html
+<!-- 询盘 Modal -->
+<div id="inquiry-modal" style="display:none; position:fixed; inset:0;
+     background:rgba(0,0,0,0.5); z-index:1000; align-items:center; justify-content:center;">
+  <div style="background:var(--warm-white); border-radius:18px; padding:32px;
+       max-width:480px; width:90%; position:relative;">
+    <button onclick="closeInquiryModal()"
+      style="position:absolute;top:14px;right:18px;background:none;border:none;
+             font-size:20px;cursor:pointer;color:var(--muted);">✕</button>
+    <h3 style="font-family:'Fraunces',serif;font-size:22px;margin-bottom:8px;">
+      <span class="en-only">Send Purchase Inquiry</span>
+      <span class="zh-only">发送购买询盘</span>
+    </h3>
+    <p style="color:var(--muted);font-size:13px;margin-bottom:20px;">
+      <span class="en-only">Tell the creator why you're interested. They'll review and get back to you.</span>
+      <span class="zh-only">告诉创作者你的购买意向，他们会尽快与你联系。</span>
+    </p>
+    <textarea id="inquiry-message" rows="4" placeholder="e.g. I'm a producer looking for short drama scripts..."
+      style="width:100%;border:1px solid var(--border);border-radius:10px;
+             padding:12px;font-size:14px;resize:vertical;font-family:inherit;
+             background:var(--bg);color:var(--text);box-sizing:border-box;"></textarea>
+    <div style="margin-top:14px; display:flex; gap:10px; justify-content:flex-end;">
+      <button onclick="closeInquiryModal()"
+        class="btn btn-outline" style="font-size:13px;">
+        <span class="en-only">Cancel</span>
+        <span class="zh-only">取消</span>
+      </button>
+      <button onclick="submitInquiry()"
+        class="btn btn-primary" id="inquiry-submit-btn" style="font-size:13px;">
+        <span class="en-only">Send Inquiry</span>
+        <span class="zh-only">发送询盘</span>
+      </button>
+    </div>
+    <p id="inquiry-result" style="margin-top:12px;font-size:13px;text-align:center;display:none;"></p>
+  </div>
+</div>
+```
+
+**第二步：** 修改购买按钮的点击事件，改为打开 modal：
+
+```js
+// 找到原来的 buy 按钮点击处理，改为：
+document.getElementById('buy-btn').addEventListener('click', () => {
+  // 未登录 → 跳转登录
+  const { data: { session } } = ... // 用已有的 session 检查
+  // 如果已有登录用户检查逻辑，直接复用；否则：
+  if (!window._currentUser) {
+    window.location.href = 'login.html';
+    return;
+  }
+  openInquiryModal();
+});
+```
+
+**第三步：** 加 modal 控制和提交函数：
+
+```js
+function openInquiryModal() {
+  const modal = document.getElementById('inquiry-modal');
+  modal.style.display = 'flex';
+  document.getElementById('inquiry-message').value = '';
+  document.getElementById('inquiry-result').style.display = 'none';
+}
+
+function closeInquiryModal() {
+  document.getElementById('inquiry-modal').style.display = 'none';
+}
+window.closeInquiryModal = closeInquiryModal;
+
+async function submitInquiry() {
+  const btn = document.getElementById('inquiry-submit-btn');
+  const resultEl = document.getElementById('inquiry-result');
+  const message = document.getElementById('inquiry-message').value.trim();
+
+  btn.disabled = true;
+  btn.textContent = document.body.classList.contains('zh') ? '发送中...' : 'Sending...';
+
+  // scriptId 和 sellerId 应该在 loadScript() 时已经读取并存到 window._scriptData
+  const { error } = await window.supabase_client
+    .from('purchase_requests')
+    .insert({
+      script_id: window._scriptData.id,
+      script_title: window._scriptData.title,
+      buyer_id: window._currentUser.id,
+      seller_id: window._scriptData.user_id,
+      message: message,
+      status: 'pending'
+    });
+
+  btn.disabled = false;
+  btn.innerHTML = document.body.classList.contains('zh')
+    ? '<span class="zh-only">发送询盘</span>'
+    : '<span class="en-only">Send Inquiry</span>';
+
+  resultEl.style.display = 'block';
+  if (error) {
+    resultEl.style.color = 'var(--coral)';
+    resultEl.textContent = error.message;
+  } else {
+    resultEl.style.color = 'var(--sage)';
+    resultEl.textContent = document.body.classList.contains('zh')
+      ? '✅ 询盘已发送！创作者会尽快与你联系。'
+      : '✅ Inquiry sent! The creator will be in touch soon.';
+    setTimeout(closeInquiryModal, 2500);
+  }
+}
+window.submitInquiry = submitInquiry;
+```
+
+**重要：** 确保 `loadScript()` 函数里把 script 数据存到 `window._scriptData`（如果已经有类似变量就复用），当前用户存到 `window._currentUser`。
+
+---
+
+### 📋 任务 B：新建 my-inquiries.html（我的询盘页）
+
+**新建文件** `my-inquiries.html`，放在项目根目录。
+
+**功能：**
+- 需要登录（引入 `js/auth.js`，调用 `requireAuth()`）
+- 根据用户角色显示不同内容：
+  - **创作者**：显示"收到的询盘"（`seller_id = currentUser.id`）
+  - **买家**：显示"我发出的询盘"（`buyer_id = currentUser.id`）
+  - （如果角色未知，两种都显示）
+
+**读取数据：**
+```js
+// 收到的询盘（创作者）
+const { data: received } = await window.supabase_client
+  .from('purchase_requests')
+  .select('*')
+  .eq('seller_id', currentUser.id)
+  .order('created_at', { ascending: false });
+
+// 发出的询盘（买家）
+const { data: sent } = await window.supabase_client
+  .from('purchase_requests')
+  .select('*')
+  .eq('buyer_id', currentUser.id)
+  .order('created_at', { ascending: false });
+```
+
+**每条询盘显示：**
+- 作品标题（可点击 → `script-detail.html?id=xxx`）
+- 消息内容
+- 状态徽章：`pending`（待处理）/ `accepted`（已接受）/ `rejected`（已拒绝）
+- 发送时间
+
+**创作者可以接受/拒绝询盘：**
+```js
+async function updateStatus(id, newStatus) {
+  await window.supabase_client
+    .from('purchase_requests')
+    .update({ status: newStatus })
+    .eq('id', id);
+  loadInquiries(); // 刷新列表
+}
+```
+
+**样式：** 与 `scripts-list-author.html` 保持一致，用卡片列表。引入 `css/common.css`、`js/theme.js`、`js/nav-mobile.js`、`js/auth.js`、`js/supabase-client.js`。
+
+**双语文案：**
+- 页面标题：My Inquiries / 我的询盘
+- 收到的询盘：Received / 收到的询盘
+- 发出的询盘：Sent / 发出的询盘
+- 状态：Pending/待处理，Accepted/已接受，Rejected/已拒绝
+- 空状态：No inquiries yet. / 暂无询盘。
+
+---
+
+### 📋 任务 C：在 dashboard.html 加入口
+
+在 dashboard.html 的功能卡片区，加"我的询盘"入口：
+
+```html
+<a href="my-inquiries.html" class="dash-card">
+  <div class="dash-card-icon">💬</div>
+  <div class="dash-card-title">
+    <span class="en-only">My Inquiries</span>
+    <span class="zh-only">我的询盘</span>
+  </div>
+  <div class="dash-card-desc">
+    <span class="en-only">View purchase inquiries you've sent or received</span>
+    <span class="zh-only">查看你发出或收到的购买询盘</span>
+  </div>
+</a>
+```
+
+加在现有卡片的后面（创作者和买家都显示这个入口）。
+
+---
+
+### ✅ 完成后
+
+```bash
+git add script-detail.html my-inquiries.html dashboard.html
+git commit -m "feat: Add purchase inquiry system
+
+- script-detail.html: Buy button opens inquiry modal, submits to purchase_requests table
+- my-inquiries.html: buyers see sent inquiries, creators see received inquiries with accept/reject
+- dashboard.html: add My Inquiries entry card for all users"
+git push origin main
+```
+
+在本文件末尾写完成状态：
+```
+✅ 完成时间：[时间]
+✅ 任务A（询盘弹窗）：完成/失败
+✅ 任务B（my-inquiries.html）：完成/失败
+✅ 任务C（Dashboard入口）：完成/失败
+✅ 推送状态：成功/失败
+```
+
+---
+
+### 执行记录（Cursor）
+
+✅ 完成时间：2026-05-09 17:38 CST（UTC+8）
+✅ 任务A（询盘弹窗）：完成
+✅ 任务B（my-inquiries.html）：完成
+✅ 任务C（Dashboard入口）：完成
+✅ 推送状态：成功
+
+> ⚠️ 提醒：RJ 需要先在 Supabase SQL Editor 运行本任务开头的 SQL，
+> 否则 INSERT 会因为表不存在而报错。
