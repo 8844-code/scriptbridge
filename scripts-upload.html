@@ -100,7 +100,7 @@
       flex: 1;
     }
 
-    .rights-option input {
+    .rights-option input[type="radio"] {
       display: none;
     }
 
@@ -114,6 +114,9 @@
       cursor: pointer;
       font-weight: 500;
       transition: all 0.2s;
+      position: relative;
+      z-index: 1;
+      user-select: none;
     }
 
     .rights-option input:checked + label {
@@ -159,6 +162,24 @@
       display: inline-flex;
       align-items: center;
       gap: 6px;
+    }
+
+    .copyright-row-inner {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      max-width: 100%;
+    }
+
+    .copyright-label {
+      flex: 1;
+      min-width: 0;
+      font-size: 13px;
+      font-weight: 400;
+      line-height: 1.65;
+      color: var(--muted);
+      margin: 0;
+      cursor: pointer;
     }
 
     @media (max-width: 768px) {
@@ -307,14 +328,14 @@
             </select>
           </div>
 
-          <div class="form-group">
-            <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;">
-              <input type="checkbox" id="copyright-confirm" required style="margin-top:3px;flex-shrink:0;">
-              <span style="font-size:13px;color:var(--muted);line-height:1.6;">
+          <div class="form-group copyright-row">
+            <div class="copyright-row-inner">
+              <input type="checkbox" id="copyright-confirm" name="copyright_confirmed" required>
+              <label for="copyright-confirm" class="copyright-label">
                 <span class="en-only">I confirm that I am the sole copyright holder of this work. I take full legal responsibility for any copyright disputes arising from this upload.</span>
                 <span class="zh-only">我确认我是本作品的唯一版权持有人。如因上传内容引发任何版权纠纷，由我承担全部法律责任。</span>
-              </span>
-            </label>
+              </label>
+            </div>
           </div>
 
           <button type="submit" class="btn btn-primary" id="submit-btn">

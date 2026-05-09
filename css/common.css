@@ -364,7 +364,8 @@ html.nav-compact .btn-logout {
   margin-bottom: 20px;
 }
 
-.form-group label {
+/* 仅字段标题：避免套在卡片选项、版权行里的 label 继承成「整页小标题」样式 */
+.form-group > label {
   display: block;
   font-size: 14px;
   font-weight: 600;
@@ -372,7 +373,7 @@ html.nav-compact .btn-logout {
   color: var(--ink);
 }
 
-.form-group input,
+.form-group input:not([type="radio"]):not([type="checkbox"]),
 .form-group select,
 .form-group textarea {
   width: 100%;
@@ -386,7 +387,31 @@ html.nav-compact .btn-logout {
   transition: all 0.2s;
 }
 
-.form-group input:focus,
+.form-group input[type="radio"],
+.form-group input[type="checkbox"] {
+  width: auto;
+  max-width: none;
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  font: inherit;
+  color: inherit;
+}
+
+.form-group input[type="checkbox"] {
+  width: 1.15rem;
+  height: 1.15rem;
+  min-width: 1.15rem;
+  flex-shrink: 0;
+  accent-color: var(--coral);
+  cursor: pointer;
+  vertical-align: top;
+}
+
+.form-group input:not([type="radio"]):not([type="checkbox"]):focus,
 .form-group select:focus,
 .form-group textarea:focus {
   outline: none;
@@ -399,7 +424,7 @@ html.nav-compact .btn-logout {
   min-height: 100px;
 }
 
-.form-group input::placeholder,
+.form-group input:not([type="radio"]):not([type="checkbox"])::placeholder,
 .form-group textarea::placeholder {
   color: var(--muted);
   opacity: 1;
@@ -418,7 +443,7 @@ html.nav-compact .btn-logout {
   box-shadow: 0 14px 36px rgba(0, 0, 0, 0.35) !important;
 }
 
-:root.theme-dark .form-group label,
+:root.theme-dark .form-group > label,
 :root.theme-dark .switch-link,
 :root.theme-dark .description-label,
 :root.theme-dark .profile-field label,
@@ -447,7 +472,7 @@ html.nav-compact .btn-logout {
   color: #f8fafc !important;
 }
 
-:root.theme-dark .form-group input,
+:root.theme-dark .form-group input:not([type="radio"]):not([type="checkbox"]),
 :root.theme-dark .form-group textarea,
 :root.theme-dark .form-group select,
 :root.theme-dark .filters-card input,
@@ -463,6 +488,11 @@ html.nav-compact .btn-logout {
   background: rgba(255, 255, 255, 0.08) !important;
   border-color: rgba(248, 250, 252, 0.24) !important;
   color: #e2e8f0 !important;
+}
+
+:root.theme-dark .form-group input[type="checkbox"] {
+  background: rgba(255, 255, 255, 0.12) !important;
+  border-color: rgba(248, 250, 252, 0.35) !important;
 }
 
 :root.theme-dark .switch-link a,
@@ -665,7 +695,7 @@ html.nav-compact .btn-logout {
     margin-bottom: 14px;
   }
 
-  .form-group input,
+  .form-group input:not([type="radio"]):not([type="checkbox"]),
   .form-group select,
   .form-group textarea {
     padding: 10px 12px;
