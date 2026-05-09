@@ -268,3 +268,130 @@ git push origin main
 ✅ 任务B（重复邮箱）：完成
 ✅ 任务C（404页）：完成
 ✅ 推送状态：成功
+
+---
+
+## 📋 当前进度总览（Claude 整理，2026-05-09）
+
+### ✅ 已完成的功能
+
+**页面**
+- `index.html` — 首页候补名单，双语，Supabase 实时人数，重复邮箱检测
+- `login.html` — 登录，双语，忘记密码入口
+- `signup.html` — 注册，双语，角色选择（创作者/买家）
+- `forgot-password.html` — 密码重置，Supabase 邮件发送
+- `dashboard.html` — 个人主页，双语，角色对应功能入口
+- `scripts-upload.html` — 上传作品，Supabase Storage，双语
+- `scripts-browse.html` — 浏览作品，标题搜索+类型筛选，双语
+- `scripts-list-author.html` — 我的作品，预览+删除，双语
+- `script-detail.html` — 作品详情，购买/下载入口，双语
+- `admin-waitlist.html` — 候补后台（仅管理员可见），实时数据
+- `404.html` — 错误页，双语
+
+**系统**
+- `js/theme.js` — 深色/浅色/自动主题，持久化
+- `js/nav-mobile.js` — 滚动隐藏导航（手机+桌面）
+- Supabase Storage RLS 权限已配置
+- 全站中文文案规范（作品/个人主页，无"脚本"/"控制台"）
+
+### ❌ 还缺少的功能（按优先级）
+
+| 优先级 | 功能 | 说明 |
+|--------|------|------|
+| 🔴 高 | **作品编辑页**（script-edit.html） | Edit 按钮现在是禁用的 |
+| 🔴 高 | **购买流程** | 购买按钮弹"under development" |
+| 🟠 中 | 我的购买记录 | 买家买了什么没地方看 |
+| 🟠 中 | 浏览页更多筛选 | 只有标题+类型，缺价格区间 |
+| 🟡 低 | 邮箱验证（注册后） | 暂无验证邮件 |
+| 🟡 低 | 用户资料编辑 | 头像/简介无法修改 |
+
+---
+
+## 🎯 新任务（Claude 分配，2026-05-09）
+
+**优先级：🔴 立即执行**
+**任务名：作品编辑页（script-edit.html）**
+
+---
+
+### 背景
+
+`scripts-list-author.html` 的 Edit 按钮已经存在，但点击只弹出"编辑功能暂未开放"。需要新建 `script-edit.html`，让创作者能修改已上传作品的信息。
+
+---
+
+### 📋 任务：新建 script-edit.html
+
+**功能要求：**
+
+1. **读取现有数据**：从 URL 参数 `?id=xxx` 获取作品 ID，从 Supabase `scripts` 表加载该作品信息，填入表单
+2. **可编辑字段**（与上传页一致）：
+   - 标题（title）
+   - 简介（description）
+   - 作品类型（script_type）
+   - 定价（price）
+   - 版权类型（rights_type）
+   - 作品文件（可选：不换文件就保留原来的）
+3. **权限检查**：只有作品的创建者（`user_id === currentUser.id`）才能编辑，其他人跳转回 dashboard
+4. **保存**：点击"保存修改"后调用 Supabase `.update()`，成功后跳回 `scripts-list-author.html`
+
+**Supabase 更新示例：**
+```js
+const { error } = await window.supabase_client
+  .from('scripts')
+  .update({
+    title: titleInput.value.trim(),
+    description: descriptionInput.value.trim(),
+    script_type: scriptTypeInput.value,
+    price: Number(priceInput.value),
+    rights_type: rightsType,
+    // 如果用户换了文件，更新 file_url；否则不动
+  })
+  .eq('id', scriptId)
+  .eq('user_id', currentUser.id); // 双重保险：只能改自己的
+```
+
+**样式要求：**
+- 与 `scripts-upload.html` 完全一致（复制框架即可）
+- 标题改为"编辑作品" / "Edit Script"
+- 保存按钮："保存修改" / "Save Changes"
+- 取消按钮：返回 `scripts-list-author.html`
+- 双语支持（en-only / zh-only）
+- 引入 `js/theme.js`、`js/nav-mobile.js`、`css/common.css`、`js/supabase-client.js`、`js/auth.js`
+
+---
+
+### 📋 同时修改：scripts-list-author.html
+
+找到 Edit 按钮的部分，把禁用状态改为真实跳转：
+
+```js
+// 原来的（禁用）：
+'<button class="btn btn-outline btn-sm btn-disabled" onclick="showEditDisabled(event)">' + t('edit') + '</button>'
+
+// 改成（真实跳转）：
+'<a href="script-edit.html?id=' + item.id + '" class="btn btn-outline btn-sm">' + t('edit') + '</a>'
+```
+
+---
+
+### ✅ 完成后
+
+```bash
+git add script-edit.html scripts-list-author.html
+git commit -m "feat: Add script editing page and enable Edit button
+
+- Add script-edit.html with load/edit/save flow via Supabase
+- Enable Edit button in scripts-list-author.html to link to edit page
+- Owner-only access enforced both client-side and in Supabase query
+- Bilingual support (EN/ZH) with same style as upload page"
+git push origin main
+```
+
+在本文件末尾写完成状态：
+```
+✅ 完成时间：[时间]
+✅ script-edit.html：完成/失败
+✅ Edit 按钮启用：完成/失败
+✅ 推送状态：成功/失败
+```
