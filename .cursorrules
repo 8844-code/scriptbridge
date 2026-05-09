@@ -1,0 +1,64 @@
+# ScriptBridge — Cursor 自动工作规则
+
+## 每次打开项目，立即执行以下流程：
+
+### 第 1 步：读取任务
+打开 `CURSOR_TASK.md`，找到**最后一个**"🎯 新任务"部分。
+检查它末尾是否有 `✅ 完成时间` 状态行。
+
+- **有完成状态** → 任务已完成，等待 Claude 分配新任务，告诉用户"当前没有新任务，请通知 Claude"。
+- **没有完成状态** → 立即开始执行该任务，不需要用户重复说明。
+
+### 第 2 步：执行任务
+- 严格按照 `CURSOR_TASK.md` 里的任务说明执行
+- 优先完成所有子任务（任务 A、B、C……）
+- 遇到不确定的地方，选最合理的实现方式，不要停下来问
+- 在浏览器中验证效果
+
+### 第 3 步：提交并推送
+任务完成后：
+```bash
+git add [修改的文件]
+git commit -m "[任务说明里提供的 commit message]"
+git push origin main
+```
+
+### 第 4 步：回写完成状态
+在 `CURSOR_TASK.md` 末尾的完成状态模板里填入：
+```
+✅ 完成时间：[当前时间 UTC+8]
+✅ 任务A：完成/失败
+✅ 任务B：完成/失败
+✅ 推送状态：成功/失败
+```
+然后再 commit 并 push 这个更新：
+```bash
+git add CURSOR_TASK.md
+git commit -m "docs: mark task as completed"
+git push origin main
+```
+
+---
+
+## 项目基本信息
+
+- **线上地址：** https://8844-code.github.io/scriptbridge/
+- **技术栈：** 纯静态 HTML/CSS/JS + Supabase 后端
+- **Supabase 接入：** `js/supabase-client.js`（已配置，直接使用 `window.supabase_client`）
+- **认证：** `js/auth.js` 提供 `requireAuth()` 和 `getCurrentUser()`
+- **样式：** `css/common.css` 全局样式，变量在 `:root`
+- **主题：** `js/theme.js`（深色/浅色/自动）
+- **导航：** `js/nav-mobile.js`（滚动隐藏）
+
+## 代码规范
+
+- 所有中文界面用 `en-only` / `zh-only` class 做双语
+- 新页面复制现有页面框架（如 `scripts-upload.html`）保持视觉一致
+- **禁止提交：** `.claude/`、`.obsidian/`、`.DS_Store`
+- **不需要**每次改动都问用户——直接判断并执行
+
+## 与 Claude 的协作方式
+
+- **Claude** = 规划师，写任务进 `CURSOR_TASK.md`，审查代码
+- **Cursor（你）** = 执行师，读任务、写代码、提交推送、回写状态
+- 沟通渠道只有 `CURSOR_TASK.md`，不依赖用户转达
