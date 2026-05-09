@@ -1,0 +1,40 @@
+<!--
+  标签页 favicon（32px）：同一 S 概念，饱和度更低 + 玻璃灰底，易与页顶珊瑚导航区分
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+  <defs>
+    <linearGradient id="fbBg" x1="2" y1="2" x2="30" y2="30" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#4a5568"/>
+      <stop offset="50%" stop-color="#3b4654"/>
+      <stop offset="100%" stop-color="#2a3440"/>
+    </linearGradient>
+    <linearGradient id="fbGlass" x1="4" y1="3" x2="22" y2="11" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="rgba(255,255,255,0.2)"/>
+      <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
+    </linearGradient>
+    <!-- 低饱和珊瑚 → 雾 sage -->
+    <linearGradient id="fbS" x1="6" y1="6" x2="28" y2="28" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#d4a096"/>
+      <stop offset="45%" stop-color="rgba(240,236,232,0.95)"/>
+      <stop offset="100%" stop-color="#7a9e88"/>
+    </linearGradient>
+    <linearGradient id="fbShine" x1="7" y1="7" x2="26" y2="24" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="rgba(230,180,165,0.55)"/>
+      <stop offset="100%" stop-color="rgba(120,150,135,0.45)"/>
+    </linearGradient>
+  </defs>
+  <rect width="32" height="32" rx="8" fill="url(#fbBg)"/>
+  <rect x="0.5" y="0.5" width="31" height="31" rx="7.5" stroke="rgba(255,255,255,0.18)" fill="none"/>
+  <path d="M4 9 Q16 5.5 28 10" stroke="url(#fbGlass)" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+
+  <!-- 与 scriptbridge-mark.svg 同一 S 曲线，viewBox 32 线性缩放 ×0.8 -->
+  <path d="M 21.6 8.4 C 8.8 8.4 6.4 13.6 15.84 16.16 C 25.2 18.8 22 24.8 8.4 24.8"
+        fill="none" stroke="url(#fbShine)" stroke-width="1.24" stroke-linecap="round" opacity="0.9"/>
+  <path d="M 21.6 8.4 C 8.8 8.4 6.4 13.6 15.84 16.16 C 25.2 18.8 22 24.8 8.4 24.8"
+        fill="none" stroke="url(#fbS)" stroke-width="2.52" stroke-linecap="round"/>
+
+  <path d="M 13.6 11.6 L 16.4 9.6 L 17.2 12.64" stroke="rgba(212,160,150,0.5)" stroke-width="0.92" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+
+  <circle cx="15.84" cy="16.16" r="1.6" fill="#5c7f6c" stroke="rgba(255,250,246,0.55)" stroke-width="0.68"/>
+  <circle cx="15.84" cy="16.16" r="0.72" fill="#c99588"/>
+</svg>
