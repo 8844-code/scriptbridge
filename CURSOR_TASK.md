@@ -687,3 +687,147 @@ git push origin main
 ✅ 任务B（首页入口）：完成/失败
 ✅ 推送状态：成功/失败
 ```
+
+---
+
+## 🎯 新任务（Claude 分配，2026-05-09）
+
+**优先级：🔴 立即执行**
+**任务名：作品状态管理（公开/下架/重新上架）**
+
+> ⚠️ 前置条件（Claude 已确认完成）：Supabase `scripts` 表已新增 `status` 字段，默认值 `'published'`
+
+---
+
+### 📋 任务 A：上传页加"可见性"选项（scripts-upload.html）
+
+在定价字段下方，加一个可见性选择：
+
+```html
+<div class="form-group">
+  <label id="label-visibility">
+    <span class="en-only">Visibility</span>
+    <span class="zh-only">可见性</span>
+  </label>
+  <div style="display:flex; gap:16px; margin-top:8px;">
+    <label style="display:flex;align-items:center;gap:6px;cursor:pointer;">
+      <input type="radio" name="visibility" value="published" checked>
+      <span class="en-only">Public — visible in marketplace</span>
+      <span class="zh-only">公开 — 在市场中可见</span>
+    </label>
+    <label style="display:flex;align-items:center;gap:6px;cursor:pointer;">
+      <input type="radio" name="visibility" value="draft">
+      <span class="en-only">Draft — only visible to me</span>
+      <span class="zh-only">草稿 — 仅自己可见</span>
+    </label>
+  </div>
+</div>
+```
+
+在 `insert` 的数据里加上 `status` 字段：
+```js
+status: document.querySelector('input[name="visibility"]:checked').value,
+```
+
+---
+
+### 📋 任务 B：我的作品列表加下架/上架按钮（scripts-list-author.html）
+
+**第一步：** 从 Supabase 读取作品时，额外选取 `status` 字段：
+```js
+.select('id, title, script_type, price, created_at, status')
+```
+
+**第二步：** 每行操作按钮区加下架/上架按钮（根据当前 status 动态显示）：
+```js
+// 如果 status === 'published'，显示"下架"按钮
+// 如果 status === 'draft' 或 'unpublished'，显示"上架"按钮
+
+const isPublished = item.status === 'published';
+const toggleBtn = isPublished
+  ? `<button class="btn btn-outline btn-sm" onclick="toggleStatus('${item.id}','draft')">
+       ${currentLang === 'zh' ? '下架' : 'Unpublish'}
+     </button>`
+  : `<button class="btn btn-primary btn-sm" onclick="toggleStatus('${item.id}','published')">
+       ${currentLang === 'zh' ? '上架' : 'Publish'}
+     </button>`;
+```
+
+**第三步：** 加 `toggleStatus` 函数：
+```js
+async function toggleStatus(scriptId, newStatus) {
+  const label = newStatus === 'published'
+    ? (currentLang === 'zh' ? '上架' : 'publish')
+    : (currentLang === 'zh' ? '下架' : 'unpublish');
+  if (!confirm(`${currentLang === 'zh' ? '确认' : 'Confirm'} ${label}?`)) return;
+
+  const { error } = await window.supabase_client
+    .from('scripts')
+    .update({ status: newStatus })
+    .eq('id', scriptId)
+    .eq('user_id', currentUser.id);
+
+  if (error) {
+    showAlert((currentLang === 'zh' ? '操作失败：' : 'Failed: ') + error.message, 'error');
+  } else {
+    showAlert(currentLang === 'zh' ? '操作成功' : 'Done!', 'success');
+    setTimeout(() => loadScripts(), 800);
+  }
+}
+window.toggleStatus = toggleStatus;
+```
+
+**第四步：** 在作品列表里加一列"状态"，显示当前是否公开：
+```js
+// 在 status 列显示：
+const statusBadge = item.status === 'published'
+  ? `<span style="color:var(--sage);font-size:12px;font-weight:600;">● ${currentLang==='zh'?'已上架':'Live'}</span>`
+  : `<span style="color:var(--muted);font-size:12px;font-weight:600;">○ ${currentLang==='zh'?'草稿':'Draft'}</span>`;
+```
+
+---
+
+### 📋 任务 C：浏览页和市场页只显示已上架作品
+
+**在 `scripts-browse.html` 和 `marketplace.html` 的 Supabase 查询里加过滤条件：**
+```js
+.from('scripts')
+.select('...')
+.eq('status', 'published')   // ← 加这一行
+.order('created_at', { ascending: false })
+```
+
+---
+
+### 📋 任务 D：编辑页同步加可见性选项（script-edit.html）
+
+与任务 A 一样，在 `script-edit.html` 里：
+1. 加可见性单选框（public/draft）
+2. 加载已有数据时预选当前 status
+3. 保存时把 `status` 一起 update 进 Supabase
+
+---
+
+### ✅ 完成后
+
+```bash
+git add scripts-upload.html scripts-list-author.html scripts-browse.html script-edit.html marketplace.html
+git commit -m "feat: Add script visibility and publish/unpublish management
+
+- scripts-upload.html: add visibility selector (public/draft) on upload
+- scripts-list-author.html: add status badge and publish/unpublish button per script
+- scripts-browse.html: filter to only show published scripts
+- marketplace.html: filter to only show published scripts
+- script-edit.html: add visibility selector synced with current status"
+git push origin main
+```
+
+在本文件末尾写完成状态：
+```
+✅ 完成时间：[时间]
+✅ 任务A（上传页可见性）：完成/失败
+✅ 任务B（下架/上架按钮）：完成/失败
+✅ 任务C（浏览页过滤）：完成/失败
+✅ 任务D（编辑页可见性）：完成/失败
+✅ 推送状态：成功/失败
+```
