@@ -570,6 +570,54 @@
       detailContent.style.display = 'none';
     }
 
+    function lockDownload(btn) {
+      if (!btn) return;
+      btn.removeAttribute('href');
+      btn.removeAttribute('download');
+      btn.style.opacity = '0.45';
+      btn.style.cursor = 'not-allowed';
+      btn.style.pointerEvents = 'none';
+      const next = btn.nextElementSibling;
+      if (next && next.classList.contains('download-lock-hint')) return;
+      const hint = document.createElement('p');
+      hint.className = 'download-lock-hint';
+      hint.style.cssText = 'font-size:13px;color:var(--muted);margin-top:8px;';
+      hint.innerHTML = document.body.classList.contains('zh')
+        ? '🔒 发送询盘并等待创作者接受后可下载完整文件。'
+        : '🔒 Send an inquiry and wait for the creator to accept before downloading.';
+      btn.parentNode.insertBefore(hint, btn.nextSibling);
+    }
+
+    async function checkDownloadAccess() {
+      const downloadBtn = document.getElementById('download-btn');
+      const previewBtn = document.getElementById('preview-btn');
+
+      if (!window._currentUser || !window._scriptData) {
+        lockDownload(downloadBtn);
+        lockDownload(previewBtn);
+        return;
+      }
+
+      if (String(window._currentUser.id) === String(window._scriptData.user_id)) {
+        return;
+      }
+
+      const { data: accepted } = await window.supabase_client
+        .from('purchase_requests')
+        .select('id')
+        .eq('script_id', window._scriptData.id)
+        .eq('buyer_id', window._currentUser.id)
+        .eq('status', 'accepted')
+        .maybeSingle();
+
+      if (accepted) {
+        return;
+      }
+
+      lockDownload(downloadBtn);
+      lockDownload(previewBtn);
+    }
+
     async function loadScript() {
       const scriptId = getQueryParam('id');
 
@@ -595,6 +643,7 @@
         window._authorEmail = authorEmail;
 
         renderScript(data);
+        await checkDownloadAccess();
       } catch (error) {
         console.error('Failed to load script:', error);
         showError();
