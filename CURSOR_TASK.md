@@ -1355,3 +1355,132 @@ git push origin main
 
 > ⚠️ 提醒：RJ 需要先在 Supabase SQL Editor 运行本任务开头的 SQL，
 > 否则 INSERT 会因为表不存在而报错。
+
+---
+
+## 🎯 新任务（Claude 分配，2026-05-09）
+
+**优先级：🔴 立即执行**
+**任务名：下载权限保护**
+
+---
+
+### 背景
+
+目前 `script-detail.html` 的下载按钮对所有登录用户开放——任何人登录后都能直接下载完整文件，根本不需要发询盘。这是一个严重的内容泄露漏洞，必须修复。
+
+**目标规则：**
+- ✅ 创作者本人 → 可以下载（自己的文件）
+- ✅ 买家已有"已接受"的询盘（status = 'accepted'）→ 可以下载
+- ❌ 其他所有人（普通浏览者、未发过询盘的买家）→ **不能**下载，显示引导提示
+
+---
+
+### 📋 任务：修改 script-detail.html 下载权限逻辑
+
+#### 第一步：在 `loadScript()` 完成后，调用权限检查函数
+
+在你原有的 `loadScript()` 或 `window.addEventListener('DOMContentLoaded', ...)` 里，
+加载完 script 数据 + 当前用户后，调用：
+
+```js
+await checkDownloadAccess();
+```
+
+#### 第二步：实现 `checkDownloadAccess()` 函数
+
+```js
+async function checkDownloadAccess() {
+  const downloadBtn = document.getElementById('download-btn');
+  const previewBtn  = document.getElementById('preview-btn'); // 如果有单独 preview 按钮
+
+  // 1. 未登录 → 隐藏下载按钮（已登录才到这里，通常不会触发）
+  if (!window._currentUser) {
+    lockDownload(downloadBtn);
+    return;
+  }
+
+  // 2. 是创作者本人 → 直接放行
+  if (window._currentUser.id === window._scriptData.user_id) {
+    return; // 按钮保持可用
+  }
+
+  // 3. 查询是否有 accepted 询盘
+  const { data: accepted } = await window.supabase_client
+    .from('purchase_requests')
+    .select('id')
+    .eq('script_id', window._scriptData.id)
+    .eq('buyer_id', window._currentUser.id)
+    .eq('status', 'accepted')
+    .maybeSingle();
+
+  if (accepted) {
+    return; // 有已接受询盘 → 放行
+  }
+
+  // 4. 其他情况 → 锁定
+  lockDownload(downloadBtn);
+  if (previewBtn) lockDownload(previewBtn);
+}
+
+function lockDownload(btn) {
+  if (!btn) return;
+  btn.removeAttribute('href');
+  btn.removeAttribute('download');
+  btn.style.opacity = '0.45';
+  btn.style.cursor  = 'not-allowed';
+  btn.style.pointerEvents = 'none';
+
+  // 在下载按钮旁边插入提示文字
+  const hint = document.createElement('p');
+  hint.style.cssText = 'font-size:13px;color:var(--muted);margin-top:8px;';
+  hint.innerHTML = document.body.classList.contains('zh')
+    ? '🔒 发送询盘并等待创作者接受后可下载完整文件。'
+    : '🔒 Send an inquiry and wait for the creator to accept before downloading.';
+  btn.parentNode.insertBefore(hint, btn.nextSibling);
+}
+```
+
+#### 第三步：确保 `window._scriptData` 和 `window._currentUser` 在 loadScript 时被赋值
+
+检查现有代码，在读取 script 数据后加上：
+```js
+window._scriptData = script; // script 是从 Supabase 读到的那条记录
+```
+
+在获取当前用户后加上：
+```js
+window._currentUser = currentUser; // 已有的 getCurrentUser() 结果
+```
+
+如果这两个变量已经以其他名字存在，直接在 `checkDownloadAccess()` 里改用对应名字即可。
+
+---
+
+### ✅ 完成后
+
+```bash
+git add script-detail.html
+git commit -m "feat: Gate file download behind inquiry acceptance
+
+- Download button locked for users without accepted purchase request
+- Creator can always download their own files
+- Other users see lock hint: send inquiry first
+- Uses purchase_requests table (status = 'accepted') to check access"
+git push origin main
+```
+
+在本文件末尾写完成状态：
+```
+✅ 完成时间：[时间]
+✅ 下载权限保护：完成/失败
+✅ 推送状态：成功/失败
+```
+
+---
+
+### 执行记录（Cursor）
+
+✅ 完成时间：2026-05-09 17:55 CST（UTC+8）
+✅ 下载权限保护：完成
+✅ 推送状态：成功
