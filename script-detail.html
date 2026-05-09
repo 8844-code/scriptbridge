@@ -427,6 +427,12 @@
     let currentUser = null;
     let scriptData = null;
 
+    (function initLang() {
+      const lang = localStorage.getItem('scriptbridge_lang') || 'en';
+      document.body.classList.toggle('zh', lang === 'zh');
+      document.documentElement.lang = lang === 'zh' ? 'zh-CN' : 'en';
+    })();
+
     function formatDate(isoString) {
       if (!isoString) return '—';
       return new Date(isoString).toLocaleDateString();
@@ -490,12 +496,12 @@
 
       scriptData = script;
 
-      document.getElementById('script-title').textContent = escapeHtml(script.title || 'Untitled Script');
-      document.getElementById('script-type').textContent = escapeHtml(script.script_type || '—');
+      document.getElementById('script-title').textContent = script.title || 'Untitled Script';
+      document.getElementById('script-type').textContent = script.script_type || '—';
       document.getElementById('script-date').textContent = formatDate(script.created_at);
       document.getElementById('script-price').textContent = formatPrice(script.price);
-      document.getElementById('script-rights').textContent = escapeHtml(script.rights_type || '—');
-      document.getElementById('script-description').textContent = escapeHtml(script.description || '—');
+      document.getElementById('script-rights').textContent = script.rights_type || '—';
+      document.getElementById('script-description').textContent = script.description || '—';
 
       // Setup file buttons
       if (script.file_url) {
@@ -551,7 +557,7 @@
         }
 
         const { name: authorName, email: authorEmail } = await loadAuthor(data.user_id);
-        document.getElementById('script-author').textContent = escapeHtml(authorName);
+        document.getElementById('script-author').textContent = authorName;
         window._authorEmail = authorEmail;
 
         renderScript(data);
