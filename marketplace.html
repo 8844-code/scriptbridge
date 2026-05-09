@@ -200,12 +200,61 @@
         font-size: 28px;
       }
     }
+
+    .beta-note {
+      margin-top: 36px;
+      padding: 24px 26px;
+      border: 1px dashed rgba(242, 106, 79, 0.45);
+      border-radius: 18px;
+      background: rgba(255, 245, 238, 0.6);
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      backdrop-filter: blur(6px);
+    }
+    .beta-note-icon {
+      font-size: 26px;
+      line-height: 1;
+      padding-top: 4px;
+      flex-shrink: 0;
+    }
+    .beta-note-text h3 {
+      font-family: 'Fraunces', serif;
+      font-size: 18px;
+      font-weight: 600;
+      margin: 0 0 6px;
+      color: var(--ink);
+      letter-spacing: -0.01em;
+    }
+    .beta-note-text p {
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--muted);
+      margin: 0 0 14px;
+    }
+    .beta-cta-btn {
+      font-size: 14px;
+      padding: 10px 18px;
+    }
+    :root.theme-dark .beta-note {
+      background: rgba(255, 122, 95, 0.08);
+      border-color: rgba(255, 154, 130, 0.55);
+    }
+    :root.theme-dark .beta-note-text h3 { color: #f8fafc; }
+    :root.theme-dark .beta-note-text p { color: #cbd5e1; }
+    @media (max-width: 600px) {
+      .beta-note {
+        flex-direction: column;
+        gap: 8px;
+        padding: 18px;
+      }
+    }
   </style>
 </head>
 <body>
   <nav>
     <a href="index.html" class="nav-logo">
-      <div class="nav-logo-mark" aria-hidden="true"><img src="images/scriptbridge-mark.svg" alt=""></div>
+      <div class="nav-logo-mark" aria-hidden="true"><img src="images/scriptbridge-mark.svg?v=20260510" alt=""></div>
       <div class="nav-logo-text-wrap">
         <span class="nav-logo-zh">剧桥</span>
         <span class="nav-logo-en">ScriptBridge</span>
@@ -257,6 +306,20 @@
 
       <section id="scripts-grid" class="scripts-grid" style="display: none;"></section>
       <section id="empty-state" class="empty-state" style="display: none;"></section>
+
+      <section class="beta-note" aria-live="polite">
+        <div class="beta-note-icon" aria-hidden="true">⏳</div>
+        <div class="beta-note-text">
+          <h3 class="en-only">Login &amp; full marketplace coming soon</h3>
+          <h3 class="zh-only">登录窗口与完整市场，敬请期待</h3>
+          <p class="en-only">We're polishing the buyer / creator experience for private beta. Drop your email on the homepage and you'll be the first to get in.</p>
+          <p class="zh-only">登录与购买/上传体验仍在打磨中。先在首页留下邮箱，内测开放时我们会第一时间通知你。</p>
+          <a class="btn btn-primary beta-cta-btn" href="index.html#signup">
+            <span class="en-only">Join the waitlist →</span>
+            <span class="zh-only">加入候补名单 →</span>
+          </a>
+        </div>
+      </section>
     </div>
   </main>
 
