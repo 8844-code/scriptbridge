@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Edit Script — ScriptBridge</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23FF4D2E'/%3E%3Ctext x='16' y='23' font-family='Georgia,serif' font-size='20' font-weight='700' fill='white' text-anchor='middle'%3ES%3C/text%3E%3C/svg%3E">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300;1,9..40,400&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;0,9..144,700;1,9..144,300;1,9..144,500;1,9..144,700&family=Noto+Sans+SC:wght@300;400;500&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/common.css">
+  <script src="js/theme.js" defer></script>
+  <script src="js/nav-mobile.js" defer></script>
+
+  <style>
+    .upload-wrapper {
+      min-height: 100vh;
+      padding: 100px 40px 80px;
+      position: relative;
+    }
+
+    .upload-wrapper::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 10% 10%, rgba(255, 77, 46, 0.07), transparent 34%),
+        radial-gradient(circle at 90% 90%, rgba(61, 107, 79, 0.09), transparent 34%);
+      pointer-events: none;
+    }
+
+    .upload-container {
+      max-width: 760px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+    }
+
+    .upload-header {
+      margin-bottom: 24px;
+    }
+
+    .upload-header h1 {
+      font-family: 'Fraunces', serif;
+      font-size: 36px;
+      font-weight: 600;
+      color: var(--ink);
+      letter-spacing: -0.02em;
+      margin-bottom: 6px;
+    }
+
+    .upload-header p {
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .upload-card {
+      background: rgba(253, 250, 244, 0.92);
+      border: 1px solid rgba(26, 26, 26, 0.12);
+      border-radius: 22px;
+      padding: 32px;
+      box-shadow: 0 14px 36px rgba(26, 26, 26, 0.08);
+      backdrop-filter: blur(4px);
+    }
+
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+      border-radius: 12px;
+      border: 1px solid rgba(26, 26, 26, 0.14);
+      background: rgba(255, 255, 255, 0.84);
+    }
+
+    .form-group textarea {
+      min-height: 130px;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus,
+    .form-group select:focus {
+      border-color: rgba(61, 107, 79, 0.65);
+      box-shadow: 0 0 0 3px rgba(61, 107, 79, 0.15);
+    }
+
+    .rights-group {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .rights-option {
+      position: relative;
+      min-width: 130px;
+      flex: 1;
+    }
+
+    .rights-option input {
+      display: none;
+    }
+
+    .rights-option label {
+      display: block;
+      border: 1px solid rgba(26, 26, 26, 0.16);
+      border-radius: 12px;
+      padding: 12px 14px;
+      text-align: center;
+      background: rgba(255, 255, 255, 0.8);
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+
+    .rights-option input:checked + label {
+      border-color: rgba(61, 107, 79, 0.8);
+      background: rgba(61, 107, 79, 0.1);
+      color: var(--sage);
+      font-weight: 600;
+    }
+
+    .rights-option label:hover {
+      border-color: rgba(61, 107, 79, 0.6);
+    }
+
+    .action-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .btn-save {
+      flex: 1;
+      min-width: 180px;
+      border-radius: 12px;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+      background: linear-gradient(140deg, #2f5a40 0%, #3d6b4f 100%);
+      box-shadow: 0 10px 18px rgba(61, 107, 79, 0.24);
+    }
+
+    .btn-save:hover {
+      background: linear-gradient(140deg, #2a5139 0%, #365f46 100%);
+      transform: translateY(-1px);
+    }
+
+    .btn-cancel {
+      min-width: 160px;
+      border-radius: 12px;
+    }
+
+    .file-note {
+      margin-top: 6px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .nav-user-menu {
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 500;
+      background: rgba(255, 255, 255, 0.55);
+      border: 1px solid var(--border);
+      border-radius: var(--r-pill);
+      padding: 8px 14px;
+      max-width: 240px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    @media (max-width: 768px) {
+      .upload-wrapper {
+        padding: 80px 20px 60px;
+      }
+
+      .upload-header h1 {
+        font-size: 28px;
+      }
+
+      .upload-card {
+        padding: 22px;
+      }
+
+      .action-row {
+        flex-direction: column;
+      }
+
+      .btn-save,
+      .btn-cancel {
+        width: 100%;
+      }
+
+      .nav-user-menu {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="scripts-list-author.html" class="nav-logo">
+      <div class="nav-logo-mark">S</div>
+      <div>
+        <div class="nav-logo-text">ScriptBridge</div>
+      </div>
+    </a>
+    <div class="nav-right">
+      <div class="lang-pill">
+        <button id="lang-en" type="button">EN</button>
+        <button id="lang-zh" type="button">中文</button>
+      </div>
+      <a href="scripts-list-author.html" class="btn btn-outline back-link" id="back-link">← Back</a>
+      <div id="nav-user-menu" class="nav-user-menu">Loading user...</div>
+      <button type="button" class="btn btn-logout" id="logout-btn" onclick="logout()">Log Out</button>
+    </div>
+  </nav>
+
+  <main class="upload-wrapper">
+    <div class="upload-container">
+      <header class="upload-header">
+        <h1 id="page-title">Edit Script</h1>
+        <p id="page-subtitle">Update your script information and save changes.</p>
+      </header>
+
+      <section class="upload-card">
+        <div id="alert-container"></div>
+
+        <form id="edit-form">
+          <div class="form-group">
+            <label for="title" id="label-title">Script Title</label>
+            <input type="text" id="title" name="title" placeholder="Enter your script title" required>
+            <div class="form-error" id="title-error"></div>
+          </div>
+
+          <div class="form-group">
+            <label for="description" id="label-description">Script Description</label>
+            <textarea id="description" name="description" placeholder="Describe your script idea, genre and highlights..." required></textarea>
+            <div class="form-error" id="description-error"></div>
+          </div>
+
+          <div class="form-group">
+            <label for="script-type" id="label-type">Script Type</label>
+            <select id="script-type" name="script_type">
+              <option value="短剧剧本">短剧剧本</option>
+              <option value="电影剧本">电影剧本</option>
+              <option value="小说IP">小说IP</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="price" id="label-price">Price (CNY)</label>
+            <input type="number" id="price" name="price" min="0" step="0.01" placeholder="e.g. 299.00" required>
+            <div class="form-error" id="price-error"></div>
+          </div>
+
+          <div class="form-group">
+            <label id="label-rights">Rights Type</label>
+            <div class="rights-group">
+              <div class="rights-option">
+                <input type="radio" id="rights-buyout" name="rights_type" value="买断" checked>
+                <label for="rights-buyout" id="label-rights-buyout">买断</label>
+              </div>
+              <div class="rights-option">
+                <input type="radio" id="rights-license" name="rights_type" value="授权">
+                <label for="rights-license" id="label-rights-license">授权</label>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="script-file" id="label-file">Replace Script File (.pdf .doc .docx .txt)</label>
+            <input type="file" id="script-file" name="script_file" accept=".pdf,.doc,.docx,.txt">
+            <p class="file-note" id="file-note">Leave empty to keep current file.</p>
+            <div class="form-error" id="file-error"></div>
+          </div>
+
+          <div class="action-row">
+            <button type="submit" class="btn btn-save" id="submit-btn">
+              <span id="btn-text">Save Changes</span>
+              <span id="btn-spinner" class="spinner" style="display: none;"></span>
+            </button>
+            <a href="scripts-list-author.html" class="btn btn-outline btn-cancel" id="cancel-btn">Cancel</a>
+          </div>
+        </form>
+      </section>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    const form = document.getElementById('edit-form');
+    const titleInput = document.getElementById('title');
+    const descriptionInput = document.getElementById('description');
+    const scriptTypeInput = document.getElementById('script-type');
+    const priceInput = document.getElementById('price');
+    const fileInput = document.getElementById('script-file');
+    const submitBtn = document.getElementById('submit-btn');
+    const btnText = document.getElementById('btn-text');
+    const btnSpinner = document.getElementById('btn-spinner');
+    const alertContainer = document.getElementById('alert-container');
+    const navUserMenu = document.getElementById('nav-user-menu');
+    const langEnBtn = document.getElementById('lang-en');
+    const langZhBtn = document.getElementById('lang-zh');
+
+    const scriptId = new URLSearchParams(window.location.search).get('id');
+    let currentUser = null;
+    let currentScript = null;
+    let currentLang = localStorage.getItem('scriptbridge_lang') || 'en';
+    const i18n = {
+      en: {
+        back: '← Back',
+        logout: 'Log Out',
+        pageTitle: 'Edit Script',
+        pageSubtitle: 'Update your script information and save changes.',
+        title: 'Script Title',
+        titlePh: 'Enter your script title',
+        description: 'Script Description',
+        descriptionPh: 'Describe your script idea, genre and highlights...',
+        type: 'Script Type',
+        file: 'Replace Script File (.pdf .doc .docx .txt)',
+        fileNote: 'Leave empty to keep current file.',
+        price: 'Price (CNY)',
+        pricePh: 'e.g. 299.00',
+        rights: 'Rights Type',
+        buyout: 'Buyout',
+        license: 'License',
+        save: 'Save Changes',
+        cancel: 'Cancel',
+        errTitle: 'Title is required',
+        errDescription: 'Description is required',
+        errPrice: 'Please enter a valid price',
+        errNoId: 'Missing script ID.',
+        errNotFound: 'Script not found.',
+        errNoAccess: 'You can only edit your own scripts.',
+        errSignin: 'Please sign in again and try.',
+        uploadFailed: 'File upload failed: ',
+        loadFailed: 'Failed to load script: ',
+        saveSuccess: 'Script updated successfully! Redirecting...',
+        saveFailed: 'Save failed: '
+      },
+      zh: {
+        back: '← 返回',
+        logout: '退出登录',
+        pageTitle: '编辑作品',
+        pageSubtitle: '更新作品信息并保存修改。',
+        title: '作品标题',
+        titlePh: '请输入作品标题',
+        description: '作品简介',
+        descriptionPh: '描述你的故事设定、题材与亮点...',
+        type: '作品类型',
+        file: '替换作品文件（.pdf .doc .docx .txt）',
+        fileNote: '不上传新文件则保留当前文件。',
+        price: '定价（人民币）',
+        pricePh: '例如：299.00',
+        rights: '版权类型',
+        buyout: '买断',
+        license: '授权',
+        save: '保存修改',
+        cancel: '取消',
+        errTitle: '请输入标题',
+        errDescription: '请输入简介',
+        errPrice: '请输入有效价格',
+        errNoId: '缺少作品 ID。',
+        errNotFound: '未找到该作品。',
+        errNoAccess: '只能编辑自己的作品。',
+        errSignin: '请重新登录后重试。',
+        uploadFailed: '文件上传失败：',
+        loadFailed: '加载作品失败：',
+        saveSuccess: '作品更新成功！正在跳转…',
+        saveFailed: '保存失败：'
+      }
+    };
+
+    function t(key) {
+      return i18n[currentLang][key];
+    }
+
+    function setLang(lang) {
+      currentLang = lang === 'zh' ? 'zh' : 'en';
+      document.body.classList.toggle('zh', currentLang === 'zh');
+      document.documentElement.lang = currentLang === 'zh' ? 'zh-CN' : 'en';
+      langEnBtn.classList.toggle('active', currentLang === 'en');
+      langZhBtn.classList.toggle('active', currentLang === 'zh');
+      localStorage.setItem('scriptbridge_lang', currentLang);
+      document.getElementById('back-link').textContent = t('back');
+      document.getElementById('logout-btn').textContent = t('logout');
+      document.getElementById('page-title').textContent = t('pageTitle');
+      document.getElementById('page-subtitle').textContent = t('pageSubtitle');
+      document.getElementById('label-title').textContent = t('title');
+      titleInput.placeholder = t('titlePh');
+      document.getElementById('label-description').textContent = t('description');
+      descriptionInput.placeholder = t('descriptionPh');
+      document.getElementById('label-type').textContent = t('type');
+      document.getElementById('label-file').textContent = t('file');
+      document.getElementById('file-note').textContent = t('fileNote');
+      document.getElementById('label-price').textContent = t('price');
+      priceInput.placeholder = t('pricePh');
+      document.getElementById('label-rights').textContent = t('rights');
+      document.getElementById('label-rights-buyout').textContent = t('buyout');
+      document.getElementById('label-rights-license').textContent = t('license');
+      document.getElementById('btn-text').textContent = t('save');
+      document.getElementById('cancel-btn').textContent = t('cancel');
+    }
+
+    function showAlert(message, type) {
+      alertContainer.innerHTML = '<div class="alert alert-' + type + '">' + message + '</div>';
+      window.scrollTo(0, 0);
+    }
+
+    function clearErrors() {
+      document.getElementById('title-error').textContent = '';
+      document.getElementById('description-error').textContent = '';
+      document.getElementById('price-error').textContent = '';
+      document.getElementById('file-error').textContent = '';
+    }
+
+    function validateForm() {
+      clearErrors();
+      let isValid = true;
+      if (!titleInput.value.trim()) {
+        document.getElementById('title-error').textContent = t('errTitle');
+        isValid = false;
+      }
+      if (!descriptionInput.value.trim()) {
+        document.getElementById('description-error').textContent = t('errDescription');
+        isValid = false;
+      }
+      if (!priceInput.value || Number(priceInput.value) < 0) {
+        document.getElementById('price-error').textContent = t('errPrice');
+        isValid = false;
+      }
+      return isValid;
+    }
+
+    function setSubmitting(isSubmitting) {
+      submitBtn.disabled = isSubmitting;
+      btnText.style.display = isSubmitting ? 'none' : 'inline';
+      btnSpinner.style.display = isSubmitting ? 'inline-block' : 'none';
+    }
+
+    async function uploadFileToStorage(file, userId) {
+      const ext = file.name.split('.').pop().toLowerCase();
+      const filePath = userId + '/' + Date.now() + '-' + Math.random().toString(36).slice(2, 8) + '.' + ext;
+      const { data, error } = await window.supabase_client.storage
+        .from('scripts-files')
+        .upload(filePath, file, { upsert: false });
+      if (error) throw new Error(t('uploadFailed') + error.message);
+
+      const { data: publicData } = window.supabase_client.storage
+        .from('scripts-files')
+        .getPublicUrl(data.path);
+      return publicData.publicUrl || data.path;
+    }
+
+    function extractStoragePath(fileUrl) {
+      if (!fileUrl) return null;
+      const marker = '/storage/v1/object/public/scripts-files/';
+      const idx = fileUrl.indexOf(marker);
+      if (idx === -1) return null;
+      return decodeURIComponent(fileUrl.slice(idx + marker.length));
+    }
+
+    async function loadScriptDetail() {
+      if (!scriptId) {
+        showAlert(t('errNoId'), 'error');
+        setTimeout(() => { window.location.href = 'scripts-list-author.html'; }, 1200);
+        return;
+      }
+      const { data, error } = await window.supabase_client
+        .from('scripts')
+        .select('*')
+        .eq('id', scriptId)
+        .maybeSingle();
+      if (error) throw error;
+      if (!data) {
+        showAlert(t('errNotFound'), 'error');
+        setTimeout(() => { window.location.href = 'scripts-list-author.html'; }, 1200);
+        return;
+      }
+      if (String(data.user_id) !== String(currentUser.id)) {
+        showAlert(t('errNoAccess'), 'error');
+        setTimeout(() => { window.location.href = 'dashboard.html'; }, 1200);
+        return;
+      }
+      currentScript = data;
+      titleInput.value = data.title || '';
+      descriptionInput.value = data.description || '';
+      scriptTypeInput.value = data.script_type || '短剧剧本';
+      priceInput.value = Number(data.price || 0);
+      const rightsValue = data.rights_type || '买断';
+      const rightsEl = document.querySelector('input[name="rights_type"][value="' + rightsValue + '"]');
+      if (rightsEl) rightsEl.checked = true;
+    }
+
+    async function initPage() {
+      try {
+        setLang(currentLang);
+        const session = await requireAuth();
+        if (!session) return;
+        currentUser = await getCurrentUser();
+        if (!currentUser) {
+          window.location.href = 'login.html';
+          return;
+        }
+        navUserMenu.textContent = currentUser.email || currentUser.id;
+        await loadScriptDetail();
+      } catch (error) {
+        showAlert(t('loadFailed') + error.message, 'error');
+      }
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!currentUser || !currentScript) {
+        showAlert(t('errSignin'), 'error');
+        return;
+      }
+      if (!validateForm()) return;
+      setSubmitting(true);
+      try {
+        const updatePayload = {
+          title: titleInput.value.trim(),
+          description: descriptionInput.value.trim(),
+          script_type: scriptTypeInput.value,
+          price: Number(priceInput.value),
+          rights_type: document.querySelector('input[name="rights_type"]:checked').value
+        };
+
+        if (fileInput.files.length) {
+          const newFile = fileInput.files[0];
+          const newFileUrl = await uploadFileToStorage(newFile, currentUser.id);
+          updatePayload.file_url = newFileUrl;
+        }
+
+        const { error } = await window.supabase_client
+          .from('scripts')
+          .update(updatePayload)
+          .eq('id', scriptId)
+          .eq('user_id', currentUser.id);
+        if (error) throw error;
+
+        if (updatePayload.file_url && currentScript.file_url) {
+          const oldPath = extractStoragePath(currentScript.file_url);
+          if (oldPath) {
+            await window.supabase_client.storage.from('scripts-files').remove([oldPath]);
+          }
+        }
+
+        showAlert(t('saveSuccess'), 'success');
+        setTimeout(() => {
+          window.location.href = 'scripts-list-author.html';
+        }, 1400);
+      } catch (error) {
+        showAlert(t('saveFailed') + error.message, 'error');
+        setSubmitting(false);
+      }
+    });
+
+    window.addEventListener('DOMContentLoaded', initPage);
+    langEnBtn.addEventListener('click', () => setLang('en'));
+    langZhBtn.addEventListener('click', () => setLang('zh'));
+  </script>
+</body>
+</html>

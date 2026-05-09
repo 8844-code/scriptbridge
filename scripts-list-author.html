@@ -400,7 +400,6 @@
         close: 'Close',
         untitled: 'Untitled',
         noDesc: 'No description.',
-        disabled: 'Edit feature is temporarily disabled.',
         loadFailed: 'Failed to load scripts: ',
         unableLoad: 'Unable to load data.',
         confirmDelete: 'Delete "{title}"? This action cannot be undone.',
@@ -428,7 +427,6 @@
         close: '关闭',
         untitled: '未命名',
         noDesc: '暂无描述。',
-        disabled: '编辑功能暂未开放。',
         loadFailed: '加载失败：',
         unableLoad: '无法加载数据。',
         confirmDelete: '确认删除”{title}”？此操作不可撤销。',
@@ -496,7 +494,7 @@
           '<td>' +
             '<div class="action-buttons">' +
               '<button class="btn btn-outline btn-sm" onclick="openPreview(\'' + item.id + '\')">' + t('preview') + '</button>' +
-              '<button class="btn btn-outline btn-sm btn-disabled" onclick="showEditDisabled(event)">' + t('edit') + '</button>' +
+              '<a href="script-edit.html?id=' + item.id + '" class="btn btn-outline btn-sm">' + t('edit') + '</a>' +
               '<button class="btn btn-danger btn-sm" onclick="deleteScript(\'' + item.id + '\')">' + t('del') + '</button>' +
             '</div>' +
           '</td>' +
@@ -556,11 +554,6 @@
       }
     }
 
-    function showEditDisabled(event) {
-      event.preventDefault();
-      showAlert(t('disabled'), 'error');
-    }
-
     function openPreview(scriptId) {
       const item = scriptsData.find((script) => String(script.id) === String(scriptId));
       if (!item) return;
@@ -617,7 +610,6 @@
     });
 
     window.openPreview = openPreview;
-    window.showEditDisabled = showEditDisabled;
     window.deleteScript = deleteScript;
 
     window.addEventListener('DOMContentLoaded', initPage);
