@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Terms of Service — ScriptBridge</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23FF4D2E'/%3E%3Ctext x='16' y='23' font-family='Georgia,serif' font-size='20' font-weight='700' fill='white' text-anchor='middle'%3ES%3C/text%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Fraunces:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/common.css">
+  <script src="js/theme.js" defer></script>
+  <script src="js/nav-mobile.js" defer></script>
+</head>
+<body>
+  <nav>
+    <a href="index.html" class="nav-logo">
+      <div class="nav-logo-mark">S</div>
+      <div><div class="nav-logo-text">ScriptBridge</div></div>
+    </a>
+    <div class="nav-right">
+      <a href="index.html" class="btn btn-outline en-only">Back Home</a>
+      <a href="index.html" class="btn btn-outline zh-only">返回首页</a>
+    </div>
+  </nav>
+
+  <article style="max-width:760px;margin:0 auto;padding:100px 40px 80px;line-height:1.8;">
+
+    <h1 style="font-family:'Fraunces',serif;font-size:36px;margin-bottom:8px;">
+      <span class="en-only">Terms of Service</span>
+      <span class="zh-only">服务条款</span>
+    </h1>
+    <p style="color:var(--muted);font-size:14px;margin-bottom:40px;">
+      <span class="en-only">Last updated: May 2026 · This is a draft for MVP stage and has not been reviewed by legal counsel.</span>
+      <span class="zh-only">最后更新：2026年5月 · 本文档为MVP阶段草稿，尚未经过专业法律审查。</span>
+    </p>
+
+    <h2 class="en-only">1. Platform Nature</h2>
+    <h2 class="zh-only">1. 平台性质</h2>
+    <p class="en-only">ScriptBridge is an information platform that connects script creators and buyers. We facilitate copyright transactions but are not a party to any transaction between users.</p>
+    <p class="zh-only">ScriptBridge 是一个连接剧本创作者与买家的信息撮合平台。平台为用户之间的版权交易提供技术支持，但不作为任何交易的当事方。</p>
+
+    <h2 class="en-only">2. User Registration</h2>
+    <h2 class="zh-only">2. 用户注册</h2>
+    <p class="en-only">You must provide accurate information when registering. You are responsible for keeping your account credentials secure. Each user may only register one account.</p>
+    <p class="zh-only">注册时须提供真实有效的信息。用户须自行妥善保管账号密码。每位用户仅可注册一个账号。</p>
+
+    <h2 class="en-only">3. Creator Responsibilities</h2>
+    <h2 class="zh-only">3. 创作者责任</h2>
+    <p class="en-only">By uploading content, you confirm that: (a) you are the original author or hold the rights to distribute the work; (b) the content does not infringe any third party's intellectual property; (c) you take full legal responsibility for any copyright disputes arising from your uploads.</p>
+    <p class="zh-only">上传作品即表示你确认：(a) 你是作品原创作者或拥有合法的版权授权；(b) 作品内容不侵犯任何第三方知识产权；(c) 因你上传的内容引发的任何版权纠纷，由你承担全部法律责任。</p>
+
+    <h2 class="en-only">4. Platform Disclaimer</h2>
+    <h2 class="zh-only">4. 平台免责声明</h2>
+    <p class="en-only">ScriptBridge does not verify the originality or legal status of uploaded works. We are not liable for disputes between users. The platform reserves the right to remove content that violates these terms.</p>
+    <p class="zh-only">ScriptBridge 不对上传作品的原创性或版权状态进行核实。平台不对用户之间产生的纠纷承担责任。平台保留删除违规内容的权利。</p>
+
+    <h2 class="en-only">5. Prohibited Activities</h2>
+    <h2 class="zh-only">5. 禁止行为</h2>
+    <p class="en-only">Users must not: upload plagiarized or infringing content; impersonate others; attempt to circumvent platform fees; harass other users.</p>
+    <p class="zh-only">用户不得：上传抄袭或侵权内容；冒充他人身份；绕过平台收费机制；骚扰其他用户。</p>
+
+    <h2 class="en-only">6. Changes to Terms</h2>
+    <h2 class="zh-only">6. 条款变更</h2>
+    <p class="en-only">We may update these terms at any time. Continued use of the platform after changes constitutes acceptance of the new terms.</p>
+    <p class="zh-only">平台可随时更新本条款。继续使用平台视为接受更新后的条款。</p>
+
+    <h2 class="en-only">7. Contact</h2>
+    <h2 class="zh-only">7. 联系方式</h2>
+    <p>
+      <span class="en-only">For questions about these terms, contact us at </span>
+      <span class="zh-only">如对本条款有疑问，请联系 </span>
+      <a href="mailto:qtian904@gmail.com">qtian904@gmail.com</a>
+    </p>
+
+  </article>
+
+  <script>
+    (function initLang() {
+      const lang = localStorage.getItem('scriptbridge_lang') || 'en';
+      document.body.classList.toggle('zh', lang === 'zh');
+      document.documentElement.lang = lang === 'zh' ? 'zh-CN' : 'en';
+    })();
+  </script>
+</body>
+</html>

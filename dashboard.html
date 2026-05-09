@@ -139,6 +139,18 @@
       letter-spacing: 0.05em;
     }
 
+    .profile-label-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 6px;
+    }
+
+    .profile-label-row label {
+      margin-bottom: 0;
+    }
+
     .profile-field p {
       font-size: 16px;
       color: var(--ink);
@@ -301,7 +313,13 @@
             <p id="profile-role">—</p>
           </div>
           <div class="profile-field">
-            <label id="profile-label-bio">Bio</label>
+            <div class="profile-label-row">
+              <label id="profile-label-bio">Bio</label>
+              <a href="profile-edit.html" class="btn btn-outline" style="font-size:13px;padding:6px 14px;">
+                <span class="en-only">Edit Profile</span>
+                <span class="zh-only">编辑资料</span>
+              </a>
+            </div>
             <p id="profile-bio">—</p>
           </div>
           <div class="profile-field">

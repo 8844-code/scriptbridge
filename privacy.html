@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Privacy Policy — ScriptBridge</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23FF4D2E'/%3E%3Ctext x='16' y='23' font-family='Georgia,serif' font-size='20' font-weight='700' fill='white' text-anchor='middle'%3ES%3C/text%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Fraunces:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/common.css">
+  <script src="js/theme.js" defer></script>
+  <script src="js/nav-mobile.js" defer></script>
+</head>
+<body>
+  <nav>
+    <a href="index.html" class="nav-logo">
+      <div class="nav-logo-mark">S</div>
+      <div><div class="nav-logo-text">ScriptBridge</div></div>
+    </a>
+    <div class="nav-right">
+      <a href="index.html" class="btn btn-outline en-only">Back Home</a>
+      <a href="index.html" class="btn btn-outline zh-only">返回首页</a>
+    </div>
+  </nav>
+
+  <article style="max-width:760px;margin:0 auto;padding:100px 40px 80px;line-height:1.8;">
+
+    <h1 style="font-family:'Fraunces',serif;font-size:36px;margin-bottom:8px;">
+      <span class="en-only">Privacy Policy</span>
+      <span class="zh-only">隐私政策</span>
+    </h1>
+    <p style="color:var(--muted);font-size:14px;margin-bottom:40px;">
+      <span class="en-only">Last updated: May 2026</span>
+      <span class="zh-only">最后更新：2026年5月</span>
+    </p>
+
+    <h2 class="en-only">1. Information We Collect</h2>
+    <h2 class="zh-only">1. 我们收集的信息</h2>
+    <p class="en-only">We collect: your email address (for registration and login); your display name and bio (optional, set by you); content you upload (scripts and associated files); usage data such as login times.</p>
+    <p class="zh-only">我们收集：你的邮箱地址（用于注册和登录）；你设置的显示名称和简介（可选）；你上传的内容（作品文件及相关信息）；使用数据（如登录时间）。</p>
+
+    <h2 class="en-only">2. How We Use Your Information</h2>
+    <h2 class="zh-only">2. 信息用途</h2>
+    <p class="en-only">Your information is used to: provide and maintain platform services; enable communication between creators and buyers; send important platform notifications (no marketing spam).</p>
+    <p class="zh-only">你的信息用于：提供和维护平台服务；促成创作者与买家之间的联系；发送重要平台通知（不发送垃圾营销邮件）。</p>
+
+    <h2 class="en-only">3. Data Sharing</h2>
+    <h2 class="zh-only">3. 数据共享</h2>
+    <p class="en-only">We do not sell your personal data. Your email is only visible to platform administrators. Your display name is shown publicly on your uploaded works.</p>
+    <p class="zh-only">我们不出售你的个人信息。你的邮箱仅平台管理员可见。你的显示名称会在你上传的作品页面公开显示。</p>
+
+    <h2 class="en-only">4. Data Storage</h2>
+    <h2 class="zh-only">4. 数据存储</h2>
+    <p class="en-only">Your data is stored securely via Supabase (supabase.com). Uploaded files are stored in Supabase Storage. We apply reasonable security measures to protect your data.</p>
+    <p class="zh-only">你的数据通过 Supabase（supabase.com）安全存储。上传的文件存储在 Supabase Storage 中。我们采取合理的安全措施保护你的数据。</p>
+
+    <h2 class="en-only">5. Your Rights</h2>
+    <h2 class="zh-only">5. 你的权利</h2>
+    <p class="en-only">You may request deletion of your account and associated data at any time by contacting us. You can update your profile information from your dashboard.</p>
+    <p class="zh-only">你可随时联系我们申请删除账号及相关数据。你可在个人主页中自行更新资料信息。</p>
+
+    <h2 class="en-only">6. Contact</h2>
+    <h2 class="zh-only">6. 联系方式</h2>
+    <p>
+      <span class="en-only">Privacy questions: </span>
+      <span class="zh-only">隐私相关问题：</span>
+      <a href="mailto:qtian904@gmail.com">qtian904@gmail.com</a>
+    </p>
+
+  </article>
+
+  <script>
+    (function initLang() {
+      const lang = localStorage.getItem('scriptbridge_lang') || 'en';
+      document.body.classList.toggle('zh', lang === 'zh');
+      document.documentElement.lang = lang === 'zh' ? 'zh-CN' : 'en';
+    })();
+  </script>
+</body>
+</html>
