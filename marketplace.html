@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Browse Scripts — ScriptBridge</title>
+  <title>Browse Marketplace — ScriptBridge</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23FF4D2E'/%3E%3Ctext x='16' y='23' font-family='Georgia,serif' font-size='20' font-weight='700' fill='white' text-anchor='middle'%3ES%3C/text%3E%3C/svg%3E">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -107,6 +107,10 @@
       gap: 10px;
     }
 
+    .script-card--clickable {
+      cursor: pointer;
+    }
+
     .script-card:hover {
       border-color: var(--coral);
       transform: translateY(-2px);
@@ -155,24 +159,11 @@
       color: var(--muted);
     }
 
-    .nav-user-menu {
-      color: var(--muted);
-      font-size: 14px;
-      font-weight: 500;
-      background: rgba(255, 255, 255, 0.55);
-      border: 1px solid var(--border);
-      border-radius: var(--r-pill);
-      padding: 8px 14px;
-      max-width: 240px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .back-link {
-      display: inline-flex;
+    #nav-auth-slot {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
       align-items: center;
-      gap: 6px;
     }
 
     .empty-state {
@@ -208,16 +199,12 @@
       .browse-header h1 {
         font-size: 28px;
       }
-
-      .nav-user-menu {
-        display: none;
-      }
     }
   </style>
 </head>
 <body>
   <nav>
-    <a href="dashboard.html" class="nav-logo">
+    <a href="index.html" class="nav-logo">
       <div class="nav-logo-mark">S</div>
       <div>
         <div class="nav-logo-text">ScriptBridge</div>
@@ -228,17 +215,19 @@
         <button id="lang-en" type="button">EN</button>
         <button id="lang-zh" type="button">中文</button>
       </div>
-      <a href="dashboard.html" class="btn btn-outline back-link" id="back-link">← Back</a>
-      <div id="nav-user-menu" class="nav-user-menu">Loading user...</div>
-      <button type="button" class="btn btn-logout" id="logout-btn" onclick="logout()">Log Out</button>
+      <a href="index.html" class="btn btn-outline" id="home-link">
+        <span class="en-only">Home</span>
+        <span class="zh-only">首页</span>
+      </a>
+      <div id="nav-auth-slot"></div>
     </div>
   </nav>
 
   <main class="browse-wrapper">
     <div class="browse-container">
       <header class="browse-header">
-        <h1 id="page-title">Browse Scripts</h1>
-        <p id="page-subtitle">Find stories and IP from creators.</p>
+        <h1 id="page-title">Browse Marketplace</h1>
+        <p id="page-subtitle">Discover published scripts. Sign in to view full details.</p>
       </header>
 
       <section class="filters-card">
@@ -266,16 +255,14 @@
       </div>
 
       <section id="scripts-grid" class="scripts-grid" style="display: none;"></section>
-      <section id="empty-state" class="empty-state" style="display: none;">No scripts found</section>
+      <section id="empty-state" class="empty-state" style="display: none;"></section>
     </div>
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase-client.js"></script>
-  <script src="js/auth.js"></script>
 
   <script>
-    const navUserMenu = document.getElementById('nav-user-menu');
     const searchInput = document.getElementById('search-input');
     const typeFilter = document.getElementById('type-filter');
     const sortSelect = document.getElementById('sort-select');
@@ -286,17 +273,16 @@
     const emptyState = document.getElementById('empty-state');
     const langEnBtn = document.getElementById('lang-en');
     const langZhBtn = document.getElementById('lang-zh');
+    const navAuthSlot = document.getElementById('nav-auth-slot');
 
-    let currentUser = null;
+    window._isLoggedIn = false;
     let allScripts = [];
     let authorMap = {};
     let currentLang = localStorage.getItem('scriptbridge_lang') || 'en';
     const i18n = {
       en: {
-        back: '← Back',
-        logout: 'Log Out',
-        pageTitle: 'Browse Scripts',
-        pageSubtitle: 'Find stories and IP from creators.',
+        pageTitle: 'Browse Marketplace',
+        pageSubtitle: 'Discover published scripts. Sign in to view full details.',
         searchPh: 'Search by script title...',
         typeAll: 'All Types',
         sortLatest: 'Latest',
@@ -305,18 +291,18 @@
         priceMinPh: 'Min price',
         priceMaxPh: 'Max price',
         loading: 'Loading scripts...',
-        empty: 'No scripts found',
+        empty: 'No scripts match your filters.',
+        emptyMarket: 'No scripts available yet. Check back soon.',
         unknownAuthor: 'Unknown author',
         untitled: 'Untitled Script',
         by: 'By ',
         uploaded: 'Uploaded: ',
-        failed: 'Failed to load scripts: '
+        failed: 'Failed to load scripts: ',
+        loginPrompt: 'Please sign in to view script details. Go to sign in?'
       },
       zh: {
-        back: '← 返回',
-        logout: '退出登录',
-        pageTitle: '浏览作品',
-        pageSubtitle: '发现创作者发布的剧本与 IP。',
+        pageTitle: '浏览市场',
+        pageSubtitle: '浏览已上架作品，登录后可查看详情。',
         searchPh: '按标题搜索作品...',
         typeAll: '全部类型',
         sortLatest: '最新发布',
@@ -325,17 +311,33 @@
         priceMinPh: '最低价',
         priceMaxPh: '最高价',
         loading: '正在加载中...',
-        empty: '暂无作品',
+        empty: '没有符合筛选条件的作品。',
+        emptyMarket: '暂无上架作品，敬请期待。',
         unknownAuthor: '未知作者',
         untitled: '未命名作品',
         by: '作者：',
         uploaded: '上传时间：',
-        failed: '加载失败：'
+        failed: '加载失败：',
+        loginPrompt: '查看作品详情需要先登录。是否前往登录？'
       }
     };
 
     function t(key) {
       return i18n[currentLang][key];
+    }
+
+    function updateNavAuth() {
+      if (window._isLoggedIn) {
+        navAuthSlot.innerHTML =
+          '<a href="dashboard.html" class="btn btn-outline en-only">Dashboard</a>' +
+          '<a href="dashboard.html" class="btn btn-outline zh-only">个人主页</a>';
+      } else {
+        navAuthSlot.innerHTML =
+          '<a href="login.html" class="btn btn-outline en-only">Sign In</a>' +
+          '<a href="login.html" class="btn btn-outline zh-only">登录</a>' +
+          '<a href="signup.html" class="btn btn-primary en-only">Create Account</a>' +
+          '<a href="signup.html" class="btn btn-primary zh-only">注册</a>';
+      }
     }
 
     function setLang(lang) {
@@ -345,8 +347,7 @@
       langEnBtn.classList.toggle('active', currentLang === 'en');
       langZhBtn.classList.toggle('active', currentLang === 'zh');
       localStorage.setItem('scriptbridge_lang', currentLang);
-      document.getElementById('back-link').textContent = t('back');
-      document.getElementById('logout-btn').textContent = t('logout');
+      document.title = currentLang === 'zh' ? '浏览市场 — ScriptBridge' : 'Browse Marketplace — ScriptBridge';
       document.getElementById('page-title').textContent = t('pageTitle');
       document.getElementById('page-subtitle').textContent = t('pageSubtitle');
       searchInput.placeholder = t('searchPh');
@@ -357,7 +358,8 @@
       priceMinInput.placeholder = t('priceMinPh');
       priceMaxInput.placeholder = t('priceMaxPh');
       document.getElementById('loading-text').textContent = t('loading');
-      emptyState.textContent = t('empty');
+      updateNavAuth();
+      if (allScripts.length) applyFilters();
     }
 
     function formatDate(isoString) {
@@ -438,17 +440,28 @@
       renderScripts(list);
     }
 
+    function setEmptyStateMessage(noPublished) {
+      if (noPublished) {
+        emptyState.innerHTML =
+          '<span class="en-only">' + escapeHtml(i18n.en.emptyMarket) + '</span>' +
+          '<span class="zh-only">' + escapeHtml(i18n.zh.emptyMarket) + '</span>';
+      } else {
+        emptyState.textContent = t('empty');
+      }
+    }
+
     function renderScripts(list) {
       if (!list.length) {
         scriptsGrid.style.display = 'none';
         emptyState.style.display = 'block';
+        setEmptyStateMessage(!allScripts.length);
         return;
       }
 
       const html = list.map((item) => {
         const author = authorMap[item.user_id] || t('unknownAuthor');
         return (
-          '<a class="script-card" href="script-detail.html?id=' + encodeURIComponent(item.id) + '">' +
+          '<div class="script-card script-card--clickable" tabindex="0" role="link" data-script-id="' + escapeHtml(item.id) + '">' +
             '<div class="script-card-title">' + escapeHtml(item.title || t('untitled')) + '</div>' +
             '<div class="script-card-author">' + t('by') + escapeHtml(author) + '</div>' +
             '<div class="script-card-row">' +
@@ -456,7 +469,7 @@
               '<span class="script-price">' + formatPrice(item.price) + '</span>' +
             '</div>' +
             '<div class="script-date">' + t('uploaded') + formatDate(item.created_at) + '</div>' +
-          '</a>'
+          '</div>'
         );
       }).join('');
 
@@ -465,21 +478,25 @@
       emptyState.style.display = 'none';
     }
 
+    function openCardFromEvent(e) {
+      const card = e.target.closest('.script-card');
+      if (!card) return;
+      const id = card.getAttribute('data-script-id');
+      if (!id) return;
+      if (!window._isLoggedIn) {
+        if (window.confirm(t('loginPrompt'))) {
+          window.location.href = 'login.html';
+        }
+        return;
+      }
+      window.location.href = 'script-detail.html?id=' + encodeURIComponent(id);
+    }
+
     async function initPage() {
       try {
+        const { data: { session } } = await window.supabase_client.auth.getSession();
+        window._isLoggedIn = !!(session && session.user);
         setLang(currentLang);
-
-        const session = await requireAuth();
-        if (!session) return;
-
-        currentUser = await getCurrentUser();
-        if (!currentUser) {
-          window.location.href = 'login.html';
-          return;
-        }
-
-        navUserMenu.textContent = currentUser.email || currentUser.id;
-
         await loadScripts();
         loadingState.style.display = 'none';
         applyFilters();
@@ -487,6 +504,23 @@
         loadingState.innerHTML = t('failed') + escapeHtml(error.message);
       }
     }
+
+    scriptsGrid.addEventListener('click', openCardFromEvent);
+    scriptsGrid.addEventListener('keydown', (e) => {
+      if (e.key !== 'Enter' && e.key !== ' ') return;
+      const card = e.target.closest('.script-card');
+      if (!card) return;
+      e.preventDefault();
+      const id = card.getAttribute('data-script-id');
+      if (!id) return;
+      if (!window._isLoggedIn) {
+        if (window.confirm(t('loginPrompt'))) {
+          window.location.href = 'login.html';
+        }
+        return;
+      }
+      window.location.href = 'script-detail.html?id=' + encodeURIComponent(id);
+    });
 
     searchInput.addEventListener('input', applyFilters);
     typeFilter.addEventListener('change', applyFilters);

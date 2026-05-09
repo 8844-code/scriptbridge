@@ -77,7 +77,7 @@
     .scripts-table {
       width: 100%;
       border-collapse: collapse;
-      min-width: 760px;
+      min-width: 880px;
     }
 
     .scripts-table th,
@@ -271,7 +271,7 @@
       }
 
       .scripts-table {
-        min-width: 680px;
+        min-width: 820px;
       }
 
       .nav-user-menu {
@@ -319,13 +319,14 @@
                 <th id="th-title">Title</th>
                 <th id="th-type">Type</th>
                 <th id="th-price">Price</th>
+                <th id="th-status">Status</th>
                 <th id="th-uploaded">Uploaded At</th>
                 <th id="th-actions">Actions</th>
               </tr>
             </thead>
             <tbody id="scripts-table-body">
               <tr>
-                <td colspan="5" class="loading-row">
+                <td colspan="6" class="loading-row">
                   <span class="spinner" style="vertical-align: middle;"></span>
                   <span style="margin-left: 8px;" id="loading-text">Loading scripts...</span>
                 </td>
@@ -388,6 +389,7 @@
         thTitle: 'Title',
         thType: 'Type',
         thPrice: 'Price',
+        thStatus: 'Status',
         thUploaded: 'Uploaded At',
         thActions: 'Actions',
         loading: 'Loading scripts...',
@@ -404,7 +406,15 @@
         unableLoad: 'Unable to load data.',
         confirmDelete: 'Delete "{title}"? This action cannot be undone.',
         deleteSuccess: 'Script deleted successfully.',
-        deleteFailed: 'Delete failed: '
+        deleteFailed: 'Delete failed: ',
+        unpublish: 'Unpublish',
+        publish: 'Publish',
+        confirmUnpublish: 'Confirm unpublish?',
+        confirmPublish: 'Confirm publish?',
+        toggleOk: 'Done!',
+        toggleFailed: 'Failed: ',
+        live: 'Live',
+        draft: 'Draft'
       },
       zh: {
         back: '← 返回',
@@ -415,6 +425,7 @@
         thTitle: '标题',
         thType: '类型',
         thPrice: '价格',
+        thStatus: '状态',
         thUploaded: '上传日期',
         thActions: '操作',
         loading: '正在加载中...',
@@ -431,7 +442,15 @@
         unableLoad: '无法加载数据。',
         confirmDelete: '确认删除”{title}”？此操作不可撤销。',
         deleteSuccess: '删除成功。',
-        deleteFailed: '删除失败：'
+        deleteFailed: '删除失败：',
+        unpublish: '下架',
+        publish: '上架',
+        confirmUnpublish: '确认下架？',
+        confirmPublish: '确认上架？',
+        toggleOk: '操作成功',
+        toggleFailed: '操作失败：',
+        live: '已上架',
+        draft: '草稿'
       }
     };
 
@@ -454,6 +473,7 @@
       document.getElementById('th-title').textContent = t('thTitle');
       document.getElementById('th-type').textContent = t('thType');
       document.getElementById('th-price').textContent = t('thPrice');
+      document.getElementById('th-status').textContent = t('thStatus');
       document.getElementById('th-uploaded').textContent = t('thUploaded');
       document.getElementById('th-actions').textContent = t('thActions');
       document.getElementById('loading-text').textContent = t('loading');
@@ -462,6 +482,7 @@
       document.getElementById('empty-upload-btn').textContent = t('uploadBtn');
       previewFileLink.textContent = t('openFile');
       closePreviewBtn.textContent = t('close');
+      if (scriptsData.length) renderTableRows(scriptsData);
     }
 
     function showAlert(message, type) {
@@ -486,13 +507,22 @@
     function renderTableRows(items) {
       const rowsHtml = items.map((item) => {
         const safeTitle = (item.title || '').replace(/"/g, '&quot;');
+        const isPublished = item.status === 'published';
+        const statusBadge = isPublished
+          ? '<span style="color:var(--sage);font-size:12px;font-weight:600;">● ' + t('live') + '</span>'
+          : '<span style="color:var(--muted);font-size:12px;font-weight:600;">○ ' + t('draft') + '</span>';
+        const toggleBtn = isPublished
+          ? '<button type="button" class="btn btn-outline btn-sm" onclick="toggleStatus(\'' + item.id + '\',\'draft\')">' + t('unpublish') + '</button>'
+          : '<button type="button" class="btn btn-primary btn-sm" onclick="toggleStatus(\'' + item.id + '\',\'published\')">' + t('publish') + '</button>';
         return '<tr>' +
           '<td><div class="script-title" title="' + safeTitle + '">' + (item.title || t('untitled')) + '</div></td>' +
           '<td>' + (item.script_type || '—') + '</td>' +
           '<td><span class="price-pill">' + formatPrice(item.price) + '</span></td>' +
+          '<td>' + statusBadge + '</td>' +
           '<td>' + formatDate(item.created_at) + '</td>' +
           '<td>' +
             '<div class="action-buttons">' +
+              toggleBtn +
               '<button class="btn btn-outline btn-sm" onclick="openPreview(\'' + item.id + '\')">' + t('preview') + '</button>' +
               '<a href="script-edit.html?id=' + item.id + '" class="btn btn-outline btn-sm">' + t('edit') + '</a>' +
               '<button class="btn btn-danger btn-sm" onclick="deleteScript(\'' + item.id + '\')">' + t('del') + '</button>' +
@@ -517,7 +547,7 @@
     async function loadScripts() {
       const { data, error } = await window.supabase_client
         .from('scripts')
-        .select('*')
+        .select('id, title, script_type, price, created_at, status, description, file_url')
         .eq('user_id', currentUser.id)
         .order('created_at', { ascending: false });
 
@@ -550,7 +580,7 @@
         await loadScripts();
       } catch (error) {
         showAlert(t('loadFailed') + error.message, 'error');
-        tableBody.innerHTML = '<tr><td colspan="5" class="loading-row">' + t('unableLoad') + '</td></tr>';
+        tableBody.innerHTML = '<tr><td colspan="6" class="loading-row">' + t('unableLoad') + '</td></tr>';
       }
     }
 
@@ -569,6 +599,24 @@
 
     function closePreview() {
       previewModal.classList.remove('show');
+    }
+
+    async function toggleStatus(scriptId, newStatus) {
+      const confirmed = window.confirm(newStatus === 'published' ? t('confirmPublish') : t('confirmUnpublish'));
+      if (!confirmed) return;
+
+      const { error } = await window.supabase_client
+        .from('scripts')
+        .update({ status: newStatus })
+        .eq('id', scriptId)
+        .eq('user_id', currentUser.id);
+
+      if (error) {
+        showAlert(t('toggleFailed') + error.message, 'error');
+      } else {
+        showAlert(t('toggleOk'), 'success');
+        setTimeout(() => loadScripts(), 800);
+      }
     }
 
     async function deleteScript(scriptId) {
@@ -611,6 +659,7 @@
 
     window.openPreview = openPreview;
     window.deleteScript = deleteScript;
+    window.toggleStatus = toggleStatus;
 
     window.addEventListener('DOMContentLoaded', initPage);
     langEnBtn.addEventListener('click', () => setLang('en'));

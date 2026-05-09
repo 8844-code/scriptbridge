@@ -265,6 +265,29 @@
           </div>
 
           <div class="form-group">
+            <label id="label-visibility">
+              <span class="en-only">Visibility</span>
+              <span class="zh-only">可见性</span>
+            </label>
+            <div class="rights-group" style="margin-top: 8px;">
+              <div class="rights-option">
+                <input type="radio" id="vis-published" name="visibility" value="published" checked>
+                <label for="vis-published">
+                  <span class="en-only">Public — visible in marketplace</span>
+                  <span class="zh-only">公开 — 在市场中可见</span>
+                </label>
+              </div>
+              <div class="rights-option">
+                <input type="radio" id="vis-draft" name="visibility" value="draft">
+                <label for="vis-draft">
+                  <span class="en-only">Draft — only visible to me</span>
+                  <span class="zh-only">草稿 — 仅自己可见</span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
             <label id="label-rights">Rights Type</label>
             <div class="rights-group">
               <div class="rights-option">
@@ -334,6 +357,7 @@
         fileNote: 'Leave empty to keep current file.',
         price: 'Price (CNY)',
         pricePh: 'e.g. 299.00',
+        visibility: 'Visibility',
         rights: 'Rights Type',
         buyout: 'Buyout',
         license: 'License',
@@ -365,6 +389,7 @@
         fileNote: '不上传新文件则保留当前文件。',
         price: '定价（人民币）',
         pricePh: '例如：299.00',
+        visibility: '可见性',
         rights: '版权类型',
         buyout: '买断',
         license: '授权',
@@ -408,6 +433,8 @@
       document.getElementById('file-note').textContent = t('fileNote');
       document.getElementById('label-price').textContent = t('price');
       priceInput.placeholder = t('pricePh');
+      document.querySelector('#label-visibility .en-only').textContent = i18n.en.visibility;
+      document.querySelector('#label-visibility .zh-only').textContent = i18n.zh.visibility;
       document.getElementById('label-rights').textContent = t('rights');
       document.getElementById('label-rights-buyout').textContent = t('buyout');
       document.getElementById('label-rights-license').textContent = t('license');
@@ -503,6 +530,9 @@
       const rightsValue = data.rights_type || '买断';
       const rightsEl = document.querySelector('input[name="rights_type"][value="' + rightsValue + '"]');
       if (rightsEl) rightsEl.checked = true;
+      const vis = (data.status === 'draft') ? 'draft' : 'published';
+      const visEl = document.querySelector('input[name="visibility"][value="' + vis + '"]');
+      if (visEl) visEl.checked = true;
     }
 
     async function initPage() {
@@ -536,7 +566,8 @@
           description: descriptionInput.value.trim(),
           script_type: scriptTypeInput.value,
           price: Number(priceInput.value),
-          rights_type: document.querySelector('input[name="rights_type"]:checked').value
+          rights_type: document.querySelector('input[name="rights_type"]:checked').value,
+          status: document.querySelector('input[name="visibility"]:checked').value
         };
 
         if (fileInput.files.length) {

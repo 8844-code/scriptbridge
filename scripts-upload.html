@@ -244,6 +244,29 @@
           </div>
 
           <div class="form-group">
+            <label id="label-visibility">
+              <span class="en-only">Visibility</span>
+              <span class="zh-only">可见性</span>
+            </label>
+            <div class="rights-group" style="margin-top: 8px;">
+              <div class="rights-option">
+                <input type="radio" id="vis-published" name="visibility" value="published" checked>
+                <label for="vis-published">
+                  <span class="en-only">Public — visible in marketplace</span>
+                  <span class="zh-only">公开 — 在市场中可见</span>
+                </label>
+              </div>
+              <div class="rights-option">
+                <input type="radio" id="vis-draft" name="visibility" value="draft">
+                <label for="vis-draft">
+                  <span class="en-only">Draft — only visible to me</span>
+                  <span class="zh-only">草稿 — 仅自己可见</span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
             <label id="label-rights">Rights Type</label>
             <div class="rights-group">
               <div class="rights-option">
@@ -303,6 +326,7 @@
         price: 'Price (CNY)',
         pricePh: 'e.g. 299.00',
         rights: 'Rights Type',
+        visibility: 'Visibility',
         buyout: 'Buyout',
         license: 'License',
         submit: 'Submit Script',
@@ -329,6 +353,7 @@
         price: '定价（人民币）',
         pricePh: '例如：299.00',
         rights: '版权类型',
+        visibility: '可见性',
         buyout: '买断',
         license: '授权',
         submit: '提交作品',
@@ -366,6 +391,8 @@
       document.getElementById('label-file').textContent = t('file');
       document.getElementById('label-price').textContent = t('price');
       priceInput.placeholder = t('pricePh');
+      document.querySelector('#label-visibility .en-only').textContent = i18n.en.visibility;
+      document.querySelector('#label-visibility .zh-only').textContent = i18n.zh.visibility;
       document.getElementById('label-rights').textContent = t('rights');
       document.getElementById('label-rights-buyout').textContent = t('buyout');
       document.getElementById('label-rights-license').textContent = t('license');
@@ -478,6 +505,7 @@
             price: Number(priceInput.value),
             rights_type: rightsType,
             file_url: fileUrl,
+            status: document.querySelector('input[name="visibility"]:checked').value,
             created_at: new Date().toISOString(),
           });
 
