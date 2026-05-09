@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+  <defs>
+    <linearGradient id="fabg" x1="2" y1="2" x2="30" y2="30" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#faf4ec"/>
+      <stop offset="42%" stop-color="#fde8e0"/>
+      <stop offset="100%" stop-color="#e8f0eb"/>
+    </linearGradient>
+    <linearGradient id="fagl" x1="3" y1="3" x2="22" y2="11" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="rgba(255,255,255,0.65)"/>
+      <stop offset="55%" stop-color="rgba(255,255,255,0.08)"/>
+      <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
+    </linearGradient>
+    <linearGradient id="fas" x1="6" y1="6" x2="27" y2="27" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#f26a4f"/>
+      <stop offset="48%" stop-color="#fefcf8"/>
+      <stop offset="100%" stop-color="#4d7661"/>
+    </linearGradient>
+    <linearGradient id="fain" x1="8" y1="8" x2="26" y2="24" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#ff8f78"/>
+      <stop offset="50%" stop-color="rgba(255,255,255,0.75)"/>
+      <stop offset="100%" stop-color="#6b9c82"/>
+    </linearGradient>
+  </defs>
+  <rect width="32" height="32" rx="8" fill="url(#fabg)"/>
+  <rect x="0.6" y="0.6" width="30.8" height="30.8" rx="7.4" stroke="rgba(242,106,79,0.22)" fill="none"/>
+  <rect x="0.6" y="0.6" width="30.8" height="30.8" rx="7.4" stroke="rgba(77,118,97,0.12)" fill="none"/>
+  <path d="M4.8 8.8 Q16 5.6 27.2 10.4" stroke="url(#fagl)" stroke-width="1.76" fill="none" stroke-linecap="round"/>
+  <path d="M 21.6 8.4 C 8.8 8.4 6.4 13.6 15.84 16.16 C 25.2 18.8 22 24.8 8.4 24.8"
+        fill="none" stroke="url(#fain)" stroke-width="1.6" stroke-linecap="round" opacity="0.85"/>
+  <path d="M 21.6 8.4 C 8.8 8.4 6.4 13.6 15.84 16.16 C 25.2 18.8 22 24.8 8.4 24.8"
+        fill="none" stroke="url(#fas)" stroke-width="2.52" stroke-linecap="round"/>
+  <path d="M 13.6 11.6 L 16.4 9.6 L 17.2 12.64" stroke="rgba(242,106,79,0.55)" stroke-width="0.92" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="15.84" cy="16.16" r="1.6" fill="#4d7661" stroke="#fefcf8" stroke-width="0.68"/>
+  <circle cx="15.84" cy="16.16" r="0.72" fill="#f26a4f" opacity="0.9"/>
+</svg>

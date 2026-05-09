@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Browse Marketplace — 剧桥 · ScriptBridge</title>
-  <link rel="icon" type="image/svg+xml" href="images/scriptbridge-mark.svg?v=2">
+  <link rel="icon" type="image/svg+xml" href="images/favicon.svg?v=20260510">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -205,7 +205,7 @@
 <body>
   <nav>
     <a href="index.html" class="nav-logo">
-      <img class="nav-logo-mark" src="images/scriptbridge-mark.svg?v=2" alt="" width="40" height="40" decoding="async">
+      <div class="nav-logo-mark" aria-hidden="true"><img src="images/scriptbridge-mark.svg" alt=""></div>
       <div class="nav-logo-text-wrap">
         <span class="nav-logo-zh">剧桥</span>
         <span class="nav-logo-en">ScriptBridge</span>
@@ -283,7 +283,7 @@
     const i18n = {
       en: {
         pageTitle: 'Browse Marketplace',
-        pageSubtitle: 'Discover published scripts on the marketplace. Full details open after launch.',
+        pageSubtitle: 'A preview of published scripts. Full details open during private beta.',
         searchPh: 'Search by script title...',
         typeAll: 'All Types',
         sortLatest: 'Latest',
@@ -299,11 +299,11 @@
         by: 'By ',
         uploaded: 'Uploaded: ',
         failed: 'Failed to load scripts: ',
-        waitlistPrompt: 'Full script pages are not open to the public yet. Join the waitlist on the homepage to get early access?'
+        loginPrompt: 'Full script details are limited to private beta. Join the waitlist?'
       },
       zh: {
         pageTitle: '浏览市场',
-        pageSubtitle: '浏览已上架作品目录。完整详情将在正式开放后提供。',
+        pageSubtitle: '可浏览已上架作品，详情功能内测期开放。',
         searchPh: '按标题搜索作品...',
         typeAll: '全部类型',
         sortLatest: '最新发布',
@@ -319,7 +319,7 @@
         by: '作者：',
         uploaded: '上传时间：',
         failed: '加载失败：',
-        waitlistPrompt: '作品详情页暂未对公众开放。是否前往首页加入候补名单？'
+        loginPrompt: '内测期间作品详情暂未开放。要先加入候补名单吗？'
       }
     };
 
@@ -333,9 +333,10 @@
           '<a href="dashboard.html" class="btn btn-outline en-only">Dashboard</a>' +
           '<a href="dashboard.html" class="btn btn-outline zh-only">个人主页</a>';
       } else {
+        // 内测期间隐藏登录/注册入口，引导回首页加入候补
         navAuthSlot.innerHTML =
-          '<a href="index.html#signup" class="btn btn-outline en-only">Join Waitlist</a>' +
-          '<a href="index.html#signup" class="btn btn-outline zh-only">加入候补</a>';
+          '<a href="index.html#signup" class="btn btn-primary en-only">Join Waitlist</a>' +
+          '<a href="index.html#signup" class="btn btn-primary zh-only">加入候补</a>';
       }
     }
 
@@ -483,7 +484,7 @@
       const id = card.getAttribute('data-script-id');
       if (!id) return;
       if (!window._isLoggedIn) {
-        if (window.confirm(t('waitlistPrompt'))) {
+        if (window.confirm(t('loginPrompt'))) {
           window.location.href = 'index.html#signup';
         }
         return;
@@ -513,7 +514,7 @@
       const id = card.getAttribute('data-script-id');
       if (!id) return;
       if (!window._isLoggedIn) {
-        if (window.confirm(t('waitlistPrompt'))) {
+        if (window.confirm(t('loginPrompt'))) {
           window.location.href = 'index.html#signup';
         }
         return;

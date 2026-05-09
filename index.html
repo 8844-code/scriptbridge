@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>剧桥 · ScriptBridge — Chinese IP Marketplace</title>
-<link rel="icon" type="image/svg+xml" href="images/scriptbridge-mark.svg?v=2">
+<link rel="icon" type="image/svg+xml" href="images/favicon.svg?v=20260510">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300;1,9..40,400&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;0,9..144,700;1,9..144,300;1,9..144,500;1,9..144,700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -704,7 +704,7 @@ body:not(.zh) .zh-only { display: none !important; }
 
 <nav>
   <a href="index.html" class="nav-logo" title="剧桥 ScriptBridge — Home">
-    <img class="nav-logo-mark" src="images/scriptbridge-mark.svg?v=2" alt="" width="40" height="40" decoding="async">
+    <div class="nav-logo-mark" aria-hidden="true"><img src="images/scriptbridge-mark.svg" alt=""></div>
     <div class="nav-logo-text-wrap">
       <span class="nav-logo-zh">剧桥</span>
       <span class="nav-logo-en">ScriptBridge</span>
@@ -747,13 +747,13 @@ body:not(.zh) .zh-only { display: none !important; }
     <span class="zh-only">第一个正规的中文剧本版权交易平台——透明定价、法律合同、资金托管，连接创作者与全球买家。</span>
   </p>
   <div class="hero-cta">
-    <a href="signup.html" class="btn-primary" onclick="selectRole('creator')">
+    <a href="#signup" class="btn-primary" onclick="selectRole('creator')">
       <span class="en-only">✍️ Join as Creator</span>
-      <span class="zh-only">✍️ 创作者入驻</span>
+      <span class="zh-only">✍️ 创作者候补</span>
     </a>
-    <a href="signup.html" class="btn-outline" onclick="selectRole('buyer')">
-      <span class="en-only">🎬 Browse as Buyer</span>
-      <span class="zh-only">🎬 买家入驻</span>
+    <a href="#signup" class="btn-outline" onclick="selectRole('buyer')">
+      <span class="en-only">🎬 Join as Buyer</span>
+      <span class="zh-only">🎬 买家候补</span>
     </a>
   </div>
   <div class="hero-stats">
