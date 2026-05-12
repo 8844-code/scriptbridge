@@ -770,6 +770,74 @@ html.nav-compact .btn-logout {
   }
 }
 
+/* ===== 深色模式：页面内联浅色块（marketplace / script-detail 等）===== */
+:root.theme-dark .browse-header p {
+  color: #94a3b8 !important;
+}
+
+:root.theme-dark .empty-state {
+  background: rgba(30, 41, 59, 0.88) !important;
+  border-color: rgba(248, 250, 252, 0.22) !important;
+  color: #e2e8f0 !important;
+}
+
+:root.theme-dark .license-extra-panel {
+  background: rgba(15, 23, 42, 0.88) !important;
+  border-color: rgba(248, 250, 252, 0.18) !important;
+  color: #e2e8f0 !important;
+}
+
+:root.theme-dark .license-extra-panel #script-region,
+:root.theme-dark .license-extra-panel #script-rights-years {
+  color: #f8fafc !important;
+}
+
+:root.theme-dark .inquiry-modal-panel {
+  background: rgba(30, 41, 59, 0.96) !important;
+  border: 1px solid rgba(248, 250, 252, 0.2) !important;
+  color: #e2e8f0 !important;
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.45);
+}
+
+:root.theme-dark .inquiry-modal-panel h3 {
+  color: #f8fafc !important;
+}
+
+:root.theme-dark #inquiry-message {
+  background: rgba(15, 23, 42, 0.65) !important;
+  border-color: rgba(248, 250, 252, 0.22) !important;
+  color: #f1f5f9 !important;
+}
+
+:root.theme-dark .detail-meta-row {
+  border-bottom-color: rgba(248, 250, 252, 0.12) !important;
+}
+
+:root.theme-dark .detail-price-box {
+  background: rgba(15, 23, 42, 0.55) !important;
+  border-color: rgba(134, 239, 172, 0.28) !important;
+}
+
+:root.theme-dark .script-type-pill {
+  background: rgba(61, 107, 79, 0.32) !important;
+  color: #bbf7d0 !important;
+}
+
+:root.theme-dark .price-value {
+  color: #86efac !important;
+}
+
+:root.theme-dark .rights-badge {
+  background: rgba(242, 106, 79, 0.22) !important;
+  color: #fecaca !important;
+}
+
+:root.theme-dark #preview-text {
+  background: rgba(15, 23, 42, 0.72) !important;
+  border-color: rgba(248, 250, 252, 0.18) !important;
+  color: #e2e8f0 !important;
+}
+
 /* ===== 工具类 ===== */
 .text-center {
   text-align: center;

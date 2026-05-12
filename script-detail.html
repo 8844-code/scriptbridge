@@ -372,7 +372,7 @@
               </div>
             </div>
 
-            <div id="license-extra-row" style="display:none; margin-top:16px; padding:14px 16px; border:1px solid rgba(26, 26, 26, 0.1); border-radius:14px; background:rgba(255,255,255,0.5); font-size:14px; color:var(--ink); line-height:1.6;">
+            <div id="license-extra-row" class="license-extra-panel" style="display:none; margin-top:16px; padding:14px 16px; border:1px solid rgba(26, 26, 26, 0.1); border-radius:14px; background:rgba(255,255,255,0.5); font-size:14px; color:var(--ink); line-height:1.6;">
               <div style="margin-bottom:6px;">
                 <span class="en-only" style="color:var(--muted);font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;">License Region</span>
                 <span class="zh-only" style="color:var(--muted);font-size:12px;font-weight:600;">授权地区</span>
@@ -441,7 +441,7 @@
   </main>
 
   <div id="inquiry-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:1000; align-items:center; justify-content:center;">
-    <div style="background:var(--warm-white); border-radius:18px; padding:32px; max-width:480px; width:90%; position:relative;">
+    <div class="inquiry-modal-panel" style="background:var(--warm-white); border-radius:18px; padding:32px; max-width:480px; width:90%; position:relative;">
       <button onclick="closeInquiryModal()" style="position:absolute;top:14px;right:18px;background:none;border:none;font-size:20px;cursor:pointer;color:var(--muted);">✕</button>
       <h3 style="font-family:'Fraunces',serif;font-size:22px;margin-bottom:8px;">
         <span class="en-only">License Application</span>
@@ -451,7 +451,7 @@
         <span class="en-only">Tell the creator why you're interested. They'll review and get back to you.</span>
         <span class="zh-only">告诉创作者你的授权意向，他们会尽快与你联系。</span>
       </p>
-      <textarea id="inquiry-message" rows="4" placeholder="e.g. I'm a producer looking for short drama scripts..." style="width:100%;border:1px solid var(--border);border-radius:10px;padding:12px;font-size:14px;resize:vertical;font-family:inherit;background:var(--bg);color:var(--text);box-sizing:border-box;"></textarea>
+      <textarea id="inquiry-message" rows="4" placeholder="e.g. I'm a producer looking for short drama scripts..." style="width:100%;border:1px solid var(--border);border-radius:10px;padding:12px;font-size:14px;resize:vertical;font-family:inherit;background:var(--warm-white);color:var(--ink);box-sizing:border-box;"></textarea>
       <div style="margin-top:14px; display:flex; gap:10px; justify-content:flex-end;">
         <button onclick="closeInquiryModal()" class="btn btn-outline" style="font-size:13px;">
           <span class="en-only">Cancel</span>
