@@ -63,6 +63,12 @@ body::before {
     radial-gradient(circle at 88% 92%, rgba(77, 118, 97, 0.1), transparent 34%);
 }
 
+:root.theme-dark body::before {
+  background:
+    radial-gradient(circle at 12% 8%, rgba(255, 122, 95, 0.07), transparent 32%),
+    radial-gradient(circle at 88% 92%, rgba(111, 159, 134, 0.09), transparent 34%);
+}
+
 /* ===== 导航栏 ===== */
 nav {
   position: fixed;
@@ -363,11 +369,14 @@ html.nav-compact .btn-logout {
 }
 
 :root.theme-dark .btn-outline {
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(244, 247, 251, 0.28);
+  color: #f4f7fb;
 }
 
 :root.theme-dark .btn-outline:hover {
-  background: rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.14);
+  border-color: rgba(244, 247, 251, 0.45);
 }
 
 .btn:disabled {
@@ -443,6 +452,12 @@ html.nav-compact .btn-logout {
 .form-group input:not([type="radio"]):not([type="checkbox"])::placeholder,
 .form-group textarea::placeholder {
   color: var(--muted);
+  opacity: 1;
+}
+
+:root.theme-dark .form-group input:not([type="radio"]):not([type="checkbox"])::placeholder,
+:root.theme-dark .form-group textarea::placeholder {
+  color: #94a3b8;
   opacity: 1;
 }
 
@@ -575,6 +590,12 @@ html.nav-compact .btn-logout {
   padding: 24px;
   box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
   backdrop-filter: blur(10px);
+}
+
+:root.theme-dark .card {
+  background: rgba(30, 41, 59, 0.82);
+  border-color: rgba(248, 250, 252, 0.2);
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.42);
 }
 
 .card-header {
