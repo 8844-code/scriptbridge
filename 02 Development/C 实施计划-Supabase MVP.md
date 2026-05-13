@@ -293,21 +293,21 @@ git push https://8844-code:[TOKEN]@github.com/8844-code/scriptbridge.git main
 
 在开始每一个新的 Phase 前，确认：
 
-- [ ] **Day 1 开始前**
-  - [ ] Supabase 账号已创建
-  - [ ] 数据库表已全部创建
-  - [ ] SUPABASE_URL 和 KEY 已保存到 `js/supabase-client.js`
-  - [ ] 本地测试环境就绪（能在浏览器打开 HTML 文件）
+- [x] **Day 1 开始前**
+  - [x] Supabase 账号已创建
+  - [x] 数据库表已全部创建
+  - [x] SUPABASE_URL 和 KEY 已保存到 `js/supabase-client.js`
+  - [x] 本地测试环境就绪（能在浏览器打开 HTML 文件）
 
-- [ ] **Phase 1 完成后**
-  - [ ] signup.html 能完整注册
-  - [ ] login.html 能登录并保存 session
-  - [ ] dashboard.html 能显示当前登录用户信息
-  - [ ] 推送到 GitHub 并验证网络地址能访问
+- [x] **Phase 1 完成后**
+  - [x] signup.html 能完整注册
+  - [x] login.html 能登录并保存 session
+  - [x] dashboard.html 能显示当前登录用户信息
+  - [x] 推送到 GitHub 并验证网络地址能访问
 
 - [ ] **Phase 2 完成后**
-  - [ ] scripts-upload.html 能上传 PDF/Word
-  - [ ] 文件真实存储在 Supabase Storage
+  - [x] scripts-upload.html 能上传 PDF/Word
+  - [x] 文件真实存储在 Supabase Storage
   - [ ] 元数据真实存储在 scripts 表
   - [ ] scripts-list-author.html 能显示自己上传的所有作品
 

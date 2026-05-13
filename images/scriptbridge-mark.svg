@@ -1,50 +1,40 @@
 <!--
-  剧桥 / ScriptBridge — 导航栏 Mark（约 36px）
-  概念：稿纸折痕 + 连续 S 形丝带（Script + Bridge 联结点）
-  品牌色：--coral #f26a4f · --sage #4d7661 · 暖米底 #f3efe8
+  剧桥 / ScriptBridge — Nav Mark (light mode, ~36px)
+  S 双色带设计：上段珊瑚 + 下段墨绿，粗色带，高对比度
+  灵感：S形剧本纸张 + 桥形连接点
 -->
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" fill="none" aria-hidden="true">
   <defs>
-    <!-- 背景：暖米 + 淡珊瑚，靠边有一点 sage，呼应整站 -->
-    <linearGradient id="sbBg" x1="2" y1="2" x2="38" y2="38" gradientUnits="userSpaceOnUse">
-      <stop offset="0%" stop-color="#faf4ec"/>
-      <stop offset="42%" stop-color="#fde8e0"/>
-      <stop offset="100%" stop-color="#e8f0eb"/>
-    </linearGradient>
-    <linearGradient id="sbGlass" x1="4" y1="4" x2="28" y2="14" gradientUnits="userSpaceOnUse">
-      <stop offset="0%" stop-color="rgba(255,255,255,0.65)"/>
-      <stop offset="55%" stop-color="rgba(255,255,255,0.08)"/>
-      <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
-    </linearGradient>
-    <!-- S 主丝带：珊瑚 → 白芯 → sage -->
-    <linearGradient id="sbSstroke" x1="8" y1="8" x2="34" y2="34" gradientUnits="userSpaceOnUse">
-      <stop offset="0%" stop-color="#f26a4f"/>
-      <stop offset="48%" stop-color="#fefcf8"/>
-      <stop offset="100%" stop-color="#4d7661"/>
-    </linearGradient>
-    <linearGradient id="sbSinner" x1="10" y1="10" x2="32" y2="30" gradientUnits="userSpaceOnUse">
-      <stop offset="0%" stop-color="#ff8f78"/>
-      <stop offset="50%" stop-color="rgba(255,255,255,0.75)"/>
-      <stop offset="100%" stop-color="#6b9c82"/>
+    <linearGradient id="bgL" x1="2" y1="2" x2="38" y2="38" gradientUnits="userSpaceOnUse">
+      <stop offset="0%"   stop-color="#fdf6f0"/>
+      <stop offset="55%"  stop-color="#f4ece2"/>
+      <stop offset="100%" stop-color="#e9e0d4"/>
     </linearGradient>
   </defs>
-  <!-- 圆角底板 -->
-  <rect width="40" height="40" rx="10" fill="url(#sbBg)"/>
-  <rect x="0.75" y="0.75" width="38.5" height="38.5" rx="9.25" stroke="rgba(242,106,79,0.22)" fill="none"/>
-  <rect x="0.75" y="0.75" width="38.5" height="38.5" rx="9.25" stroke="rgba(77,118,97,0.12)" fill="none"/>
-  <!-- 顶侧玻璃高光 -->
-  <path d="M6 11 Q20 7 34 13" stroke="url(#sbGlass)" stroke-width="2.2" fill="none" stroke-linecap="round"/>
 
-  <!-- 明显的 S 形主笔画（上层略细高光，下层主色） -->
-  <path d="M 27 10.5 C 11 10.5 8 17 19.8 20.2 C 31.5 23.5 27.5 31 10.5 31"
-        fill="none" stroke="url(#sbSinner)" stroke-width="2" stroke-linecap="round" opacity="0.85"/>
-  <path d="M 27 10.5 C 11 10.5 8 17 19.8 20.2 C 31.5 23.5 27.5 31 10.5 31"
-        fill="none" stroke="url(#sbSstroke)" stroke-width="3.15" stroke-linecap="round"/>
+  <!-- 暖米底板 -->
+  <rect width="40" height="40" rx="10" fill="url(#bgL)"/>
+  <!-- 珊瑚描边 -->
+  <rect x="0.75" y="0.75" width="38.5" height="38.5" rx="9.25"
+        stroke="rgba(200,60,40,0.18)" fill="none" stroke-width="1"/>
 
-  <!-- 折页「狗耳」折角，暗示稿纸，落在 S 中上弯内侧 -->
-  <path d="M 17 14.5 L 20.5 12 L 21.5 15.8" stroke="rgba(242,106,79,0.55)" stroke-width="1.15" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <!-- S 下段色带：墨绿（先画，在珊瑚层后面） -->
+  <path d="M 20 20.5 C 33 24 29 31.5 12 32"
+        stroke="#2a6647" stroke-width="7.5"
+        stroke-linecap="round" fill="none"/>
 
-  <!-- 联结点：桥 / Script 节点 -->
-  <circle cx="19.8" cy="20.2" r="2" fill="#4d7661" stroke="#fefcf8" stroke-width="0.85"/>
-  <circle cx="19.8" cy="20.2" r="0.9" fill="#f26a4f" opacity="0.9"/>
+  <!-- S 上段色带：珊瑚 -->
+  <path d="M 28 10 C 11 10 7.5 18 20 20.5"
+        stroke="#cc4030" stroke-width="7.5"
+        stroke-linecap="round" fill="none"/>
+
+  <!-- 纸张折角 dog-ear（剧本稿纸暗示） -->
+  <path d="M 24 7.5 L 28.5 10.5 L 24 11.5"
+        fill="rgba(240,200,190,0.9)"
+        stroke="#e06050" stroke-width="0.9"
+        stroke-linejoin="round" stroke-linecap="round"/>
+
+  <!-- 桥形连接点 -->
+  <circle cx="20" cy="20.5" r="2.4" fill="#2a6647" stroke="rgba(255,255,255,0.95)" stroke-width="1.2"/>
+  <circle cx="20" cy="20.5" r="1.0" fill="#cc4030"/>
 </svg>
