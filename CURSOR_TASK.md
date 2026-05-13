@@ -1843,3 +1843,56 @@ git push origin main
 ✅ 任务A（推送）：**失败**（本环境无 GitHub HTTPS 凭据：`could not read Username for 'https://github.com'`）。**请在本机终端执行：** `git push origin main`，将本地 `main` 自 `5d0d074` 起的提交全部推送（含 `eb9c849`、`c78002e` 与 `docs: mark task as completed`）。
 ✅ 任务B（深色模式检查）：**完成**（`css/common.css`：`marketplace` 空状态 `.empty-state`、副标题 `.browse-header p`；`script-detail`：`.license-extra-panel`、`.inquiry-modal-panel`、`#preview-text`、价格区/类型 pill/rights badge；`script-detail.html`：弹窗内层 class、授权条 class、`#inquiry-message` 使用 `var(--warm-white)` / `var(--ink)`）。
 ✅ 推送状态：**失败**（同上）。样式改动：`eb9c849`；`CURSOR_TASK.md` 已从误截断恢复并追加本段执行记录，文档 commit：`docs: mark task as completed`。
+
+---
+
+## 🎯 新任务（Claude 分配，2026-05-12）
+
+**优先级：🔴 立即执行**  
+**任务名：提交深色 Logo 文件**
+
+---
+
+### 背景
+
+Claude 已完成深色模式 Logo 修复，涉及两个文件：
+- `images/scriptbridge-mark-dark.svg`（新建）— 深色背景版 Logo，保持与亮色版相同的 S 形设计语言
+- `css/common.css`（已修改）— 深色模式下隐藏亮色 img，用 `::after` 伪元素展示深色 SVG
+
+这两个文件**尚未提交**（`git status` 可验证），需要 Cursor 提交。
+
+---
+
+### 📋 任务 A：提交 Logo 修复
+
+```bash
+cd "/Users/gia/Desktop/RJ's AI Brian/03 项目/ScriptBridge"
+git add images/scriptbridge-mark-dark.svg css/common.css
+git commit -m "feat(brand): add dark mode logo mark SVG + CSS swap
+
+- Add images/scriptbridge-mark-dark.svg: dark navy background version
+  of the logo mark, same S-curve design as light version
+- css/common.css: in dark mode, hide light img (visibility:hidden),
+  show dark SVG via ::after pseudo-element + background-image
+- Add position:relative to .nav-logo-mark for ::after positioning"
+```
+
+推送仍会失败（无 GitHub 凭据）。**提交完成后，RJ 在本机终端运行：**
+```bash
+git push origin main
+```
+这一次 push 会把所有积压的本地 commits（`5d0d074`、`eb9c849`、`c78002e`、`93d7dbc`、`5cce348` 等）一并推上去。
+
+---
+
+### ✅ 完成后在此写：
+```
+✅ 完成时间：2026-05-12（UTC+8）
+✅ 任务A（Logo commit）：完成
+```
+
+### 执行记录（Cursor）
+
+✅ 完成时间：2026-05-12（UTC+8）
+✅ 任务A（Logo commit）：完成（`5cce348` `feat(brand): add dark mode logo mark SVG + CSS swap`；`CURSOR_TASK` 已另提交 `docs: mark task as completed`。）
+✅ 推送状态：失败（本环境无 GitHub HTTPS 凭据；请本机执行 `git push origin main`，将本地 `main` 全部推送，含 `5cce348` 与文档 commit。）
