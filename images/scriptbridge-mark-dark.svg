@@ -1,0 +1,63 @@
+<!--
+  剧桥 / ScriptBridge — 导航栏 Mark 深色版（约 36px）
+  深色背景：深空蓝渐变，与全站 dark theme 一致
+  S 主色保持不变（coral/sage），在深色背景上更跳脱
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" fill="none" aria-hidden="true">
+  <defs>
+    <!-- 背景：深色蓝灰，呼应 theme-dark 背景 -->
+    <linearGradient id="sbBgD" x1="2" y1="2" x2="38" y2="38" gradientUnits="userSpaceOnUse">
+      <stop offset="0%"   stop-color="#1e2d3e"/>
+      <stop offset="55%"  stop-color="#162236"/>
+      <stop offset="100%" stop-color="#0f1a2a"/>
+    </linearGradient>
+    <!-- 顶侧玻璃高光：深色下更明显 -->
+    <linearGradient id="sbGlassD" x1="4" y1="4" x2="28" y2="14" gradientUnits="userSpaceOnUse">
+      <stop offset="0%"   stop-color="rgba(255,255,255,0.18)"/>
+      <stop offset="55%"  stop-color="rgba(255,255,255,0.04)"/>
+      <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
+    </linearGradient>
+    <!-- S 主丝带：珊瑚 → 白芯 → sage（深色下稍亮） -->
+    <linearGradient id="sbSstrokeD" x1="8" y1="8" x2="34" y2="34" gradientUnits="userSpaceOnUse">
+      <stop offset="0%"   stop-color="#f47c62"/>
+      <stop offset="48%"  stop-color="#fff8f4"/>
+      <stop offset="100%" stop-color="#5d8f74"/>
+    </linearGradient>
+    <linearGradient id="sbSinnerD" x1="10" y1="10" x2="32" y2="30" gradientUnits="userSpaceOnUse">
+      <stop offset="0%"   stop-color="#ff9880"/>
+      <stop offset="50%"  stop-color="rgba(255,255,255,0.55)"/>
+      <stop offset="100%" stop-color="#7ab090"/>
+    </linearGradient>
+  </defs>
+
+  <!-- 深色圆角底板 -->
+  <rect width="40" height="40" rx="10" fill="url(#sbBgD)"/>
+  <!-- 外描边：白色微光（rim light 效果） -->
+  <rect x="0.75" y="0.75" width="38.5" height="38.5" rx="9.25"
+        stroke="rgba(255,255,255,0.13)" fill="none"/>
+  <!-- 珊瑚色内侧微光 -->
+  <rect x="0.75" y="0.75" width="38.5" height="38.5" rx="9.25"
+        stroke="rgba(242,106,79,0.18)" fill="none"/>
+
+  <!-- 顶侧玻璃高光 -->
+  <path d="M6 11 Q20 7 34 13"
+        stroke="url(#sbGlassD)" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+
+  <!-- S 形主笔画（高光层） -->
+  <path d="M 27 10.5 C 11 10.5 8 17 19.8 20.2 C 31.5 23.5 27.5 31 10.5 31"
+        fill="none" stroke="url(#sbSinnerD)"
+        stroke-width="2" stroke-linecap="round" opacity="0.7"/>
+  <!-- S 形主笔画（主色层） -->
+  <path d="M 27 10.5 C 11 10.5 8 17 19.8 20.2 C 31.5 23.5 27.5 31 10.5 31"
+        fill="none" stroke="url(#sbSstrokeD)"
+        stroke-width="3.15" stroke-linecap="round"/>
+
+  <!-- 折页「狗耳」折角 -->
+  <path d="M 17 14.5 L 20.5 12 L 21.5 15.8"
+        stroke="rgba(255,152,128,0.65)" stroke-width="1.15"
+        stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+
+  <!-- 联结点：桥 / Script 节点 -->
+  <circle cx="19.8" cy="20.2" r="2"   fill="#5d8f74" stroke="rgba(255,255,255,0.7)" stroke-width="0.85"/>
+  <circle cx="19.8" cy="20.2" r="0.9" fill="#f47c62" opacity="0.95"/>
+</svg>
