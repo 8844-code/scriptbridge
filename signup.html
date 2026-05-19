@@ -198,6 +198,46 @@
       }
     }
 
+    .verify-panel {
+      text-align: center;
+      padding: 8px 4px 4px;
+    }
+
+    .verify-panel h2 {
+      font-family: 'Fraunces', serif;
+      font-size: 22px;
+      font-weight: 600;
+      margin: 0 0 12px;
+      color: var(--ink);
+    }
+
+    .verify-panel p {
+      font-size: 15px;
+      line-height: 1.55;
+      color: var(--muted);
+      margin: 0 0 20px;
+    }
+
+    .verify-panel .btn-outline-link {
+      display: inline-block;
+      padding: 10px 18px;
+      border-radius: 12px;
+      border: 1px solid rgba(26, 26, 26, 0.2);
+      color: var(--ink);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    :root.theme-dark .verify-panel h2 {
+      color: #f8fafc !important;
+    }
+
+    :root.theme-dark .verify-panel .btn-outline-link {
+      border-color: rgba(248, 250, 252, 0.28);
+      color: #f8fafc;
+    }
+
     @media (max-width: 480px) {
       .auth-container {
         max-width: 100%;
@@ -253,6 +293,15 @@
         </div>
 
         <div id="alert-container"></div>
+
+        <div id="verify-success" class="verify-panel" hidden>
+          <h2><span class="en-only">Check your email</span><span class="zh-only">请查收验证邮件</span></h2>
+          <p>
+            <span class="en-only">Registration successful! Please check your inbox and click the verification link. You can sign in after your email is verified.</span>
+            <span class="zh-only">注册成功！请检查邮箱并点击验证链接，验证通过后即可登录。</span>
+          </p>
+          <a href="login.html" class="btn-outline-link"><span class="en-only">Go to Sign In</span><span class="zh-only">前往登录</span></a>
+        </div>
 
         <form id="signup-form">
           <!-- 角色选择 -->
@@ -337,6 +386,13 @@
     const btnText = document.getElementById('btn-text');
     const btnSpinner = document.getElementById('btn-spinner');
     const alertContainer = document.getElementById('alert-container');
+    const verifySuccess = document.getElementById('verify-success');
+    const switchLink = document.querySelector('.switch-link');
+    const signupHeader = document.querySelector('.signup-header');
+
+    function emailRedirectUrl() {
+      return window.location.origin + '/login.html?verified=1';
+    }
 
     // 表单验证
     function validateForm() {
@@ -404,6 +460,9 @@
         const { data, error } = await window.supabase_client.auth.signUp({
           email: email,
           password: password,
+          options: {
+            emailRedirectTo: emailRedirectUrl(),
+          },
         });
 
         if (error) {
@@ -426,13 +485,12 @@
           }
         }
 
-        // 注册成功
-        showAlert(document.body.classList.contains('zh') ? '创建成功！正在跳转到登录页...' : 'Account created successfully! Redirecting to login...', 'success');
-
-        // 2 秒后重定向到登录页
-        setTimeout(() => {
-          window.location.href = 'login.html';
-        }, 2000);
+        // 注册成功：显示邮箱验证提示，不跳转 dashboard
+        form.hidden = true;
+        if (switchLink) switchLink.hidden = true;
+        if (signupHeader) signupHeader.hidden = true;
+        alertContainer.innerHTML = '';
+        verifySuccess.hidden = false;
 
       } catch (error) {
         showAlert((document.body.classList.contains('zh') ? '注册失败：' : 'Sign up failed: ') + error.message, 'error');

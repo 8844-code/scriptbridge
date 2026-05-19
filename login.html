@@ -170,6 +170,50 @@
       }
     }
 
+    .unverified-panel {
+      margin-bottom: 18px;
+      padding: 14px 16px;
+      border-radius: 12px;
+      border: 1px solid rgba(242, 106, 79, 0.35);
+      background: rgba(242, 106, 79, 0.08);
+      font-size: 14px;
+      line-height: 1.5;
+      color: var(--ink);
+    }
+
+    .unverified-panel p {
+      margin: 0 0 12px;
+    }
+
+    .btn-resend {
+      font: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      padding: 8px 14px;
+      border-radius: 10px;
+      border: 1px solid rgba(26, 26, 26, 0.2);
+      background: var(--card, #fff);
+      color: var(--ink);
+      cursor: pointer;
+    }
+
+    .btn-resend:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    :root.theme-dark .unverified-panel {
+      background: rgba(242, 106, 79, 0.12);
+      border-color: rgba(255, 143, 120, 0.35);
+      color: #f8fafc;
+    }
+
+    :root.theme-dark .btn-resend {
+      background: #1e293b;
+      border-color: rgba(248, 250, 252, 0.28);
+      color: #f8fafc;
+    }
+
     @media (max-width: 480px) {
       .auth-container {
         max-width: 100%;
@@ -221,6 +265,14 @@
         </div>
 
         <div id="alert-container"></div>
+
+        <div id="unverified-panel" class="unverified-panel" hidden>
+          <p id="unverified-message"></p>
+          <button type="button" class="btn-resend" id="resend-verify-btn">
+            <span class="en-only">Resend verification email</span>
+            <span class="zh-only">重新发送验证邮件</span>
+          </button>
+        </div>
 
         <form id="login-form">
           <!-- 邮箱 -->
@@ -296,13 +348,76 @@
     const btnText = document.getElementById('btn-text');
     const btnSpinner = document.getElementById('btn-spinner');
     const alertContainer = document.getElementById('alert-container');
+    const unverifiedPanel = document.getElementById('unverified-panel');
+    const unverifiedMessage = document.getElementById('unverified-message');
+    const resendVerifyBtn = document.getElementById('resend-verify-btn');
 
-    // 加载保存的邮箱（如果用户之前选择了"记住我"）
-    window.addEventListener('DOMContentLoaded', () => {
+    function emailRedirectUrl() {
+      return window.location.origin + '/login.html?verified=1';
+    }
+
+    function showUnverifiedPrompt(email) {
+      const isZh = document.body.classList.contains('zh');
+      const addr = email || emailInput.value.trim();
+      if (addr) emailInput.value = addr;
+      unverifiedMessage.textContent = isZh
+        ? '请先验证邮箱。验证邮件已发送到 ' + (addr || '你的邮箱') + '。'
+        : 'Please verify your email first. A verification link was sent to ' + (addr || 'your email') + '.';
+      unverifiedPanel.hidden = false;
+    }
+
+    async function resendVerificationEmail() {
+      const email = emailInput.value.trim();
+      if (!email) {
+        showAlert(document.body.classList.contains('zh') ? '请先填写邮箱' : 'Please enter your email first', 'error');
+        return;
+      }
+      resendVerifyBtn.disabled = true;
+      try {
+        const { error } = await window.supabase_client.auth.resend({
+          type: 'signup',
+          email: email,
+          options: { emailRedirectTo: emailRedirectUrl() },
+        });
+        if (error) throw error;
+        showAlert(
+          document.body.classList.contains('zh') ? '验证邮件已重新发送，请查收。' : 'Verification email resent. Please check your inbox.',
+          'success'
+        );
+      } catch (err) {
+        showAlert(
+          (document.body.classList.contains('zh') ? '发送失败：' : 'Failed to resend: ') + err.message,
+          'error'
+        );
+      } finally {
+        resendVerifyBtn.disabled = false;
+      }
+    }
+
+    resendVerifyBtn.addEventListener('click', resendVerificationEmail);
+
+    // 加载保存的邮箱、URL 参数、邮箱验证回调
+    window.addEventListener('DOMContentLoaded', async () => {
       const savedEmail = localStorage.getItem('scriptbridge_saved_email');
       if (savedEmail) {
         emailInput.value = savedEmail;
         rememberInput.checked = true;
+      }
+
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('verified') === '1') {
+        showAlert(
+          document.body.classList.contains('zh') ? '邮箱已验证，请登录。' : 'Email verified. You can sign in now.',
+          'success'
+        );
+      }
+      if (params.get('unverified') === '1') {
+        showUnverifiedPrompt(params.get('email') || '');
+      }
+
+      const { data: { session } } = await window.supabase_client.auth.getSession();
+      if (session?.user?.email_confirmed_at) {
+        window.location.href = 'dashboard.html';
       }
     });
 
@@ -360,6 +475,21 @@
 
         if (error) {
           throw new Error(error.message);
+        }
+
+        if (data.user && !data.user.email_confirmed_at) {
+          await window.supabase_client.auth.signOut();
+          showUnverifiedPrompt(email);
+          showAlert(
+            document.body.classList.contains('zh')
+              ? '请先验证邮箱后再登录。'
+              : 'Please verify your email before signing in.',
+            'error'
+          );
+          submitBtn.disabled = false;
+          btnText.style.display = 'inline';
+          btnSpinner.style.display = 'none';
+          return;
         }
 
         // 保存邮箱（如果用户选择了"记住我"）

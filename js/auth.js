@@ -60,6 +60,13 @@ async function requireAuth() {
     window.location.href = 'login.html';
     return null;
   }
+  if (!session.user.email_confirmed_at) {
+    const email = session.user.email || '';
+    await window.supabase_client.auth.signOut();
+    const qs = email ? '?unverified=1&email=' + encodeURIComponent(email) : '?unverified=1';
+    window.location.href = 'login.html' + qs;
+    return null;
+  }
   return session;
 }
 
