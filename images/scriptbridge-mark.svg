@@ -1,40 +1,111 @@
 <!--
-  剧桥 / ScriptBridge — Nav Mark (light mode, ~36px)
-  S 双色带设计：上段珊瑚 + 下段墨绿，粗色带，高对比度
-  灵感：S形剧本纸张 + 桥形连接点
+  剧桥 / ScriptBridge — Mark v4
+  概念：两段拱形剧本纸（上段珊瑚/下段墨绿）
+  上拱偏右 + 下拱偏左 = S形负空间
+  拱桥结构 + 稿纸纹理 + 折页细节
 -->
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" fill="none" aria-hidden="true">
   <defs>
-    <linearGradient id="bgL" x1="2" y1="2" x2="38" y2="38" gradientUnits="userSpaceOnUse">
-      <stop offset="0%"   stop-color="#fdf6f0"/>
-      <stop offset="55%"  stop-color="#f4ece2"/>
-      <stop offset="100%" stop-color="#e9e0d4"/>
+    <!-- 暖米底板 -->
+    <linearGradient id="bg" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
+      <stop offset="0%"   stop-color="#fef8f2"/>
+      <stop offset="100%" stop-color="#ece4d8"/>
     </linearGradient>
+
+    <!-- 珊瑚拱：左深右亮，模拟弧面光影 -->
+    <linearGradient id="cG" x1="36" y1="8" x2="14" y2="22" gradientUnits="userSpaceOnUse">
+      <stop offset="0%"   stop-color="#e86858"/>
+      <stop offset="100%" stop-color="#a82e1e"/>
+    </linearGradient>
+
+    <!-- 墨绿拱：右深左亮 -->
+    <linearGradient id="sG" x1="4" y1="18" x2="26" y2="34" gradientUnits="userSpaceOnUse">
+      <stop offset="0%"   stop-color="#3a8862"/>
+      <stop offset="100%" stop-color="#1b4d32"/>
+    </linearGradient>
+
+    <clipPath id="clip">
+      <rect width="40" height="40" rx="10"/>
+    </clipPath>
   </defs>
 
-  <!-- 暖米底板 -->
-  <rect width="40" height="40" rx="10" fill="url(#bgL)"/>
-  <!-- 珊瑚描边 -->
+  <!-- 底板 -->
+  <rect width="40" height="40" rx="10" fill="url(#bg)"/>
+  <!-- 稿纸横线（背景纹理，大尺寸明显） -->
+  <g clip-path="url(#clip)" opacity="0.12">
+    <line x1="0" y1="10" x2="40" y2="10" stroke="#7a5a3a" stroke-width="0.6"/>
+    <line x1="0" y1="16" x2="40" y2="16" stroke="#7a5a3a" stroke-width="0.6"/>
+    <line x1="0" y1="22" x2="40" y2="22" stroke="#7a5a3a" stroke-width="0.6"/>
+    <line x1="0" y1="28" x2="40" y2="28" stroke="#7a5a3a" stroke-width="0.6"/>
+    <line x1="0" y1="34" x2="40" y2="34" stroke="#7a5a3a" stroke-width="0.6"/>
+  </g>
+  <!-- 外框 -->
   <rect x="0.75" y="0.75" width="38.5" height="38.5" rx="9.25"
-        stroke="rgba(200,60,40,0.18)" fill="none" stroke-width="1"/>
+        stroke="rgba(180,55,35,0.18)" fill="none" stroke-width="0.9"/>
 
-  <!-- S 下段色带：墨绿（先画，在珊瑚层后面） -->
-  <path d="M 20 20.5 C 33 24 29 31.5 12 32"
-        stroke="#2a6647" stroke-width="7.5"
-        stroke-linecap="round" fill="none"/>
+  <!-- ══════════════════════════════
+       下拱：墨绿，偏左，向下弧
+       正空间在左下，负空间在右下（S下开口）
+  ══════════════════════════════ -->
+  <path d="
+    M 3,20
+    C 3,38  27,38  27,20
+    C 27,26  3,26  3,20
+    Z
+  " fill="url(#sG)"/>
 
-  <!-- S 上段色带：珊瑚 -->
-  <path d="M 28 10 C 11 10 7.5 18 20 20.5"
-        stroke="#cc4030" stroke-width="7.5"
-        stroke-linecap="round" fill="none"/>
+  <!-- 墨绿拱上的稿纸横线 -->
+  <g clip-path="url(#clip)" opacity="0.25">
+    <line x1="3" y1="28" x2="27" y2="28" stroke="#b0ffcc" stroke-width="0.55"/>
+    <line x1="4" y1="31.5" x2="25" y2="31.5" stroke="#b0ffcc" stroke-width="0.55"/>
+    <line x1="5" y1="34.5" x2="22" y2="34.5" stroke="#b0ffcc" stroke-width="0.55"/>
+  </g>
 
-  <!-- 纸张折角 dog-ear（剧本稿纸暗示） -->
-  <path d="M 24 7.5 L 28.5 10.5 L 24 11.5"
-        fill="rgba(240,200,190,0.9)"
-        stroke="#e06050" stroke-width="0.9"
-        stroke-linejoin="round" stroke-linecap="round"/>
+  <!-- 墨绿拱的折页角（右上角） -->
+  <path d="M 24,20 L 28,23 L 24,24"
+        fill="rgba(180,255,210,0.5)"
+        stroke="#5ab87a" stroke-width="0.7"
+        stroke-linejoin="round"/>
 
-  <!-- 桥形连接点 -->
-  <circle cx="20" cy="20.5" r="2.4" fill="#2a6647" stroke="rgba(255,255,255,0.95)" stroke-width="1.2"/>
-  <circle cx="20" cy="20.5" r="1.0" fill="#cc4030"/>
+  <!-- ══════════════════════════════
+       上拱：珊瑚，偏右，向上弧
+       正空间在右上，负空间在左上（S上开口）
+  ══════════════════════════════ -->
+  <path d="
+    M 13,20
+    C 13,2   37,2   37,20
+    C 37,14  13,14  13,20
+    Z
+  " fill="url(#cG)"/>
+
+  <!-- 珊瑚拱上的稿纸横线 -->
+  <g clip-path="url(#clip)" opacity="0.25">
+    <line x1="14" y1="8" x2="36" y2="8"  stroke="#ffddd5" stroke-width="0.55"/>
+    <line x1="15" y1="11" x2="36" y2="11" stroke="#ffddd5" stroke-width="0.55"/>
+    <line x1="15" y1="14" x2="36" y2="14" stroke="#ffddd5" stroke-width="0.55"/>
+  </g>
+
+  <!-- 珊瑚拱的折页角（左下角） -->
+  <path d="M 16,20 L 12,17 L 16,16"
+        fill="rgba(255,210,200,0.55)"
+        stroke="#e07060" stroke-width="0.7"
+        stroke-linejoin="round"/>
+
+  <!-- ══════════════════════════════
+       拱桥连接结构（两拱相交处）
+  ══════════════════════════════ -->
+  <!-- 拱桥弧线（白色，桥的弧形主缆） -->
+  <path d="M 13,20 Q 20,14 27,20"
+        stroke="rgba(255,255,255,0.75)" stroke-width="1.1"
+        fill="none" stroke-linecap="round"/>
+  <!-- 桥墩（两侧垂线） -->
+  <line x1="13.5" y1="20" x2="13.5" y2="22"
+        stroke="rgba(255,255,255,0.55)" stroke-width="0.9"/>
+  <line x1="26.5" y1="20" x2="26.5" y2="22"
+        stroke="rgba(255,255,255,0.55)" stroke-width="0.9"/>
+
+  <!-- 中心锚点（桥梁连接节点） -->
+  <circle cx="20" cy="20" r="2.8"
+          fill="#1b4d32" stroke="rgba(255,255,255,0.92)" stroke-width="1.2"/>
+  <circle cx="20" cy="20" r="1.1" fill="#cc3828"/>
 </svg>
