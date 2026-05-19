@@ -10,3 +10,10 @@
 
 # Node modules (if used in future)
 node_modules/
+
+# Logo design drafts
+images/mark-a.svg
+images/mark-b.svg
+images/mark-c.svg
+C-logo-concepts-preview.html
+logo-preview.html
