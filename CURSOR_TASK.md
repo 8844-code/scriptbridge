@@ -1,5 +1,124 @@
 # 🎯 Cursor 立即执行的任务
 
+**时间戳：** 2026-05-20
+**优先级：** 🔴 立即执行
+**状态：** 待执行
+
+---
+
+## 📋 任务零：搜索小红书热帖并生成内测招募文案（优先执行）
+
+### 背景
+ScriptBridge 网站已上线，现在需要发小红书招募内测用户（编剧 + 制片方）。
+需要先搜索小红书上近期爆火的"创业进度/产品上线/内测招募"类型帖子，模仿其结构和语气写一篇。
+
+### 步骤1：搜索热帖
+用浏览器搜索以下关键词，找3-5篇点赞量高的帖子（点赞 > 500）：
+- 小红书搜索：`内测 招募 创业`
+- 小红书搜索：`产品上线了 编剧`
+- 小红书搜索：`我做了一个产品 创业日记`
+
+记录下这些帖子的：标题句式、开头第一句、正文结构、结尾引导方式。
+
+### 步骤2：生成文案
+根据搜索到的热帖模式，写一篇新的小红书帖子，要求：
+- **主题**：ScriptBridge 项目当前阶段 + 招募内测用户
+- **内容重点**：展示网站已经做了什么（✅已完成），正在内测，需要编剧和制片方参与
+- **不要**：讲为什么做这个项目的故事（那是另一篇）
+- **结尾**：低门槛行动指令，比如"评论'内测'"
+
+### 步骤3：输出格式
+把生成的文案写入：
+`03 项目/ScriptBridge/03 上线推广/(C) 小红书内测招募文案.md`
+
+格式参考 `(C) 小红书内容储备库.md` 里的帖子结构（封面标题、正文、标签、配图Prompt）。
+
+---
+
+---
+
+## 📋 任务一：清理 Logo 草稿文件（5分钟）
+
+### 步骤1：把草稿文件加进 .gitignore
+打开根目录的 `.gitignore`，末尾加：
+```
+# Logo design drafts
+images/mark-a.svg
+images/mark-b.svg
+images/mark-c.svg
+C-logo-concepts-preview.html
+logo-preview.html
+```
+
+### 步骤2：提交剩余 logo 改动
+```bash
+git add images/favicon.svg images/scriptbridge-mark.svg .gitignore WORKFLOW.md CURSOR_TASK.md
+git commit -m "chore(brand): finalize logo assets and ignore draft files"
+git push origin main
+```
+
+---
+
+## 📋 任务二：注册邮箱验证流程
+
+**目标：** 用户注册后收到验证邮件，未验证前无法使用平台功能。
+
+### 修改 `signup.html`
+注册成功后不跳转 dashboard，改为在页面内显示提示：
+```
+✅ 注册成功！请检查邮箱，点击验证链接后即可登录。
+Registration successful! Please check your email to verify your account.
+```
+
+### 修改 `login.html`
+登录时检测 `session.user.email_confirmed_at`：
+- 已验证 → 正常跳转 dashboard
+- 未验证 → 显示提示 + 「重新发送验证邮件」按钮
+  ```javascript
+  supabase.auth.resend({ type: 'signup', email })
+  ```
+
+### 修改 `js/auth.js`
+在 `requireAuth()` 获取 session 后加验证检查：
+```javascript
+if (session && !session.user.email_confirmed_at) {
+  window.location.href = '/login.html?unverified=1';
+  return null;
+}
+```
+
+### 提交
+```bash
+git add signup.html login.html js/auth.js
+git commit -m "feat(auth): add email verification flow on signup
+
+- signup.html: show verify prompt instead of redirect
+- login.html: detect unverified users, offer resend option
+- auth.js: redirect unverified users to login"
+git push origin main
+```
+
+### 测试
+用一个新邮箱注册，确认：
+1. 注册后看到验证提示（不跳转）
+2. 邮箱收到验证邮件
+3. 点链接后能正常登录
+4. 未验证时直接访问 dashboard 会被踢回登录页
+
+---
+
+## ✅ 完成后在此写：
+```
+✅ 完成时间：[时间 UTC+8]
+✅ 任务一（清理logo）：完成/失败
+✅ 任务二（邮箱验证）：完成/失败，commit hash：
+✅ 推送状态：成功/失败
+```
+
+---
+
+## 历史任务记录
+
 **时间戳：** 2026-05-08  
 **优先级：** 🔴 立即执行  
 **状态：** 进行中
@@ -1896,3 +2015,125 @@ git push origin main
 ✅ 完成时间：2026-05-12（UTC+8）
 ✅ 任务A（Logo commit）：完成（`5cce348` `feat(brand): add dark mode logo mark SVG + CSS swap`；`CURSOR_TASK` 已另提交 `docs: mark task as completed`。）
 ✅ 推送状态：失败（本环境无 GitHub HTTPS 凭据；请本机执行 `git push origin main`，将本地 `main` 全部推送，含 `5cce348` 与文档 commit。）
+
+---
+
+## 任务 2026-05-17
+
+**优先级：🟠 执行**
+**任务名：清理未提交文件 + 注册邮箱验证**
+
+---
+
+### 背景
+
+距上次提交已过了5天。`git status` 目前有：
+- **已修改未提交**：`WORKFLOW.md`、`images/favicon.svg`、`images/scriptbridge-mark.svg`（Logo 微调）
+- **未追踪文件**：`images/mark-a.svg`、`images/mark-b.svg`、`images/mark-c.svg`、`C-logo-concepts-preview.html`、`logo-preview.html`（Logo 设计草稿，已废弃）；`03 上线推广/` 下有几个小红书内容文件
+
+自定义域名已生效（CNAME 已配置），github.io 已替换。
+
+---
+
+### 📋 任务 A：提交已修改的 Logo 和 WORKFLOW 文件
+
+```bash
+# 只提交真正需要的修改，Logo 草稿不进 git
+git add images/favicon.svg images/scriptbridge-mark.svg WORKFLOW.md
+git commit -m "style(brand): update favicon and logo mark SVG
+
+Minor refinements to favicon.svg and scriptbridge-mark.svg;
+update WORKFLOW.md to reflect current project state"
+```
+
+然后把 Logo 草稿文件加进 `.gitignore`，避免误提交：
+打开 `.gitignore`，在末尾加：
+```
+# Logo design drafts
+images/mark-a.svg
+images/mark-b.svg
+images/mark-c.svg
+C-logo-concepts-preview.html
+logo-preview.html
+```
+
+```bash
+git add .gitignore
+git commit -m "chore: ignore logo design draft files"
+```
+
+---
+
+### 📋 任务 B：注册后邮箱验证
+
+**目标：** 用户注册后收到验证邮件，未验证前无法正常使用平台功能。
+
+**实现方式：**
+
+Supabase Auth 已内置邮箱验证功能，默认是开启的但 `signup.html` 目前直接跳转 dashboard，没有处理验证状态。
+
+**步骤：**
+
+1. **检查 Supabase 后台设置**（Cursor 在代码里确认，不需要手动进后台）
+   - 打开 `js/supabase-client.js`，确认 Supabase project URL（用于定位后台）
+   - 在 Supabase Dashboard → Authentication → Email Templates，确认验证邮件已启用（默认应启用）
+
+2. **修改 `signup.html`**
+   注册成功后不跳转 dashboard，改为显示提示页面：
+   ```
+   "注册成功！请检查邮箱，点击验证链接后即可登录。"
+   （英文：Registration successful! Please check your email to verify your account.）
+   ```
+   不需要新建页面，在 `signup.html` 里用条件渲染显示这个提示即可。
+
+3. **修改 `login.html`**
+   登录时检测用户是否已验证邮箱（`session.user.email_confirmed_at`）：
+   - 已验证 → 正常跳转 dashboard
+   - 未验证 → 显示提示："请先验证邮箱，验证邮件已发送到 xxx@xxx.com。"并提供「重新发送验证邮件」按钮（调用 `supabase.auth.resend({ type: 'signup', email })`）
+
+4. **处理验证回调**
+   Supabase 验证链接默认会带 token 参数，回调 URL 需要在 Supabase Dashboard → Authentication → URL Configuration 里配置（如果自定义域名已生效，回调 URL 改成你的域名，不是 github.io）。
+   
+   在代码层面：`auth.js` 的 `requireAuth()` 已在多个页面使用，在此函数里加一个验证检查：
+   ```javascript
+   // 在 requireAuth() 里，获取 session 后加：
+   if (session && !session.user.email_confirmed_at) {
+     window.location.href = '/login.html?unverified=1';
+     return null;
+   }
+   ```
+
+5. **commit**
+   ```bash
+   git add signup.html login.html js/auth.js
+   git commit -m "feat(auth): add email verification flow on signup
+
+   - signup.html: show verification prompt instead of redirect after registration
+   - login.html: detect unverified users, show resend option
+   - auth.js: redirect unverified users to login with ?unverified=1 param"
+   ```
+
+---
+
+### ⚠️ 注意事项
+
+- Supabase Free tier 每月邮件发送有上限（3封/小时/用户，100封/天总计）——目前用户量极少，够用
+- 如果测试时注册的邮箱收不到验证邮件，检查 Supabase Dashboard → Authentication → Email → 是否开启了「Enable email confirmations」
+- 任务 B 完成后，RJ 用一个新邮箱注册测试一遍，确认流程走通
+
+---
+
+### ✅ 完成后在此写：
+```
+✅ 完成时间：2026-05-19（UTC+8）
+✅ 任务A（提交Logo+WORKFLOW）：完成（1ae2575、4a3e3a3）
+✅ 任务B（邮箱验证）：完成（feat commit 见 git log -1）
+✅ 推送状态：待本机 push
+```
+
+### 执行记录（Cursor）
+
+✅ 完成时间：2026-05-19（UTC+8）
+✅ 任务A（提交Logo+WORKFLOW）：完成 — `1ae2575` style(brand)、`4a3e3a3` chore gitignore
+✅ 任务B（邮箱验证）：完成 — signup 验证提示、login 未验证拦截+重发、auth.js requireAuth 检查
+✅ 推送状态：未在本环境执行（请本机 `git push origin main`）
