@@ -321,8 +321,8 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <!-- 初始化 Supabase -->
-  <script src="js/supabase-client.js"></script>
-  <script src="js/auth.js"></script>
+  <script src="js/supabase-client.js?v=20260724-2"></script>
+  <script src="js/auth.js?v=20260724-2"></script>
 
   <script>
     // 语言切换
@@ -353,7 +353,13 @@
     const resendVerifyBtn = document.getElementById('resend-verify-btn');
 
     function emailRedirectUrl() {
-      return window.location.origin + '/login.html?verified=1';
+      return window.ScriptBridgeData?.url('/login.html?verified=1') || 'https://scriptbridge.cn/login.html?verified=1';
+    }
+
+    function safeNextPath() {
+      const next = new URLSearchParams(window.location.search).get('next');
+      if (!next || !next.startsWith('/') || next.startsWith('//')) return 'dashboard.html';
+      return next;
     }
 
     function showUnverifiedPrompt(email) {
@@ -417,7 +423,7 @@
 
       const { data: { session } } = await window.supabase_client.auth.getSession();
       if (session?.user?.email_confirmed_at) {
-        window.location.href = 'dashboard.html';
+        window.location.href = safeNextPath();
       }
     });
 
@@ -447,7 +453,9 @@
 
     // 显示提示消息
     function showAlert(message, type) {
-      alertContainer.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
+      const safeType = type === 'success' ? 'success' : 'error';
+      const safeMessage = window.ScriptBridgeData?.escapeHtml(message) || String(message);
+      alertContainer.innerHTML = `<div class="alert alert-${safeType}">${safeMessage}</div>`;
       window.scrollTo(0, 0);
     }
 
@@ -504,7 +512,7 @@
 
         // 2 秒后重定向到个人主页
         setTimeout(() => {
-          window.location.href = 'dashboard.html';
+          window.location.href = safeNextPath();
         }, 2000);
 
       } catch (error) {

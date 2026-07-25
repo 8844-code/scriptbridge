@@ -59,14 +59,14 @@ body::before {
   z-index: -1;
   pointer-events: none;
   background:
-    radial-gradient(circle at 12% 8%, rgba(242, 106, 79, 0.08), transparent 32%),
-    radial-gradient(circle at 88% 92%, rgba(77, 118, 97, 0.1), transparent 34%);
+    linear-gradient(180deg, rgba(255, 255, 255, 0.42), transparent 260px),
+    linear-gradient(90deg, rgba(77, 118, 97, 0.06), rgba(242, 106, 79, 0.04));
 }
 
 :root.theme-dark body::before {
   background:
-    radial-gradient(circle at 12% 8%, rgba(255, 122, 95, 0.07), transparent 32%),
-    radial-gradient(circle at 88% 92%, rgba(111, 159, 134, 0.09), transparent 34%);
+    linear-gradient(180deg, rgba(255, 255, 255, 0.03), transparent 260px),
+    linear-gradient(90deg, rgba(111, 159, 134, 0.08), rgba(255, 122, 95, 0.04));
 }
 
 /* ===== 导航栏 ===== */
@@ -607,6 +607,98 @@ html.nav-compact .btn-logout {
   font-weight: 600;
   margin-bottom: 16px;
   color: var(--ink);
+}
+
+/* ===== 2026 product UI pass ===== */
+.auth-card,
+.upload-card,
+.list-card,
+.filters-card,
+.detail-content,
+.metric-card,
+.section-card,
+.script-card,
+.empty-state,
+.error-state,
+.beta-note {
+  border-radius: 8px !important;
+  box-shadow: 0 1px 2px rgba(28, 36, 48, 0.04), 0 10px 24px rgba(28, 36, 48, 0.06) !important;
+}
+
+.filters-card,
+.detail-content,
+.upload-card,
+.list-card,
+.section-card,
+.metric-card {
+  background: rgba(250, 247, 241, 0.96) !important;
+  border-color: rgba(28, 36, 48, 0.14) !important;
+}
+
+.script-card {
+  background: rgba(250, 247, 241, 0.98) !important;
+  border-color: rgba(28, 36, 48, 0.14) !important;
+}
+
+.script-card:hover {
+  border-color: rgba(77, 118, 97, 0.5) !important;
+  box-shadow: 0 10px 26px rgba(28, 36, 48, 0.1) !important;
+  transform: translateY(-1px) !important;
+}
+
+.btn {
+  border-radius: 8px;
+  font-weight: 600;
+}
+
+.btn-primary {
+  background: #3f6b54;
+}
+
+.btn-primary:hover {
+  background: #345a46;
+  transform: translateY(-1px);
+  box-shadow: 0 8px 18px rgba(63, 107, 84, 0.22);
+}
+
+.btn-secondary {
+  background: #f26a4f;
+}
+
+.btn-secondary:hover {
+  background: #dd5b42;
+  transform: translateY(-1px);
+  box-shadow: 0 8px 18px rgba(242, 106, 79, 0.2);
+}
+
+.form-group input:not([type="radio"]):not([type="checkbox"]),
+.form-group select,
+.form-group textarea,
+.filters-card input,
+.filters-card select {
+  border-radius: 8px !important;
+}
+
+.browse-wrapper::before,
+.detail-wrapper::before,
+.upload-wrapper::before,
+.list-wrapper::before,
+.dashboard-wrapper::before,
+.auth-wrapper::before {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.36), transparent 280px),
+    linear-gradient(90deg, rgba(77, 118, 97, 0.05), rgba(242, 106, 79, 0.035)) !important;
+}
+
+:root.theme-dark .browse-wrapper::before,
+:root.theme-dark .detail-wrapper::before,
+:root.theme-dark .upload-wrapper::before,
+:root.theme-dark .list-wrapper::before,
+:root.theme-dark .dashboard-wrapper::before,
+:root.theme-dark .auth-wrapper::before {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.035), transparent 280px),
+    linear-gradient(90deg, rgba(111, 159, 134, 0.08), rgba(255, 122, 95, 0.04)) !important;
 }
 
 /* ===== 容器 ===== */

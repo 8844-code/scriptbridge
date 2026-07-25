@@ -1,5 +1,6 @@
 -- ScriptBridge waitlist table setup
--- Run this once in Supabase SQL Editor.
+-- Legacy bootstrap only. For current production hardening, run:
+-- sql/C-security-hardening.sql
 
 create table if not exists public.waitlist_signups (
   id bigint generated always as identity primary key,
@@ -22,19 +23,11 @@ create policy "waitlist_insert_public"
 on public.waitlist_signups
 for insert
 to anon
-with check (true);
+with check (
+  role in ('creator', 'buyer')
+  and email ~* '^[^@[:space:]]+@[^@[:space:]]+\.[^@[:space:]]+$'
+);
 
--- Allow public website visitors to upsert existing email.
-create policy "waitlist_update_public"
-on public.waitlist_signups
-for update
-to anon
-using (true)
-with check (true);
-
--- Allow public count query from frontend.
-create policy "waitlist_select_public"
-on public.waitlist_signups
-for select
-to anon
-using (true);
+-- Do not allow anonymous select/update here.
+-- Use C-security-hardening.sql RPC functions for duplicate handling, public counts,
+-- and admin exports.

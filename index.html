@@ -1105,7 +1105,7 @@ body:not(.zh) .zh-only { display: none !important; }
       <p class="share-label"><span class="en-only">Know a creator or buyer? Share ScriptBridge →</span><span class="zh-only">认识剧本创作者或买家？帮忙转发一下 →</span></p>
       <div class="share-btns">
         <button class="share-btn" onclick="copyLink()"><span class="en-only">🔗 Copy Link</span><span class="zh-only">🔗 复制链接</span></button>
-        <a class="share-btn" href="https://twitter.com/intent/tweet?text=ScriptBridge%20is%20building%20the%20first%20formal%20Chinese%20script%20IP%20marketplace.%20Worth%20watching%20if%20you%27re%20into%20Chinese%20drama%20content.&url=https%3A%2F%2F8844-code.github.io%2Fscriptbridge%2F" target="_blank">𝕏 Share on X</a>
+        <a class="share-btn" href="https://twitter.com/intent/tweet?text=ScriptBridge%20is%20building%20the%20first%20formal%20Chinese%20script%20IP%20marketplace.%20Worth%20watching%20if%20you%27re%20into%20Chinese%20drama%20content.&url=https%3A%2F%2Fscriptbridge.cn%2F" target="_blank">𝕏 Share on X</a>
       </div>
       <p class="copy-confirm" id="copy-confirm"><span class="en-only">✓ Link copied!</span><span class="zh-only">✓ 链接已复制！</span></p>
     </div>
@@ -1136,7 +1136,7 @@ body:not(.zh) .zh-only { display: none !important; }
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/supabase-client.js"></script>
+<script src="js/supabase-client.js?v=20260724-2"></script>
 <script>
 function setLang(lang) {
   document.body.classList.toggle('zh', lang === 'zh');
@@ -1163,43 +1163,39 @@ function setWaitlistCount(value) {
 
 async function fetchWaitlistCount() {
   if (!window.supabase_client) return;
-  const { count, error } = await window.supabase_client
-    .from('waitlist_signups')
-    .select('*', { count: 'exact', head: true });
+  const { data, error } = await window.supabase_client.rpc('waitlist_public_count');
   if (error) {
     console.warn('Failed to fetch waitlist count:', error.message);
     return;
   }
-  if (typeof count === 'number') {
-    animateCount(Math.max(count, MIN_WAITLIST_COUNT), 650);
+  if (typeof data === 'number') {
+    animateCount(Math.max(data, MIN_WAITLIST_COUNT), 650);
   }
 }
 
 async function saveWaitlistToSupabase(email, role) {
   if (!window.supabase_client) return { alreadyExists: false };
-  const { data: existing, error: checkError } = await window.supabase_client
-    .from('waitlist_signups')
-    .select('id')
-    .eq('email', email)
-    .maybeSingle();
-  if (checkError) {
-    console.warn('Failed to check waitlist duplicate:', checkError.message);
+
+  const rpcResult = await window.supabase_client.rpc('upsert_waitlist_signup', {
+    p_email: email,
+    p_role: role,
+    p_source: 'landing'
+  });
+
+  if (!rpcResult.error) {
+    return { alreadyExists: !!rpcResult.data };
   }
-  if (existing) {
-    return { alreadyExists: true };
-  }
+
   const { error } = await window.supabase_client
     .from('waitlist_signups')
-    .upsert(
-      {
-        email: email,
-        role: role,
-        source: 'landing'
-      },
-      { onConflict: 'email' }
-    );
+    .insert({
+      email: email,
+      role: role,
+      source: 'landing'
+    });
   if (error) {
     console.warn('Failed to save waitlist signup:', error.message);
+    return { alreadyExists: /duplicate|unique/i.test(error.message || '') };
   }
   return { alreadyExists: false };
 }
@@ -1271,7 +1267,8 @@ document.getElementById('email-input').addEventListener('keydown', e => { if (e.
 
 // Copy link
 function copyLink() {
-  navigator.clipboard.writeText('https://8844-code.github.io/scriptbridge/').then(() => {
+  const siteUrl = window.ScriptBridgeData?.SITE_URL || 'https://scriptbridge.cn';
+  navigator.clipboard.writeText(siteUrl).then(() => {
     const el = document.getElementById('copy-confirm');
     el.style.display = 'block';
     setTimeout(() => { el.style.display = 'none'; }, 2500);

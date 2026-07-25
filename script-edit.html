@@ -379,8 +379,8 @@
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="js/supabase-client.js"></script>
-  <script src="js/auth.js"></script>
+  <script src="js/supabase-client.js?v=20260724-2"></script>
+  <script src="js/auth.js?v=20260724-2"></script>
   <script>
     const form = document.getElementById('edit-form');
     const titleInput = document.getElementById('title');
@@ -558,18 +558,12 @@
         .upload(filePath, file, { upsert: false });
       if (error) throw new Error(t('uploadFailed') + error.message);
 
-      const { data: publicData } = window.supabase_client.storage
-        .from('scripts-files')
-        .getPublicUrl(data.path);
-      return publicData.publicUrl || data.path;
+      return data.path;
     }
 
     function extractStoragePath(fileUrl) {
       if (!fileUrl) return null;
-      const marker = '/storage/v1/object/public/scripts-files/';
-      const idx = fileUrl.indexOf(marker);
-      if (idx === -1) return null;
-      return decodeURIComponent(fileUrl.slice(idx + marker.length));
+      return window.ScriptBridgeData?.storagePathFromValue(fileUrl) || null;
     }
 
     async function loadScriptDetail() {
@@ -580,7 +574,7 @@
       }
       const { data, error } = await window.supabase_client
         .from('scripts')
-        .select('*')
+        .select('id, user_id, title, description, script_type, price, rights_type, status, region, rights_years, copyright_confirmed, file_url')
         .eq('id', scriptId)
         .maybeSingle();
       if (error) throw error;
@@ -624,7 +618,7 @@
         if (!session) return;
         currentUser = await getCurrentUser();
         if (!currentUser) {
-          window.location.href = 'login.html';
+          redirectToLoginWithNext();
           return;
         }
         navUserMenu.textContent = currentUser.email || currentUser.id;

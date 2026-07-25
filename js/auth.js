@@ -29,7 +29,7 @@ async function getUserProfile(userId) {
   try {
     const { data, error } = await window.supabase_client
       .from('users')
-      .select('*')
+      .select('user_id, email, role, full_name, bio')
       .eq('user_id', userId)
       .single();
 
@@ -54,16 +54,28 @@ async function logout() {
 }
 
 // 检查用户是否已登录，如果未登录则重定向到登录页
+function loginRedirectUrlWithNext() {
+  const next = window.location.pathname + window.location.search + window.location.hash;
+  return 'login.html?next=' + encodeURIComponent(next);
+}
+
+function redirectToLoginWithNext() {
+  window.location.href = loginRedirectUrlWithNext();
+}
+
 async function requireAuth() {
   const session = await checkAuthStatus();
   if (!session) {
-    window.location.href = 'login.html';
+    redirectToLoginWithNext();
     return null;
   }
   if (!session.user.email_confirmed_at) {
     const email = session.user.email || '';
     await window.supabase_client.auth.signOut();
-    const qs = email ? '?unverified=1&email=' + encodeURIComponent(email) : '?unverified=1';
+    const next = window.location.pathname + window.location.search + window.location.hash;
+    const qs = '?unverified=1'
+      + (email ? '&email=' + encodeURIComponent(email) : '')
+      + '&next=' + encodeURIComponent(next);
     window.location.href = 'login.html' + qs;
     return null;
   }

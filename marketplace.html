@@ -286,7 +286,12 @@
         <select id="type-filter">
           <option value="all" id="type-all-option">All Types</option>
           <option value="短剧剧本">短剧剧本</option>
+          <option value="微短剧">微短剧</option>
+          <option value="网络剧剧本">网络剧剧本</option>
           <option value="电影剧本">电影剧本</option>
+          <option value="综艺脚本">综艺脚本</option>
+          <option value="动漫剧本">动漫剧本</option>
+          <option value="广告脚本">广告脚本</option>
           <option value="小说IP">小说IP</option>
         </select>
 
@@ -324,7 +329,7 @@
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="js/supabase-client.js"></script>
+  <script src="js/supabase-client.js?v=20260724-2"></script>
 
   <script>
     const searchInput = document.getElementById('search-input');
@@ -445,9 +450,21 @@
 
     async function loadAuthors(userIds) {
       if (!userIds.length) return;
+      const rpcResult = await window.supabase_client.rpc('get_public_author_names', {
+        p_user_ids: userIds.map(String)
+      });
+
+      if (!rpcResult.error) {
+        authorMap = {};
+        (rpcResult.data || []).forEach((user) => {
+          authorMap[user.user_id] = user.full_name || t('unknownAuthor');
+        });
+        return;
+      }
+
       const { data, error } = await window.supabase_client
         .from('users')
-        .select('user_id, full_name, email')
+        .select('user_id, full_name')
         .in('user_id', userIds);
 
       if (error) {
@@ -457,16 +474,26 @@
 
       authorMap = {};
       (data || []).forEach((user) => {
-        authorMap[user.user_id] = user.full_name || user.email || t('unknownAuthor');
+        authorMap[user.user_id] = user.full_name || t('unknownAuthor');
       });
     }
 
     async function loadScripts() {
-      const { data, error } = await window.supabase_client
-        .from('scripts')
-        .select('*')
-        .eq('status', 'published')
-        .order('created_at', { ascending: false });
+      let data;
+      let error;
+
+      const rpcResult = await window.supabase_client.rpc('list_published_scripts');
+      if (!rpcResult.error) {
+        data = rpcResult.data;
+      } else {
+        const fallback = await window.supabase_client
+          .from('scripts')
+          .select(window.ScriptBridgeData.PUBLIC_SCRIPT_COLUMNS)
+          .eq('status', 'published')
+          .order('created_at', { ascending: false });
+        data = fallback.data;
+        error = fallback.error;
+      }
 
       if (error) throw error;
 

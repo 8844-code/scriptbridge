@@ -84,8 +84,8 @@
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="js/supabase-client.js"></script>
-  <script src="js/auth.js"></script>
+  <script src="js/supabase-client.js?v=20260724-2"></script>
+  <script src="js/auth.js?v=20260724-2"></script>
   <script>
     const navUserMenu = document.getElementById('nav-user-menu');
     const langEnBtn = document.getElementById('lang-en');
@@ -163,13 +163,13 @@
     async function loadInquiries() {
       const { data: received, error: receivedError } = await window.supabase_client
         .from('purchase_requests')
-        .select('*')
+        .select('id, script_id, script_title, buyer_id, seller_id, message, status, created_at')
         .eq('seller_id', currentUser.id)
         .order('created_at', { ascending: false });
 
       const { data: sent, error: sentError } = await window.supabase_client
         .from('purchase_requests')
-        .select('*')
+        .select('id, script_id, script_title, buyer_id, seller_id, message, status, created_at')
         .eq('buyer_id', currentUser.id)
         .order('created_at', { ascending: false });
 
@@ -199,13 +199,20 @@
     }
 
     async function updateStatus(id, newStatus) {
-      await window.supabase_client
-        .from('purchase_requests')
-        .update({ status: newStatus })
-        .eq('id', id)
-        .eq('seller_id', currentUser.id);
+      const rpcResult = await window.supabase_client.rpc('review_purchase_request', {
+        p_request_id: String(id),
+        p_status: newStatus
+      });
 
-      if (newStatus === 'accepted') {
+      if (rpcResult.error) {
+        await window.supabase_client
+          .from('purchase_requests')
+          .update({ status: newStatus })
+          .eq('id', id)
+          .eq('seller_id', currentUser.id);
+      }
+
+      if (rpcResult.error && newStatus === 'accepted') {
         const req = (_receivedData || []).find((r) => String(r.id) === String(id));
         if (req && req.script_id) {
           const { data: scriptData } = await window.supabase_client
@@ -233,7 +240,7 @@
       const session = await requireAuth();
       if (!session) return;
       currentUser = await getCurrentUser();
-      if (!currentUser) { window.location.href = 'login.html'; return; }
+      if (!currentUser) { redirectToLoginWithNext(); return; }
       navUserMenu.textContent = currentUser.email || currentUser.id;
       const { data: profile } = await window.supabase_client.from('users').select('role').eq('user_id', currentUser.id).maybeSingle();
       currentProfile = profile || null;

@@ -467,8 +467,8 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="js/supabase-client.js"></script>
-  <script src="js/auth.js"></script>
+  <script src="js/supabase-client.js?v=20260724-2"></script>
+  <script src="js/auth.js?v=20260724-2"></script>
 
   <script>
     const loadingState = document.getElementById('loading-state');
@@ -510,35 +510,36 @@
     }
 
     async function loadAuthor(userId) {
-      if (!userId) return { name: 'Unknown author', email: null };
+      if (!userId) return { name: 'Unknown author' };
+      const rpcResult = await window.supabase_client.rpc('get_public_author_names', {
+        p_user_ids: [String(userId)]
+      });
+
+      if (!rpcResult.error && rpcResult.data && rpcResult.data.length) {
+        return { name: rpcResult.data[0].full_name || 'Unknown author' };
+      }
 
       const { data: profileData, error: profileError } = await window.supabase_client
         .from('profiles')
-        .select('full_name, email')
+        .select('full_name')
         .eq('user_id', userId)
         .maybeSingle();
 
       if (!profileError && profileData) {
-        return {
-          name: profileData.full_name || profileData.email || 'Unknown author',
-          email: profileData.email || null
-        };
+        return { name: profileData.full_name || 'Unknown author' };
       }
 
       const { data: userData, error: userError } = await window.supabase_client
         .from('users')
-        .select('full_name, email')
+        .select('full_name')
         .eq('user_id', userId)
         .maybeSingle();
 
       if (userError || !userData) {
-        return { name: 'Unknown author', email: null };
+        return { name: 'Unknown author' };
       }
 
-      return {
-        name: userData.full_name || userData.email || 'Unknown author',
-        email: userData.email || null
-      };
+      return { name: userData.full_name || 'Unknown author' };
     }
 
     function renderScript(script) {
@@ -584,23 +585,12 @@
         licenseRow.style.display = 'none';
       }
 
-      // Setup file buttons
-      if (script.file_url) {
-        const previewBtn = document.getElementById('preview-btn');
-        const downloadBtn = document.getElementById('download-btn');
-
-        previewBtn.href = script.file_url;
-        previewBtn.target = '_blank';
-        previewBtn.rel = 'noopener noreferrer';
-
-        downloadBtn.href = script.file_url;
-        downloadBtn.download = script.title + (getFileExtension(script.file_url) || '.pdf');
-      }
-
       if (currentUser && String(currentUser.id) !== String(script.user_id)) {
         document.getElementById('buy-btn').style.display = 'inline-flex';
+        document.getElementById('contact-btn').style.display = 'inline-flex';
       } else {
         document.getElementById('buy-btn').style.display = 'none';
+        document.getElementById('contact-btn').style.display = 'none';
       }
 
       loadingState.style.display = 'none';
@@ -609,7 +599,7 @@
 
     function getFileExtension(url) {
       try {
-        const path = new URL(url).pathname;
+        const path = String(url).startsWith('http') ? new URL(url).pathname : String(url);
         const match = path.match(/\.[a-z0-9]+$/i);
         return match ? match[0] : '';
       } catch (e) {
@@ -641,18 +631,29 @@
       btn.parentNode.insertBefore(hint, btn.nextSibling);
     }
 
-    async function checkDownloadAccess() {
-      const downloadBtn = document.getElementById('download-btn');
-      const previewBtn = document.getElementById('preview-btn');
-
-      if (!window._currentUser || !window._scriptData) {
-        lockDownload(downloadBtn);
-        lockDownload(previewBtn);
-        return;
+    function unlockDownload(btn, signedUrl, title) {
+      if (!btn || !signedUrl) return;
+      btn.href = signedUrl;
+      btn.target = '_blank';
+      btn.rel = 'noopener noreferrer';
+      btn.style.opacity = '1';
+      btn.style.cursor = 'pointer';
+      btn.style.pointerEvents = 'auto';
+      if (btn.id === 'download-btn') {
+        btn.download = (title || 'script') + (getFileExtension(signedUrl) || '.pdf');
       }
 
+      const next = btn.nextElementSibling;
+      if (next && next.classList.contains('download-lock-hint')) {
+        next.remove();
+      }
+    }
+
+    async function hasDownloadAccess() {
+      if (!window._currentUser || !window._scriptData) return false;
+
       if (String(window._currentUser.id) === String(window._scriptData.user_id)) {
-        return;
+        return true;
       }
 
       const { data: accepted } = await window.supabase_client
@@ -663,12 +664,47 @@
         .eq('status', 'accepted')
         .maybeSingle();
 
-      if (accepted) {
-        return;
+      return !!accepted;
+    }
+
+    async function getAuthorizedFileRef() {
+      const rpcResult = await window.supabase_client.rpc('get_script_file_path', {
+        p_script_id: String(window._scriptData.id)
+      });
+
+      if (!rpcResult.error && rpcResult.data) {
+        return rpcResult.data;
       }
+
+      const { data, error } = await window.supabase_client
+        .from('scripts')
+        .select('file_url')
+        .eq('id', window._scriptData.id)
+        .maybeSingle();
+
+      if (error) throw error;
+      return data?.file_url || null;
+    }
+
+    async function checkDownloadAccess() {
+      const downloadBtn = document.getElementById('download-btn');
+      const previewBtn = document.getElementById('preview-btn');
 
       lockDownload(downloadBtn);
       lockDownload(previewBtn);
+
+      if (!await hasDownloadAccess()) {
+        return;
+      }
+
+      try {
+        const fileRef = await getAuthorizedFileRef();
+        const signedUrl = await window.ScriptBridgeData.createSignedScriptUrl(fileRef);
+        unlockDownload(previewBtn, signedUrl, window._scriptData.title);
+        unlockDownload(downloadBtn, signedUrl, window._scriptData.title);
+      } catch (error) {
+        console.warn('Failed to create authorized file URL:', error.message);
+      }
     }
 
     async function loadScript() {
@@ -680,20 +716,32 @@
       }
 
       try {
-        const { data, error } = await window.supabase_client
-          .from('scripts')
-          .select('*')
-          .eq('id', scriptId)
-          .single();
+        let data;
+        let error;
+
+        const rpcResult = await window.supabase_client.rpc('get_script_detail', {
+          p_script_id: String(scriptId)
+        });
+
+        if (!rpcResult.error) {
+          data = Array.isArray(rpcResult.data) ? rpcResult.data[0] : rpcResult.data;
+        } else {
+          const fallback = await window.supabase_client
+            .from('scripts')
+            .select(window.ScriptBridgeData.PUBLIC_SCRIPT_COLUMNS)
+            .eq('id', scriptId)
+            .single();
+          data = fallback.data;
+          error = fallback.error;
+        }
 
         if (error || !data) {
           showError();
           return;
         }
 
-        const { name: authorName, email: authorEmail } = await loadAuthor(data.user_id);
+        const { name: authorName } = await loadAuthor(data.user_id);
         document.getElementById('script-author').textContent = authorName;
-        window._authorEmail = authorEmail;
 
         renderScript(data);
         await checkDownloadAccess();
@@ -710,7 +758,7 @@
 
         currentUser = await getCurrentUser();
         if (!currentUser) {
-          window.location.href = 'login.html';
+          redirectToLoginWithNext();
           return;
         }
         window._currentUser = currentUser;
@@ -726,13 +774,7 @@
 
     // Setup action buttons
     document.getElementById('contact-btn').addEventListener('click', () => {
-      const email = window._authorEmail;
-      if (email) {
-        window.location.href = 'mailto:' + email;
-      } else {
-        const isZh = localStorage.getItem('scriptbridge_lang') === 'zh' || document.body.classList.contains('zh');
-        alert(isZh ? '暂无创作者联系方式。' : 'No contact info available for this creator.');
-      }
+      openInquiryModal();
     });
 
     function openInquiryModal() {
@@ -755,7 +797,7 @@
       const isZh = document.body.classList.contains('zh');
 
       if (!window._scriptData || !window._currentUser) {
-        window.location.href = 'login.html';
+        redirectToLoginWithNext();
         return;
       }
 
@@ -800,11 +842,11 @@
           notifyBody.append('access_key', WEB3FORMS_KEY);
           notifyBody.append('subject', '[ScriptBridge] 新授权申请：' + (window._scriptData && window._scriptData.title ? window._scriptData.title : '未知作品'));
           notifyBody.append('message',
+            '处理链接：' + (window.ScriptBridgeData?.SITE_URL || 'https://scriptbridge.cn') + '/my-inquiries.html' + '\n' +
             '作品：' + (window._scriptData && window._scriptData.title ? window._scriptData.title : '') + '\n' +
             '买家邮箱：' + (window._currentUser && window._currentUser.email ? window._currentUser.email : '') + '\n' +
             '申请留言：' + (message || '（无留言）') + '\n' +
-            '时间：' + new Date().toLocaleString('zh-CN') + '\n\n' +
-            '请登录平台处理：https://8844-code.github.io/scriptbridge/my-inquiries.html'
+            '时间：' + new Date().toLocaleString('zh-CN')
           );
           fetch('https://api.web3forms.com/submit', { method: 'POST', body: notifyBody });
         } catch (_) {}
@@ -815,7 +857,7 @@
 
     document.getElementById('buy-btn').addEventListener('click', () => {
       if (!window._currentUser) {
-        window.location.href = 'login.html';
+        redirectToLoginWithNext();
         return;
       }
       openInquiryModal();

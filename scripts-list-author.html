@@ -359,8 +359,8 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="js/supabase-client.js"></script>
-  <script src="js/auth.js"></script>
+  <script src="js/supabase-client.js?v=20260724-2"></script>
+  <script src="js/auth.js?v=20260724-2"></script>
 
   <script>
     const alertContainer = document.getElementById('alert-container');
@@ -539,10 +539,7 @@
 
     function extractStoragePath(fileUrl) {
       if (!fileUrl) return null;
-      const marker = '/storage/v1/object/public/scripts-files/';
-      const idx = fileUrl.indexOf(marker);
-      if (idx === -1) return null;
-      return decodeURIComponent(fileUrl.slice(idx + marker.length));
+      return window.ScriptBridgeData?.storagePathFromValue(fileUrl) || null;
     }
 
     async function loadScripts() {
@@ -573,7 +570,7 @@
 
         currentUser = await getCurrentUser();
         if (!currentUser) {
-          window.location.href = 'login.html';
+          redirectToLoginWithNext();
           return;
         }
 
@@ -585,16 +582,28 @@
       }
     }
 
-    function openPreview(scriptId) {
+    async function openPreview(scriptId) {
       const item = scriptsData.find((script) => String(script.id) === String(scriptId));
       if (!item) return;
 
       previewTitle.textContent = item.title || t('untitled');
       previewMeta.textContent = (item.script_type || '—') + '  |  ' + formatPrice(item.price) + '  |  ' + formatDate(item.created_at);
       previewBody.textContent = item.description || t('noDesc');
-      previewFileLink.href = item.file_url || '#';
-      previewFileLink.style.pointerEvents = item.file_url ? 'auto' : 'none';
-      previewFileLink.style.opacity = item.file_url ? '1' : '0.5';
+      previewFileLink.href = '#';
+      previewFileLink.style.pointerEvents = 'none';
+      previewFileLink.style.opacity = '0.5';
+
+      if (item.file_url) {
+        try {
+          const signedUrl = await window.ScriptBridgeData.createSignedScriptUrl(item.file_url);
+          previewFileLink.href = signedUrl || '#';
+          previewFileLink.style.pointerEvents = signedUrl ? 'auto' : 'none';
+          previewFileLink.style.opacity = signedUrl ? '1' : '0.5';
+        } catch (error) {
+          console.warn('Failed to create preview URL:', error.message);
+        }
+      }
+
       previewModal.classList.add('show');
     }
 
